@@ -1,0 +1,79 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --yellow: #FFD600;
+  --yellow-light: #FFF9C4;
+  --yellow-dark: #F9A825;
+  --blue: #1565C0;
+  --blue-mid: #1E88E5;
+  --blue-light: #E3F2FD;
+  --white: #FFFFFF;
+  --gray: #F5F5F5;
+  --text: #1A1A2E;
+  --text-sub: #555;
+}
+body { font-family: 'Segoe UI', 'Malgun Gothic', sans-serif; color: var(--text); background: var(--white); }
+
+/* NAV */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--white);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  padding: 0 5%;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 64px;
+}
+.logo {
+  font-size: 1.5rem; font-weight: 900; color: var(--blue);
+  display: flex; align-items: center; gap: 8px; text-decoration: none;
+}
+.logo span { color: var(--yellow-dark); }
+.logo-icon { font-size: 1.6rem; }
+.nav-links { display: flex; gap: 28px; align-items: center; }
+.nav-links a {
+  text-decoration: none; color: var(--text); font-size: .95rem; font-weight: 500;
+  transition: color .2s;
+}
+.nav-links a:hover { color: var(--blue-mid); }
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.btn-search {
+  background: none; border: none; cursor: pointer; font-size: 1.2rem; color: var(--text-sub);
+  transition: color .2s;
+}
+.btn-search:hover { color: var(--blue-mid); }
+.btn-login {
+  background: var(--blue); color: var(--white); border: none;
+  padding: 8px 20px; border-radius: 50px; font-size: .9rem; font-weight: 600;
+  cursor: pointer; transition: background .2s, transform .1s;
+}
+.btn-login:hover { background: var(--blue-mid); transform: translateY(-1px); }
+
+/* FOOTER */
+footer {
+  background: var(--text); color: #aaa; padding: 32px 5%;
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;
+  font-size: .85rem;
+}
+footer .f-logo { color: var(--white); font-weight: 900; font-size: 1.1rem; }
+footer .f-logo span { color: var(--yellow); }
+
+/* SECTION COMMON */
+section { padding: 70px 5%; }
+.section-title {
+  font-size: 1.8rem; font-weight: 900; color: var(--blue);
+  text-align: center; margin-bottom: 10px;
+}
+.section-sub { text-align: center; color: var(--text-sub); font-size: 1rem; margin-bottom: 40px; }
+
+/* PAGE HEADERS (for subpages) */
+.page-header {
+  background: linear-gradient(135deg, var(--blue-light) 0%, #BBDEFB 100%);
+  padding: 60px 5%;
+  text-align: center;
+}
+.page-header h1 {
+  font-size: 2.2rem; font-weight: 900; color: var(--blue);
+  margin-bottom: 15px;
+}
+.page-header p {
+  font-size: 1.1rem; color: var(--text-sub);
+}

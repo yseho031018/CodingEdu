@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>퀴즈 - CodeEdu</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <style>
+        .quiz-filter-tabs { display: flex; gap: 10px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
+        .filter-tab {
+            padding: 8px 24px; border-radius: 50px; border: 2px solid #eee;
+            background: var(--white); font-size: .95rem; font-weight: 700; cursor: pointer;
+            transition: all .2s; color: var(--text-sub); box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .filter-tab.active, .filter-tab:hover {
+            background: var(--blue); color: var(--white); border-color: var(--blue);
+        }
+        .quiz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
+        .quiz-card {
+            background: var(--white); border-radius: 24px; padding: 28px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            transition: transform .2s, box-shadow .2s;
+            display: flex; flex-direction: column; border: 2px solid transparent;
+        }
+        .quiz-card:hover { transform: translateY(-8px); box-shadow: 0 12px 30px rgba(0,0,0,0.12); border-color: var(--yellow); }
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .quiz-lang { font-weight: 900; font-size: 1.15rem; color: var(--blue); display: flex; align-items: center; gap: 6px; }
+        .quiz-difficulty { padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; color: white; }
+        .difficulty-easy { background: linear-gradient(135deg, #4CAF50, #2E7D32); }
+        .difficulty-medium { background: linear-gradient(135deg, #FFA000, #F57C00); }
+        .difficulty-hard { background: linear-gradient(135deg, #E53935, #C62828); }
+        .quiz-card h3 { font-size: 1.35rem; font-weight: 800; color: var(--text); margin-bottom: 12px; }
+        .quiz-card p { font-size: 0.95rem; color: var(--text-sub); line-height: 1.6; flex-grow: 1; margin-bottom: 24px; }
+        .quiz-meta { display: flex; gap: 16px; font-size: 0.85rem; color: #666; margin-bottom: 24px; flex-wrap: wrap; }
+        .quiz-meta span { display: flex; align-items: center; gap: 4px; }
+        .btn-quiz {
+            display: inline-block; width: 100%; text-align: center;
+            background: var(--blue-light); color: var(--blue); padding: 14px;
+            border-radius: 12px; font-weight: 800; font-size: 1rem; text-decoration: none;
+            transition: all .2s; border: none; cursor: pointer;
+        }
+        .btn-quiz:hover { background: var(--blue); color: var(--white); transform: scale(1.02); }
+    </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+    <a href="/" class="logo">
+        <span class="logo-icon">💻</span>
+        Code<span>Edu</span>
+    </a>
+    <div class="nav-links">
+        <a href="/learn">학습하기</a>
+        <a href="/quiz" style="color: var(--blue-mid); font-weight: 800;">퀴즈</a>
+        <a href="/challenge">챌린지</a>
+        <a href="/community">커뮤니티</a>
+    </div>
+    <div class="nav-right">
+        <button class="btn-search">🔍</button>
+        <button class="btn-login" onclick="alert('로그인 기능은 준비 중입니다.')">로그인</button>
+    </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<header class="page-header">
+    <h1>📝 코딩 퀴즈</h1>
+    <p>배운 내용을 퀴즈로 확인하고 실력을 테스트해보세요!<br>틀려도 괜찮아요, 다시 도전하면 되니까요 😊</p>
+</header>
+
+<!-- QUIZ SECTION -->
+<section style="background: var(--gray);">
+    <div class="quiz-filter-tabs">
+        <button class="filter-tab active" onclick="filterQuiz('all', this)">전체</button>
+        <button class="filter-tab" onclick="filterQuiz('easy', this)">🌱 쉬움</button>
+        <button class="filter-tab" onclick="filterQuiz('medium', this)">🔥 보통</button>
+        <button class="filter-tab" onclick="filterQuiz('hard', this)">🚀 어려움</button>
+    </div>
+
+    <div class="quiz-grid" id="quiz-container">
+        <!-- JavaScript Quiz -->
+        <div class="quiz-card" data-level="easy">
+            <div class="quiz-header">
+                <span class="quiz-lang">⚡ JavaScript</span>
+                <span class="quiz-difficulty difficulty-easy">쉬움</span>
+            </div>
+            <h3>JavaScript 기초 문법</h3>
+            <p>변수 선언, 조건문(if-else), 반복문(for, while) 등 기초 문법을 확실히 익혔는지 테스트합니다.</p>
+            <div class="quiz-meta">
+                <span>📋 10문제</span>
+                <span>⏱️ 15분</span>
+                <span>👥 1,234명 응시</span>
+            </div>
+            <button class="btn-quiz" onclick="alert('퀴즈를 시작합니다!')">퀴즈 시작 ▶</button>
+        </div>
+
+        <!-- Java Quiz -->
+        <div class="quiz-card" data-level="medium">
+            <div class="quiz-header">
+                <span class="quiz-lang">☕ Java</span>
+                <span class="quiz-difficulty difficulty-medium">보통</span>
+            </div>
+            <h3>Java 객체지향 개념</h3>
+            <p>클래스, 상속, 다형성, 캡슐화 등 자바의 핵심인 객체지향(OOP) 개념을 테스트합니다.</p>
+            <div class="quiz-meta">
+                <span>📋 15문제</span>
+                <span>⏱️ 20분</span>
+                <span>👥 987명 응시</span>
+            </div>
+            <button class="btn-quiz" onclick="alert('퀴즈를 시작합니다!')">퀴즈 시작 ▶</button>
+        </div>
+
+        <!-- SQL Quiz -->
+        <div class="quiz-card" data-level="medium">
+            <div class="quiz-header">
+                <span class="quiz-lang">🗄️ SQL</span>
+                <span class="quiz-difficulty difficulty-medium">보통</span>
+            </div>
+            <h3>SQL 쿼리 작성</h3>
+            <p>SELECT, JOIN, GROUP BY, HAVING 등 실무에서 자주 쓰이는 데이터베이스 쿼리 작성을 테스트합니다.</p>
+            <div class="quiz-meta">
+                <span>📋 12문제</span>
+                <span>⏱️ 25분</span>
+                <span>👥 756명 응시</span>
+            </div>
+            <button class="btn-quiz" onclick="alert('퀴즈를 시작합니다!')">퀴즈 시작 ▶</button>
+        </div>
+
+        <!-- HTML/CSS Quiz -->
+        <div class="quiz-card" data-level="easy">
+            <div class="quiz-header">
+                <span class="quiz-lang">🎨 HTML/CSS</span>
+                <span class="quiz-difficulty difficulty-easy">쉬움</span>
+            </div>
+            <h3>HTML & CSS 기초</h3>
+            <p>시맨틱 태그, 선택자, 박스 모델(Margin/Padding), Flexbox 등 웹의 화면을 구성하는 기초를 테스트합니다.</p>
+            <div class="quiz-meta">
+                <span>📋 15문제</span>
+                <span>⏱️ 15분</span>
+                <span>👥 1,567명 응시</span>
+            </div>
+            <button class="btn-quiz" onclick="alert('퀴즈를 시작합니다!')">퀴즈 시작 ▶</button>
+        </div>
+
+        <!-- Python Quiz -->
+        <div class="quiz-card" data-level="easy">
+            <div class="quiz-header">
+                <span class="quiz-lang">🐍 Python</span>
+                <span class="quiz-difficulty difficulty-easy">쉬움</span>
+            </div>
+            <h3>Python 자료구조와 함수</h3>
+            <p>리스트, 튜플, 딕셔너리와 같은 자료구조의 활용법 및 기본적인 함수 작성법을 테스트합니다.</p>
+            <div class="quiz-meta">
+                <span>📋 12문제</span>
+                <span>⏱️ 15분</span>
+                <span>👥 2,345명 응시</span>
+            </div>
+            <button class="btn-quiz" onclick="alert('퀴즈를 시작합니다!')">퀴즈 시작 ▶</button>
+        </div>
+
+        <!-- Spring Boot Quiz -->
+        <div class="quiz-card" data-level="hard">
+            <div class="quiz-header">
+                <span class="quiz-lang">🌱 Spring Boot</span>
+                <span class="quiz-difficulty difficulty-hard">어려움</span>
+            </div>
+            <h3>Spring Boot 심화</h3>
+            <p>의존성 주입(DI), AOP(관점 지향 프로그래밍), Spring Security 구조 등 심화 개념을 테스트합니다.</p>
+            <div class="quiz-meta">
+                <span>📋 20문제</span>
+                <span>⏱️ 30분</span>
+                <span>👥 432명 응시</span>
+            </div>
+            <button class="btn-quiz" onclick="alert('퀴즈를 시작합니다!')">퀴즈 시작 ▶</button>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="f-logo">💻 Code<span>Edu</span></div>
+    <div>© 2025 CodeEdu. 코딩은 즐거워요! 🎈</div>
+    <div>개인정보처리방침 · 이용약관 · 문의하기</div>
+</footer>
+
+<script>
+    function filterQuiz(level, btn) {
+        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.quiz-card').forEach(c => {
+            c.style.display = (level === 'all' || c.dataset.level === level) ? 'flex' : 'none';
+        });
+    }
+</script>
+</body>
+</html>

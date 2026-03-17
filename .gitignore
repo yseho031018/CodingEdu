@@ -1,0 +1,22 @@
+# ===== 보안 파일 =====
+# DB 비밀번호 등 민감 정보 포함 → 절대 Git에 올리지 말 것!
+src/main/resources/application.properties
+
+# 대신 application-example.properties 를 참고용으로 올릴 것
+
+# ===== 빌드 결과물 =====
+target/
+*.class
+*.jar
+*.war
+
+# ===== IDE 설정 =====
+.idea/
+*.iml
+.vscode/
+*.suo
+*.user
+
+# ===== OS =====
+.DS_Store
+Thumbs.db

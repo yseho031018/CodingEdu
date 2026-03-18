@@ -277,6 +277,7 @@
   /* TYPING */
   .typing::after { content: '|'; animation: blink-cursor .7s step-end infinite; }
   @keyframes blink-cursor { 50%{opacity:0} }
+
 </style>
 </head>
 <body>
@@ -300,8 +301,10 @@
         <a href="/register" class="btn-login" style="background:#fff; color:var(--blue); border:2px solid var(--blue); display:inline-block; padding:8px 18px;">회원가입</a>
     </div>
     <div sec:authorize="isAuthenticated()" style="display:flex; align-items:center; gap:12px;">
-        <span style="font-weight:700; font-size:.9rem; color:var(--text);"><span sec:authentication="principal.nickname">사용자</span>님 환영해요!</span>
-        <a href="/settings" class="btn-login" style="background:var(--yellow-dark); color:var(--white); text-decoration:none; display:inline-block; padding:8px 16px;">⚙️ 설정</a>
+<a href="/mypage" style="font-weight:700; font-size:.9rem; color:var(--text); text-decoration:none;">
+    👤 <span sec:authentication="principal.nickname">사용자</span>님
+</a>
+<a href="/settings" class="btn-login" style="background:var(--yellow-dark); color:var(--white); text-decoration:none; display:inline-block; padding:8px 16px;">⚙️ 설정</a>
         <form th:action="@{/logout}" method="post" style="margin:0;">
             <button type="submit" class="btn-login" style="background:#555;">로그아웃</button>
         </form>
@@ -377,70 +380,70 @@
   </div>
 
   <div class="cards-grid" id="lang-cards">
-    <div class="lang-card" data-cat="web">
+    <div class="lang-card" data-cat="web" data-lang="html">
       <div class="lang-icon">🌐</div>
       <div class="lang-name">HTML</div>
       <div class="lang-desc">웹 페이지 구조</div>
       <span class="lang-badge badge-intro">입문</span>
       <div class="lang-bar-wrap"><div class="lang-bar" style="width:90%"></div></div>
     </div>
-    <div class="lang-card" data-cat="web">
+    <div class="lang-card" data-cat="web" data-lang="css">
       <div class="lang-icon">🎨</div>
       <div class="lang-name">CSS</div>
       <div class="lang-desc">웹 페이지 스타일링</div>
       <span class="lang-badge badge-intro">입문</span>
       <div class="lang-bar-wrap"><div class="lang-bar" style="width:85%"></div></div>
     </div>
-    <div class="lang-card" data-cat="web">
+    <div class="lang-card" data-cat="web" data-lang="javascript">
       <div class="lang-icon">⚡</div>
       <div class="lang-name">JavaScript</div>
       <div class="lang-desc">웹 동적 기능</div>
       <span class="lang-badge badge-intro">입문</span>
       <div class="lang-bar-wrap"><div class="lang-bar" style="width:80%"></div></div>
     </div>
-    <div class="lang-card" data-cat="web">
+    <div class="lang-card" data-cat="web" data-lang="typescript">
       <div class="lang-icon">🔷</div>
       <div class="lang-name">TypeScript</div>
       <div class="lang-desc">타입 안전 JavaScript</div>
       <span class="lang-badge badge-basic">초급</span>
       <div class="lang-bar-wrap"><div class="lang-bar" style="width:60%"></div></div>
     </div>
-    <div class="lang-card" data-cat="java">
+    <div class="lang-card" data-cat="java" data-lang="java">
       <div class="lang-icon">☕</div>
       <div class="lang-name">Java</div>
       <div class="lang-desc">객체지향 프로그래밍</div>
       <span class="lang-badge badge-intro">입문</span>
       <div class="lang-bar-wrap"><div class="lang-bar" style="width:75%"></div></div>
     </div>
-    <div class="lang-card" data-cat="java">
+    <div class="lang-card" data-cat="java" data-lang="kotlin">
       <div class="lang-icon">🌱</div>
       <div class="lang-name">Kotlin</div>
       <div class="lang-desc">현대적 JVM 언어</div>
       <span class="lang-badge badge-basic">초급</span>
       <div class="lang-bar-wrap"><div class="lang-bar" style="width:55%"></div></div>
     </div>
-    <div class="lang-card" data-cat="c">
+    <div class="lang-card" data-cat="c" data-lang="c">
       <div class="lang-icon">🔧</div>
       <div class="lang-name">C언어</div>
       <div class="lang-desc">프로그래밍 기초</div>
       <span class="lang-badge badge-intro">입문</span>
       <div class="lang-bar-wrap"><div class="lang-bar" style="width:70%"></div></div>
     </div>
-    <div class="lang-card" data-cat="c">
+    <div class="lang-card" data-cat="c" data-lang="cpp">
       <div class="lang-icon">⚙️</div>
       <div class="lang-name">C++</div>
       <div class="lang-desc">고성능 프로그래밍</div>
       <span class="lang-badge badge-basic">초급</span>
       <div class="lang-bar-wrap"><div class="lang-bar" style="width:50%"></div></div>
     </div>
-    <div class="lang-card" data-cat="mobile">
+    <div class="lang-card" data-cat="mobile" data-lang="swift">
       <div class="lang-icon">📱</div>
       <div class="lang-name">Swift</div>
       <div class="lang-desc">iOS 앱 개발</div>
       <span class="lang-badge badge-basic">초급</span>
       <div class="lang-bar-wrap"><div class="lang-bar" style="width:45%"></div></div>
     </div>
-    <div class="lang-card" data-cat="etc">
+    <div class="lang-card" data-cat="etc" data-lang="python">
       <div class="lang-icon">🐍</div>
       <div class="lang-name">Python</div>
       <div class="lang-desc">AI / 데이터 분석</div>
@@ -491,6 +494,13 @@
 </footer>
 
 <script>
+  // 카드 클릭 → 해당 언어 강의 페이지로 바로 이동
+  document.querySelectorAll('.lang-card').forEach(card => {
+    card.addEventListener('click', () => {
+      location.href = '/learn?lang=' + card.dataset.lang;
+    });
+  });
+
   // 탭 필터
   function filterCards(cat, btn) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));

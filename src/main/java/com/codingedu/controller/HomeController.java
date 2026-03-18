@@ -33,19 +33,6 @@ public class HomeController {
         return "index"; // templates/index.html
     }
 
-    @GetMapping("/learn")
-    public String learn() {
-        return "learn"; // templates/learn.html
-    }
-
-    @GetMapping("/learn/{lang}")
-    public String learnDetail(@PathVariable String lang, Model model) {
-        String safeLang = VALID_LANGS.contains(lang) ? lang : "html";
-        model.addAttribute("lang", safeLang);
-        model.addAttribute("langTitle", safeLang.substring(0, 1).toUpperCase() + safeLang.substring(1));
-        return "learn-detail"; // templates/learn-detail.html
-    }
-
     @GetMapping("/challenge")
     public String challenge() {
         return "challenge"; // templates/challenge.html

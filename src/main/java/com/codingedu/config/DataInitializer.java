@@ -1,8 +1,10 @@
 package com.codingedu.config;
 
 import com.codingedu.entity.Choice;
+import com.codingedu.entity.LessonCourse;
 import com.codingedu.entity.Question;
 import com.codingedu.entity.Quiz;
+import com.codingedu.repository.LessonCourseRepository;
 import com.codingedu.repository.QuizRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -14,14 +16,17 @@ import java.util.List;
 public class DataInitializer implements CommandLineRunner {
 
     private final QuizRepository quizRepository;
+    private final LessonCourseRepository lessonCourseRepository;
 
-    public DataInitializer(QuizRepository quizRepository) {
+    public DataInitializer(QuizRepository quizRepository, LessonCourseRepository lessonCourseRepository) {
         this.quizRepository = quizRepository;
+        this.lessonCourseRepository = lessonCourseRepository;
     }
 
     @Override
     @Transactional
     public void run(String... args) {
+        seedLessonCourses();
         if (quizRepository.count() > 0) return; // 이미 데이터가 있으면 건너뜀
 
         quizRepository.saveAll(List.of(
@@ -151,6 +156,36 @@ public class DataInitializer implements CommandLineRunner {
                         c("@FetchType.EAGER", false), c("fetch = FetchType.LAZY", true), c("@Lazy", false), c("@LazyLoad", false))
                 })
         ));
+    }
+
+    // ── 강의 코스 시드 ────────────────────────────────────────────────
+    private void seedLessonCourses() {
+        if (lessonCourseRepository.count() > 0) return;
+        lessonCourseRepository.saveAll(List.of(
+            lc("html",       "WEB1 - HTML",          "🌐", "web",    "beginner",     8, "웹 페이지의 뼈대를 만드는 마크업 언어"),
+            lc("css",        "WEB2 - CSS",            "🎨", "web",    "beginner",     6, "웹 페이지를 아름답게 꾸미는 스타일 언어"),
+            lc("javascript", "WEB3 - JavaScript",     "⚡", "web",    "beginner",     5, "웹 페이지에 동작을 추가하는 프로그래밍 언어"),
+            lc("typescript", "TypeScript",            "💙", "web",    "intermediate", 5, "타입 안전성을 갖춘 JavaScript 상위 집합"),
+            lc("java",       "Java 기초",             "☕", "java",   "beginner",     5, "객체지향 프로그래밍의 대표 언어"),
+            lc("kotlin",     "Kotlin",                "🟣", "java",   "intermediate", 4, "Android 공식 개발 언어"),
+            lc("c",          "C언어 기초",            "💻", "c",      "beginner",     5, "프로그래밍의 기본을 다지는 시스템 언어"),
+            lc("cpp",        "C++ 기초",              "⚙️", "c",      "intermediate", 4, "고성능 애플리케이션 개발 언어"),
+            lc("swift",      "Swift",                 "🦅", "mobile", "intermediate", 4, "iOS/macOS 앱 개발 언어"),
+            lc("python",     "Python",                "🐍", "etc",    "beginner",     5, "데이터 과학, AI, 웹 개발에 사용되는 언어")
+        ));
+    }
+
+    private LessonCourse lc(String lang, String title, String icon,
+                             String category, String level, int lessonCount, String desc) {
+        LessonCourse c = new LessonCourse();
+        c.setLang(lang);
+        c.setTitle(title);
+        c.setIcon(icon);
+        c.setCategory(category);
+        c.setLevel(level);
+        c.setLessonCount(lessonCount);
+        c.setDescription(desc);
+        return c;
     }
 
     // ── 헬퍼 레코드/메서드 ──────────────────────────────────────────

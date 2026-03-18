@@ -6,204 +6,251 @@
     <title>학습하기 - CodeEdu</title>
     <link rel="stylesheet" href="/css/common.css">
     <style>
-        .curriculum-layout { display: flex; flex-direction: column; gap: 40px; }
-        .lang-section-block { background: var(--white); border-radius: 20px; padding: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #eee; position: relative; overflow: hidden; }
-        .lang-section-block::before { content: ''; position: absolute; top: 0; left: 0; width: 6px; height: 100%; border-radius: 6px 0 0 6px; }
-        .block-web::before { background: linear-gradient(180deg, #1565C0, #64B5F6); }
-        .block-java::before { background: linear-gradient(180deg, #E65100, #FFB74D); }
-        .block-c::before { background: linear-gradient(180deg, #37474F, #90A4AE); }
-
-        .lang-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; border-bottom: 2px dashed #eee; padding-bottom: 20px; }
-        .lang-title-group { display: flex; align-items: center; gap: 16px; }
-        .lang-icon-big { font-size: 3rem; background: var(--gray); width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .lang-title-group h2 { font-size: 1.8rem; font-weight: 900; color: var(--text); margin-bottom: 4px; }
-        .lang-title-group p { font-size: .95rem; color: #777; font-weight: 600; }
-        
-        .progress-box { text-align: right; }
-        .progress-box .pct { font-size: 1.5rem; font-weight: 900; color: var(--blue); }
-        .progress-box .txt { font-size: .8rem; color: var(--text-sub); }
-
-        .curriculum-list { display: flex; flex-direction: column; gap: 16px; }
-        .curr-item { display: flex; gap: 24px; padding: 20px; border-radius: 16px; background: var(--gray); text-decoration: none; color: inherit; transition: all .2s; border: 2px solid transparent; align-items: center; }
-        .curr-item:hover { transform: translateX(8px); background: var(--white); border-color: var(--blue-mid); box-shadow: 0 4px 12px rgba(21,101,192,0.1); }
-        
-        .curr-no { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: var(--white); border-radius: 50%; font-size: 1.2rem; font-weight: 900; color: var(--text-sub); flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
-        .curr-item.completed .curr-no { background: var(--blue); color: var(--white); border-color: var(--blue); }
-        .curr-item.completed:hover { border-color: var(--blue); }
-
-        .curr-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-        .curr-content h4 { font-size: 1.15rem; font-weight: 800; color: var(--text); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
-        .curr-item:hover .curr-content h4 { color: var(--blue); }
-        .curr-content p { font-size: .9rem; color: #666; }
-        
-        .curr-status { font-size: .85rem; font-weight: 700; padding: 6px 14px; border-radius: 50px; background: var(--white); color: var(--text-sub); }
-        .curr-item.completed .curr-status { background: #E8F5E9; color: #2E7D32; }
-        .curr-status.active { background: #E3F2FD; color: #1565C0; border: 1px solid #BBDEFB; }
-
-        @media (max-width: 768px) {
-            .lang-header { flex-direction: column; align-items: flex-start; gap: 20px; }
-            .progress-box { text-align: left; }
-            .curr-item { flex-direction: column; align-items: flex-start; gap: 12px; }
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 44px; flex-wrap: wrap; }
+        .filter-btn {
+            padding: 8px 20px; border-radius: 50px; border: 2px solid #e8e8e8;
+            background: #fff; font-size: .875rem; font-weight: 600; color: var(--text-sub);
+            cursor: pointer; transition: all .2s;
         }
+        .filter-btn:hover { border-color: var(--blue-mid); color: var(--blue-mid); }
+        .filter-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+        .learn-section { margin-bottom: 60px; }
+        .learn-section.hidden { display: none; }
+        .category-title {
+            font-size: 1.25rem; font-weight: 800; color: var(--text);
+            margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--blue-light);
+        }
+
+        .language-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+        .language-card {
+            display: block; text-decoration: none; background: #fff;
+            border: 2px solid #e8e8e8; border-radius: 16px; padding: 24px 20px;
+            transition: all .2s; color: var(--text); position: relative;
+        }
+        .language-card:hover { border-color: var(--blue-mid); box-shadow: 0 6px 24px rgba(21,101,192,.12); transform: translateY(-4px); }
+
+        .lang-icon {
+            width: 56px; height: 56px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; font-weight: 900; margin-bottom: 14px;
+        }
+        .lang-icon.html    { background: #FFF3E0; color: #E64A19; }
+        .lang-icon.css     { background: #E3F2FD; color: #1565C0; }
+        .lang-icon.js      { background: #FFFDE7; color: #F57F17; }
+        .lang-icon.ts      { background: #E8EAF6; color: #3949AB; }
+        .lang-icon.java    { background: #FFF3E0; color: #BF360C; }
+        .lang-icon.kotlin  { background: #E8F5E9; color: #2E7D32; }
+        .lang-icon.c       { background: #E3F2FD; color: #0D47A1; }
+        .lang-icon.cpp     { background: #E8EAF6; color: #283593; }
+        .lang-icon.swift   { background: #FFF3E0; color: #E65100; }
+        .lang-icon.python  { background: #E8F5E9; color: #1B5E20; }
+
+        .language-card h3 { font-size: 1rem; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+        .language-card p { font-size: .82rem; color: var(--text-sub); line-height: 1.5; margin-bottom: 14px; }
+        .card-meta { display: flex; align-items: center; justify-content: space-between; }
+        .lang-level { font-size: .72rem; font-weight: 700; padding: 3px 10px; border-radius: 50px; }
+        .lang-level.beginner     { background: #E8F5E9; color: #2E7D32; }
+        .lang-level.intermediate { background: #E3F2FD; color: #1565C0; }
+        .lang-level.advanced     { background: #FBE9E7; color: #BF360C; }
+        .lesson-count { font-size: .78rem; color: #aaa; font-weight: 600; }
+
+        /* 진도 바 (로그인 시) */
+        .progress-mini { margin-top: 12px; }
+        .progress-mini-bar { height: 4px; background: #eee; border-radius: 10px; overflow: hidden; }
+        .progress-mini-fill { height: 100%; background: var(--blue); border-radius: 10px; }
+        .progress-mini-label { font-size: .7rem; color: #888; margin-top: 4px; }
+
+        @media (max-width: 768px) { .language-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; } }
     </style>
 </head>
 <body>
 
 <!-- NAV -->
-<nav>
-    <a href="/" class="logo">
-        <span class="logo-icon">💻</span>
-        Code<span>Edu</span>
-    </a>
-    <div class="nav-links">
-        <a href="/learn" style="color: var(--blue-mid); font-weight: 800;">학습하기</a>
-        <a href="/quiz">퀴즈</a>
-        <a href="/challenge">챌린지</a>
-        <a href="/community">커뮤니티</a>
-    </div>
-    <div class="nav-right" style="display:flex; align-items:center; gap:12px;">
-        <button class="btn-search">🔍</button>
-        <div sec:authorize="isAnonymous()">
-            <a href="/login" class="btn-login" style="text-decoration:none; display:inline-block;">로그인</a>
-            <a href="/register" class="btn-login" style="background:#fff; color:var(--blue); border:2px solid var(--blue); display:inline-block; padding:8px 18px;">회원가입</a>
-        </div>
-        <div sec:authorize="isAuthenticated()" style="display:flex; align-items:center; gap:12px;">
-            <span style="font-weight:700; font-size:.9rem; color:var(--text);"><span sec:authentication="principal.nickname">사용자</span>님 환영해요!</span>
-            <form th:action="@{/logout}" method="post" style="margin:0;">
-                <button type="submit" class="btn-login" style="background:#555;">로그아웃</button>
-            </form>
-        </div>
-    </div>
-</nav>
+<nav th:replace="~{index :: nav}"></nav>
 
 <!-- PAGE HEADER -->
-<header class="page-header" style="background: linear-gradient(135deg, #E3F2FD 0%, #90CAF9 100%); padding-bottom: 40px;">
-    <h1>📚 학습 커리큘럼</h1>
-    <p>배우고 싶은 언어를 선택해서 차근차근 단계별로 따라오세요.<br>코딩은 마라톤입니다. 매일 조금씩 성장해봅시다!</p>
-</header>
+<section class="page-header">
+    <h1>📚 학습하기</h1>
+    <p>원하는 프로그래밍 언어를 선택하고 학습을 시작하세요!</p>
+</section>
 
-<section style="background: var(--gray);">
-    <div class="curriculum-layout">
-        
-        <!-- WEB BLOCK -->
-        <article class="lang-section-block block-web">
-            <div class="lang-header">
-                <div class="lang-title-group">
-                    <div class="lang-icon-big">🌐</div>
-                    <div>
-                        <h2>프론트엔드 기초 (HTML/CSS/JS)</h2>
-                        <p>웹 페이지를 직접 그리고 화려하게 움직이게 만듭니다.</p>
-                    </div>
-                </div>
-                <div class="progress-box">
-                    <div class="pct">40%</div>
-                    <div class="txt">2 / 5장 완료</div>
-                </div>
-            </div>
+<!-- MAIN CONTENT -->
+<section style="padding: 48px 5%;">
 
-            <div class="curriculum-list">
-                <a href="#" class="curr-item completed">
-                    <div class="curr-no">✔️</div>
-                    <div class="curr-content">
-                        <h4>1장. HTML 뼈대 잡기</h4>
-                        <p>웹의 구조를 이해하고 시맨틱 태그를 활용해 문서를 구성합니다.</p>
-                    </div>
-                    <div class="curr-status">완료됨</div>
-                </a>
-                
-                <a href="#" class="curr-item completed">
-                    <div class="curr-no">✔️</div>
-                    <div class="curr-content">
-                        <h4>2장. CSS 예쁘게 꾸미기</h4>
-                        <p>선택자, 색상, 그리고 Flexbox를 사용해 요소를 화면에 배치합니다.</p>
-                    </div>
-                    <div class="curr-status">완료됨</div>
-                </a>
-
-                <a href="#" class="curr-item">
-                    <div class="curr-no">3</div>
-                    <div class="curr-content">
-                        <h4>3장. JavaScript 기본 문법</h4>
-                        <p>변수, 조건문, 반복문을 통해 자바스크립트의 기본 로직을 구현합니다.</p>
-                    </div>
-                    <div class="curr-status active">학습 시작하기 ▶</div>
-                </a>
-
-                <a href="#" class="curr-item" style="opacity: 0.7;">
-                    <div class="curr-no">4</div>
-                    <div class="curr-content">
-                        <h4>4장. DOM 조작과 이벤트</h4>
-                        <p>버튼을 클릭했을 때 화면이 바뀌도록 DOM(문서 객체 모델)을 조작합니다.</p>
-                    </div>
-                    <div class="curr-status">잠김 (3장 필요)</div>
-                </a>
-
-                <a href="#" class="curr-item" style="opacity: 0.7;">
-                    <div class="curr-no">5</div>
-                    <div class="curr-content">
-                        <h4>5장. 미니 웹앱 클론 코딩</h4>
-                        <p>지금까지 배운 것을 총동원하여 간단한 투두리스트 기능을 완성합니다.</p>
-                    </div>
-                    <div class="curr-status">잠김 (4장 필요)</div>
-                </a>
-            </div>
-        </article>
-
-        <!-- JAVA BLOCK -->
-        <article class="lang-section-block block-java">
-            <div class="lang-header">
-                <div class="lang-title-group">
-                    <div class="lang-icon-big">☕</div>
-                    <div>
-                        <h2>자바 (Java) 객체지향의 이해</h2>
-                        <p>스프링 백엔드 개발자로 가기 위한 필수 자바 코어 마스터!</p>
-                    </div>
-                </div>
-                <div class="progress-box">
-                    <div class="pct" style="color:#FFF;">0%</div>
-                    <div class="txt" style="color:#FFF;">0 / 3장 완료</div>
-                </div>
-            </div>
-
-            <div class="curriculum-list">
-                <a href="#" class="curr-item">
-                    <div class="curr-no">1</div>
-                    <div class="curr-content">
-                        <h4>1장. 자바프로그래밍 첫걸음</h4>
-                        <p>JVM 구조를 이해하고 Hello World 출력부터 변수, 데이터 타입 맛보기.</p>
-                    </div>
-                    <div class="curr-status active">학습 시작하기 ▶</div>
-                </a>
-                
-                <a href="#" class="curr-item" style="opacity: 0.7;">
-                    <div class="curr-no">2</div>
-                    <div class="curr-content">
-                        <h4>2장. 제어문(Control Flow)</h4>
-                        <p>If, Switch문을 활용한 프로그램의 흐름 제어, 그리고 반복문 심화.</p>
-                    </div>
-                    <div class="curr-status">잠김 (1장 필요)</div>
-                </a>
-
-                <a href="#" class="curr-item" style="opacity: 0.7;">
-                    <div class="curr-no">3</div>
-                    <div class="curr-content">
-                        <h4>3장. 클래스와 객체(OOP)</h4>
-                        <p>객체지향의 4대 요소(캡슐화, 상속, 다형성, 추상화)를 코드로 완벽하게 실습합니다.</p>
-                    </div>
-                    <div class="curr-status">잠김 (2장 필요)</div>
-                </a>
-            </div>
-        </article>
-
+    <!-- 카테고리 필터 -->
+    <div class="filter-bar">
+        <button class="filter-btn active" data-filter="all">전체</button>
+        <button class="filter-btn" data-filter="web">🌐 웹 개발</button>
+        <button class="filter-btn" data-filter="java">☕ Java 계열</button>
+        <button class="filter-btn" data-filter="c">💻 C 계열</button>
+        <button class="filter-btn" data-filter="mobile">📱 모바일</button>
+        <button class="filter-btn" data-filter="etc">🔧 기타 언어</button>
     </div>
+
+    <!-- 카테고리별 섹션 -->
+    <th:block th:with="
+        webCourses    = ${courses.?[category == 'web']},
+        javaCourses   = ${courses.?[category == 'java']},
+        cCourses      = ${courses.?[category == 'c']},
+        mobileCourses = ${courses.?[category == 'mobile']},
+        etcCourses    = ${courses.?[category == 'etc']}
+    ">
+
+        <!-- 웹 개발 -->
+        <div class="learn-section" data-category="web" th:if="${!webCourses.isEmpty()}">
+            <h2 class="category-title">🌐 웹 개발</h2>
+            <div class="language-grid">
+                <a th:each="c : ${webCourses}"
+                   th:href="@{/learn/{lang}(lang=${c.lang})}"
+                   class="language-card">
+                    <div class="lang-icon" th:classappend="${c.lang == 'javascript' ? 'js' : c.lang == 'typescript' ? 'ts' : c.lang}"
+                         th:text="${c.icon}"></div>
+                    <h3 th:text="${c.title}">강의명</h3>
+                    <p th:text="${c.description}">설명</p>
+                    <div class="card-meta">
+                        <span class="lang-level" th:classappend="${c.level}"
+                              th:text="${c.level == 'beginner' ? '입문' : c.level == 'intermediate' ? '초급' : '중급'}">입문</span>
+                        <span class="lesson-count" th:text="'📖 ' + ${c.lessonCount} + '강'">📖 5강</span>
+                    </div>
+                    <!-- 로그인 시 진도 표시 -->
+                    <div class="progress-mini" th:if="${completedCounts != null}"
+                         th:with="done=${completedCounts[c.lang] ?: 0}">
+                        <div class="progress-mini-bar">
+                            <div class="progress-mini-fill"
+                                 th:style="'width:' + ${c.lessonCount > 0 ? done * 100 / c.lessonCount : 0} + '%'"></div>
+                        </div>
+                        <div class="progress-mini-label" th:text="${done} + '/' + ${c.lessonCount} + ' 완료'">0/5 완료</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Java 계열 -->
+        <div class="learn-section" data-category="java" th:if="${!javaCourses.isEmpty()}">
+            <h2 class="category-title">☕ Java 계열</h2>
+            <div class="language-grid">
+                <a th:each="c : ${javaCourses}"
+                   th:href="@{/learn/{lang}(lang=${c.lang})}"
+                   class="language-card">
+                    <div class="lang-icon" th:classappend="${c.lang}" th:text="${c.icon}"></div>
+                    <h3 th:text="${c.title}">강의명</h3>
+                    <p th:text="${c.description}">설명</p>
+                    <div class="card-meta">
+                        <span class="lang-level" th:classappend="${c.level}"
+                              th:text="${c.level == 'beginner' ? '입문' : c.level == 'intermediate' ? '초급' : '중급'}">초급</span>
+                        <span class="lesson-count" th:text="'📖 ' + ${c.lessonCount} + '강'">📖 4강</span>
+                    </div>
+                    <div class="progress-mini" th:if="${completedCounts != null}"
+                         th:with="done=${completedCounts[c.lang] ?: 0}">
+                        <div class="progress-mini-bar">
+                            <div class="progress-mini-fill"
+                                 th:style="'width:' + ${c.lessonCount > 0 ? done * 100 / c.lessonCount : 0} + '%'"></div>
+                        </div>
+                        <div class="progress-mini-label" th:text="${done} + '/' + ${c.lessonCount} + ' 완료'">0/4 완료</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- C 계열 -->
+        <div class="learn-section" data-category="c" th:if="${!cCourses.isEmpty()}">
+            <h2 class="category-title">💻 C 계열</h2>
+            <div class="language-grid">
+                <a th:each="c : ${cCourses}"
+                   th:href="@{/learn/{lang}(lang=${c.lang})}"
+                   class="language-card">
+                    <div class="lang-icon" th:classappend="${c.lang}" th:text="${c.icon}"></div>
+                    <h3 th:text="${c.title}">강의명</h3>
+                    <p th:text="${c.description}">설명</p>
+                    <div class="card-meta">
+                        <span class="lang-level" th:classappend="${c.level}"
+                              th:text="${c.level == 'beginner' ? '입문' : c.level == 'intermediate' ? '초급' : '중급'}">입문</span>
+                        <span class="lesson-count" th:text="'📖 ' + ${c.lessonCount} + '강'">📖 5강</span>
+                    </div>
+                    <div class="progress-mini" th:if="${completedCounts != null}"
+                         th:with="done=${completedCounts[c.lang] ?: 0}">
+                        <div class="progress-mini-bar">
+                            <div class="progress-mini-fill"
+                                 th:style="'width:' + ${c.lessonCount > 0 ? done * 100 / c.lessonCount : 0} + '%'"></div>
+                        </div>
+                        <div class="progress-mini-label" th:text="${done} + '/' + ${c.lessonCount} + ' 완료'">0/5 완료</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 모바일 -->
+        <div class="learn-section" data-category="mobile" th:if="${!mobileCourses.isEmpty()}">
+            <h2 class="category-title">📱 모바일 개발</h2>
+            <div class="language-grid">
+                <a th:each="c : ${mobileCourses}"
+                   th:href="@{/learn/{lang}(lang=${c.lang})}"
+                   class="language-card">
+                    <div class="lang-icon" th:classappend="${c.lang}" th:text="${c.icon}"></div>
+                    <h3 th:text="${c.title}">강의명</h3>
+                    <p th:text="${c.description}">설명</p>
+                    <div class="card-meta">
+                        <span class="lang-level" th:classappend="${c.level}"
+                              th:text="${c.level == 'beginner' ? '입문' : c.level == 'intermediate' ? '초급' : '중급'}">초급</span>
+                        <span class="lesson-count" th:text="'📖 ' + ${c.lessonCount} + '강'">📖 4강</span>
+                    </div>
+                    <div class="progress-mini" th:if="${completedCounts != null}"
+                         th:with="done=${completedCounts[c.lang] ?: 0}">
+                        <div class="progress-mini-bar">
+                            <div class="progress-mini-fill"
+                                 th:style="'width:' + ${c.lessonCount > 0 ? done * 100 / c.lessonCount : 0} + '%'"></div>
+                        </div>
+                        <div class="progress-mini-label" th:text="${done} + '/' + ${c.lessonCount} + ' 완료'">0/4 완료</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 기타 -->
+        <div class="learn-section" data-category="etc" th:if="${!etcCourses.isEmpty()}">
+            <h2 class="category-title">🔧 기타 언어</h2>
+            <div class="language-grid">
+                <a th:each="c : ${etcCourses}"
+                   th:href="@{/learn/{lang}(lang=${c.lang})}"
+                   class="language-card">
+                    <div class="lang-icon" th:classappend="${c.lang}" th:text="${c.icon}"></div>
+                    <h3 th:text="${c.title}">강의명</h3>
+                    <p th:text="${c.description}">설명</p>
+                    <div class="card-meta">
+                        <span class="lang-level" th:classappend="${c.level}"
+                              th:text="${c.level == 'beginner' ? '입문' : c.level == 'intermediate' ? '초급' : '중급'}">입문</span>
+                        <span class="lesson-count" th:text="'📖 ' + ${c.lessonCount} + '강'">📖 5강</span>
+                    </div>
+                    <div class="progress-mini" th:if="${completedCounts != null}"
+                         th:with="done=${completedCounts[c.lang] ?: 0}">
+                        <div class="progress-mini-bar">
+                            <div class="progress-mini-fill"
+                                 th:style="'width:' + ${c.lessonCount > 0 ? done * 100 / c.lessonCount : 0} + '%'"></div>
+                        </div>
+                        <div class="progress-mini-label" th:text="${done} + '/' + ${c.lessonCount} + ' 완료'">0/5 완료</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </th:block>
+
 </section>
 
 <!-- FOOTER -->
-<footer>
-    <div class="f-logo">💻 Code<span>Edu</span></div>
-    <div>© 2025 CodeEdu. 코딩은 즐거워요! 🎈</div>
-    <div>개인정보처리방침 · 이용약관 · 문의하기</div>
-</footer>
+<footer th:replace="~{index :: footer}"></footer>
 
+<script>
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            const filter = this.dataset.filter;
+            document.querySelectorAll('.learn-section').forEach(sec => {
+                sec.classList.toggle('hidden', filter !== 'all' && sec.dataset.category !== filter);
+            });
+        });
+    });
+</script>
 </body>
 </html>

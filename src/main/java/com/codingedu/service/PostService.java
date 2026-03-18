@@ -78,6 +78,14 @@ public class PostService {
         postRepository.save(post);
     }
 
+    public java.util.List<Post> getRecentPostsByUser(User user) {
+        return postRepository.findTop5ByAuthorOrderByCreatedAtDesc(user);
+    }
+
+    public int countPostsByUser(User user) {
+        return postRepository.countByAuthor(user);
+    }
+
     @Transactional
     public void decrementCommentCount(Post post) {
         post.setCommentCount(Math.max(0, post.getCommentCount() - 1));

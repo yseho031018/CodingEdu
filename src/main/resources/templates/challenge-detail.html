@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${challenge.title} + ' - CodeEdu'">챌린지 상세 - CodeEdu</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <style>
+        .detail-layout {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 32px;
+            padding: 48px 5%;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* 메인 */
+        .detail-card {
+            background: #fff;
+            border-radius: 24px;
+            padding: 40px;
+            border: 2px solid #e8e8e8;
+        }
+        .detail-card.featured { background: linear-gradient(135deg, #FFFDE7, #FFF9C4); border-color: var(--yellow-dark); }
+
+        .detail-header { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 28px; }
+        .detail-icon { font-size: 4rem; flex-shrink: 0; }
+        .detail-title-block h1 { font-size: 1.8rem; font-weight: 900; color: var(--text); margin-bottom: 8px; }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 14px; border-radius: 50px;
+            font-size: .8rem; font-weight: 700;
+        }
+        .status-active { background: #E8F5E9; color: #2E7D32; }
+        .status-upcoming { background: #E3F2FD; color: #1565C0; }
+        .status-joined { background: #E8F5E9; color: #2E7D32; margin-left: 8px; }
+
+        .detail-description {
+            font-size: 1rem; color: var(--text-sub); line-height: 1.8;
+            margin-bottom: 32px; padding: 20px; background: rgba(255,255,255,0.7);
+            border-radius: 12px; border-left: 4px solid var(--blue-mid);
+        }
+
+        .stats-row {
+            display: flex; gap: 24px; margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+        .stat-box {
+            flex: 1; min-width: 100px;
+            background: #f8f9ff; border-radius: 16px; padding: 20px;
+            text-align: center; border: 1px solid #e0e0ff;
+        }
+        .stat-box .num { font-size: 2rem; font-weight: 900; color: var(--blue); }
+        .stat-box .lbl { font-size: .82rem; color: #888; margin-top: 4px; }
+
+        /* 진행 바 (active) */
+        .progress-section { margin-bottom: 32px; }
+        .progress-label { display: flex; justify-content: space-between; font-size: .88rem; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; }
+        .big-bar { height: 14px; background: #eee; border-radius: 10px; overflow: hidden; }
+        .big-bar-fill { height: 100%; background: linear-gradient(90deg, var(--blue-mid), var(--yellow-dark)); border-radius: 10px; transition: width .5s; }
+        .progress-msg { margin-top: 8px; font-size: .88rem; font-weight: 700; color: #555; text-align: right; }
+
+        /* 일정 정보 */
+        .date-info { display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; }
+        .date-chip {
+            background: var(--blue-light); color: var(--blue);
+            padding: 8px 16px; border-radius: 50px;
+            font-size: .85rem; font-weight: 700;
+        }
+
+        /* 사이드바 */
+        .side-card {
+            background: #fff;
+            border-radius: 24px;
+            padding: 32px 28px;
+            border: 2px solid #e8e8e8;
+            position: sticky;
+            top: 80px;
+            height: fit-content;
+        }
+        .side-card h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 20px; color: var(--text); }
+
+        .btn-join {
+            display: block; width: 100%; padding: 16px;
+            background: var(--blue); color: #fff;
+            border: none; border-radius: 14px;
+            font-size: 1.05rem; font-weight: 800;
+            cursor: pointer; transition: all .2s; text-align: center;
+            text-decoration: none; margin-bottom: 12px;
+        }
+        .btn-join:hover { background: var(--blue-mid); transform: translateY(-2px); box-shadow: 0 6px 18px rgba(21,101,192,.3); }
+        .btn-join.joined { background: #4CAF50; }
+        .btn-join.joined:hover { background: #388E3C; }
+        .btn-leave {
+            display: block; width: 100%; padding: 12px;
+            background: #fff; color: #888;
+            border: 2px solid #ddd; border-radius: 14px;
+            font-size: .9rem; font-weight: 700;
+            cursor: pointer; transition: all .2s; text-align: center;
+            text-decoration: none; margin-bottom: 12px;
+        }
+        .btn-leave:hover { border-color: #E53935; color: #E53935; }
+        .btn-lock-side {
+            display: block; width: 100%; padding: 16px;
+            background: #f5f5f5; color: #aaa;
+            border: none; border-radius: 14px;
+            font-size: 1rem; font-weight: 700; text-align: center;
+            text-decoration: none; margin-bottom: 12px;
+        }
+        .side-info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0; font-size: .88rem; }
+        .side-info-row:last-child { border-bottom: none; }
+        .side-info-label { color: #888; }
+        .side-info-value { font-weight: 700; color: var(--text); }
+
+        .back-link { display: inline-flex; align-items: center; gap: 6px; color: #888; text-decoration: none; font-size: .9rem; margin-bottom: 28px; }
+        .back-link:hover { color: var(--blue); }
+
+        @media (max-width: 768px) {
+            .detail-layout { grid-template-columns: 1fr; }
+            .side-card { position: static; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav th:replace="~{index :: nav}"></nav>
+
+<div style="padding: 24px 5% 0; max-width: 1100px; margin: 0 auto;">
+    <a href="/challenge" class="back-link">← 챌린지 목록으로</a>
+</div>
+
+<div class="detail-layout">
+
+    <!-- 메인 정보 -->
+    <main>
+        <div class="detail-card" th:classappend="${challenge.featured ? 'featured' : ''}">
+            <div class="detail-header">
+                <div class="detail-icon" th:text="${challenge.icon}">🚀</div>
+                <div class="detail-title-block">
+                    <h1 th:text="${challenge.title}">챌린지명</h1>
+                    <span class="status-badge"
+                          th:classappend="${challenge.status == 'active' ? 'status-active' : 'status-upcoming'}"
+                          th:text="${challenge.status == 'active' ? '🟢 진행중' : '🔵 오픈 예정'}">진행중</span>
+                    <span class="status-joined" th:if="${joined}">✔ 참여중</span>
+                </div>
+            </div>
+
+            <p class="detail-description" th:text="${challenge.description}">설명</p>
+
+            <!-- 통계 -->
+            <div class="stats-row">
+                <div class="stat-box">
+                    <div class="num" th:text="${participantCount}">0</div>
+                    <div class="lbl">참여자</div>
+                </div>
+                <div class="stat-box" th:if="${challenge.status == 'active'}">
+                    <div class="num" th:text="${daysLeft}">0</div>
+                    <div class="lbl">남은 일수</div>
+                </div>
+                <div class="stat-box" th:if="${challenge.status == 'upcoming'}">
+                    <div class="num" th:text="'D-' + ${daysLeft}">D-0</div>
+                    <div class="lbl">오픈까지</div>
+                </div>
+                <div class="stat-box">
+                    <div class="num" th:text="${challenge.totalTasks}">30</div>
+                    <div class="lbl">총 미션</div>
+                </div>
+                <div class="stat-box" th:if="${challenge.status == 'active'}">
+                    <div class="num" th:text="${progressPct} + '%'">0%</div>
+                    <div class="lbl">진행률</div>
+                </div>
+            </div>
+
+            <!-- 진행 바 (active만) -->
+            <div class="progress-section" th:if="${challenge.status == 'active'}">
+                <div class="progress-label">
+                    <span>챌린지 진행 현황</span>
+                    <span th:text="${progressPct} + '%'">0%</span>
+                </div>
+                <div class="big-bar">
+                    <div class="big-bar-fill" th:style="'width:' + ${progressPct} + '%'"></div>
+                </div>
+                <div class="progress-msg"
+                     th:text="${challenge.progressMessage != null ? challenge.progressMessage : '지금 바로 시작하세요! 🚀'}"></div>
+            </div>
+
+            <!-- 일정 -->
+            <div class="date-info">
+                <span class="date-chip"
+                      th:text="'📅 시작: ' + ${#temporals.format(challenge.startDate, 'yyyy.MM.dd')}">📅 시작</span>
+                <span class="date-chip" th:if="${challenge.endDate != null}"
+                      th:text="'🏁 종료: ' + ${#temporals.format(challenge.endDate, 'yyyy.MM.dd')}">🏁 종료</span>
+                <span class="date-chip"
+                      th:text="'⏱ 기간: ' + ${challenge.totalTasks} + '일'">⏱ 기간</span>
+            </div>
+        </div>
+    </main>
+
+    <!-- 사이드바 -->
+    <aside>
+        <div class="side-card">
+            <h3>참여 정보</h3>
+
+            <!-- 로그인 + active + 미참여 -->
+            <th:block sec:authorize="isAuthenticated()">
+                <th:block th:if="${challenge.status == 'active'}">
+                    <th:block th:if="${!joined}">
+                        <form th:action="@{/challenge/{id}/join(id=${challenge.id})}" method="post">
+                            <button type="submit" class="btn-join">🎯 참여하기</button>
+                        </form>
+                    </th:block>
+                    <th:block th:if="${joined}">
+                        <span class="btn-join joined" style="display:block;">✅ 참여중입니다!</span>
+                        <form th:action="@{/challenge/{id}/leave(id=${challenge.id})}" method="post">
+                            <button type="submit" class="btn-leave">참여 취소</button>
+                        </form>
+                    </th:block>
+                </th:block>
+                <th:block th:if="${challenge.status == 'upcoming'}">
+                    <span class="btn-lock-side">🔵 아직 오픈 전이에요</span>
+                </th:block>
+            </th:block>
+
+            <!-- 비로그인 -->
+            <th:block sec:authorize="isAnonymous()">
+                <a href="/login" class="btn-join">🔒 로그인 후 참여 가능</a>
+            </th:block>
+
+            <div style="margin-top: 20px;">
+                <div class="side-info-row">
+                    <span class="side-info-label">상태</span>
+                    <span class="side-info-value"
+                          th:text="${challenge.status == 'active' ? '진행중' : '오픈 예정'}">진행중</span>
+                </div>
+                <div class="side-info-row">
+                    <span class="side-info-label">참여자</span>
+                    <span class="side-info-value" th:text="${participantCount} + '명'">0명</span>
+                </div>
+                <div class="side-info-row">
+                    <span class="side-info-label">총 미션</span>
+                    <span class="side-info-value" th:text="${challenge.totalTasks} + '개'">0개</span>
+                </div>
+                <div class="side-info-row">
+                    <span class="side-info-label">시작일</span>
+                    <span class="side-info-value"
+                          th:text="${#temporals.format(challenge.startDate, 'yyyy.MM.dd')}">-</span>
+                </div>
+                <div class="side-info-row" th:if="${challenge.endDate != null}">
+                    <span class="side-info-label">종료일</span>
+                    <span class="side-info-value"
+                          th:text="${#temporals.format(challenge.endDate, 'yyyy.MM.dd')}">-</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+</div>
+
+<!-- FOOTER -->
+<footer th:replace="~{index :: footer}"></footer>
+
+</body>
+</html>

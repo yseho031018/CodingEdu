@@ -26,7 +26,7 @@ public class SecurityConfig {
                 .csrfTokenRequestHandler(requestHandler)
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/learn", "/learn/**", "/quiz", "/challenge", "/community", "/login", "/register", "/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/", "/learn", "/learn/**", "/quiz", "/challenge", "/challenge/**", "/community", "/login", "/register", "/css/**", "/js/**", "/images/**").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

@@ -297,6 +297,33 @@
             </div>
         </div>
 
+        <!-- 참여중인 챌린지 -->
+        <div class="section-block">
+            <div class="block-title">
+                🏆 참여중인 챌린지
+                <span style="font-size:.8rem; font-weight:600; color:#888;"
+                      th:text="'총 ' + ${joinedChallenges.size()} + '개'">총 0개</span>
+            </div>
+
+            <div class="post-list" th:if="${!joinedChallenges.isEmpty()}">
+                <a th:each="p : ${joinedChallenges}"
+                   th:href="@{/challenge/{id}(id=${p.challenge.id})}"
+                   class="post-item">
+                    <span style="font-size:1.3rem; margin-right:8px;" th:text="${p.challenge.icon}">🚀</span>
+                    <span class="post-item-title" th:text="${p.challenge.title}">챌린지명</span>
+                    <span class="post-category-tag"
+                          th:text="${p.challenge.status == 'active' ? '진행중' : '예정'}">진행중</span>
+                    <span class="post-item-meta"
+                          th:text="'참여: ' + ${#temporals.format(p.joinedAt, 'MM.dd')}">01.01</span>
+                </a>
+            </div>
+
+            <div class="post-empty" th:if="${joinedChallenges.isEmpty()}">
+                참여한 챌린지가 없어요.<br>
+                <a href="/challenge" style="color:var(--blue); font-weight:700;">챌린지 보러 가기 →</a>
+            </div>
+        </div>
+
         <!-- 내 게시글 -->
         <div class="section-block">
             <div class="block-title">

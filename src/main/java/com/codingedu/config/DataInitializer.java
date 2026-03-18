@@ -1,15 +1,18 @@
 package com.codingedu.config;
 
+import com.codingedu.entity.Challenge;
 import com.codingedu.entity.Choice;
 import com.codingedu.entity.LessonCourse;
 import com.codingedu.entity.Question;
 import com.codingedu.entity.Quiz;
+import com.codingedu.repository.ChallengeRepository;
 import com.codingedu.repository.LessonCourseRepository;
 import com.codingedu.repository.QuizRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Component
@@ -17,16 +20,21 @@ public class DataInitializer implements CommandLineRunner {
 
     private final QuizRepository quizRepository;
     private final LessonCourseRepository lessonCourseRepository;
+    private final ChallengeRepository challengeRepository;
 
-    public DataInitializer(QuizRepository quizRepository, LessonCourseRepository lessonCourseRepository) {
+    public DataInitializer(QuizRepository quizRepository,
+                           LessonCourseRepository lessonCourseRepository,
+                           ChallengeRepository challengeRepository) {
         this.quizRepository = quizRepository;
         this.lessonCourseRepository = lessonCourseRepository;
+        this.challengeRepository = challengeRepository;
     }
 
     @Override
     @Transactional
     public void run(String... args) {
         seedLessonCourses();
+        seedChallenges();
         if (quizRepository.count() > 0) return; // 이미 데이터가 있으면 건너뜀
 
         quizRepository.saveAll(List.of(
@@ -185,6 +193,57 @@ public class DataInitializer implements CommandLineRunner {
         c.setLevel(level);
         c.setLessonCount(lessonCount);
         c.setDescription(desc);
+        return c;
+    }
+
+    // ── 챌린지 시드 ──────────────────────────────────────────────────
+    private void seedChallenges() {
+        if (challengeRepository.count() > 0) return;
+        LocalDate today = LocalDate.now();
+        challengeRepository.saveAll(List.of(
+            ch("30일 알고리즘 챌린지", "🚀",
+                "하루에 한 문제씩 꾸준히 풀며 코딩 테스트 실력을 확실하게 키워보세요! 스터디 그룹원들과 코드 리뷰도 진행합니다.",
+                "active", true,
+                today.minusDays(15), today.plusDays(15), 30, 508,
+                "🔥 절반이나 왔어요! 지금 시작해도 충분합니다"),
+            ch("웹사이트 클론 코딩", "💻",
+                "유명한 웹사이트(넷플릭스, 에어비앤비 등)의 껍데기를 진짜 똑같이 만들어보며 프론트엔드 실전 경험을 쌓습니다!",
+                "active", false,
+                today.minusDays(9), today.plusDays(21), 3, 297,
+                "🎨 화면이 점점 멋져지네요! 지금 참여하세요"),
+            ch("백엔드 REST API 설계", "🎯",
+                "회원가입, 로그인, 게시판 기능이 있는 서버의 RESTful API를 직접 설계하고, Postman으로 테스트해 봅니다.",
+                "active", false,
+                today.minusDays(5), today.plusDays(25), 12, 174,
+                "⚙️ 서버가 돌아가기 시작했어요! 아직 늦지 않았어요"),
+            ch("Python 데이터 분석 시각화", "📊",
+                "Pandas와 Matplotlib을 사용해서 넷플릭스 영화 데이터를 직접 분석하고 예쁜 차트로 시각화해 봅니다.",
+                "upcoming", false,
+                today.plusDays(28), today.plusDays(42), 14, 0,
+                null),
+            ch("Flutter 나만의 할 일 앱 만들기", "📱",
+                "iOS와 Android 양쪽에서 모두 동작하는 하이브리드 모바일 앱을 Flutter로 2주 안에 완성합니다.",
+                "upcoming", false,
+                today.plusDays(44), today.plusDays(58), 14, 0,
+                null)
+        ));
+    }
+
+    private Challenge ch(String title, String icon, String description,
+                          String status, boolean featured,
+                          LocalDate startDate, LocalDate endDate,
+                          int totalTasks, int participantCount, String progressMessage) {
+        Challenge c = new Challenge();
+        c.setTitle(title);
+        c.setIcon(icon);
+        c.setDescription(description);
+        c.setStatus(status);
+        c.setFeatured(featured);
+        c.setStartDate(startDate);
+        c.setEndDate(endDate);
+        c.setTotalTasks(totalTasks);
+        c.setParticipantCount(participantCount);
+        c.setProgressMessage(progressMessage);
         return c;
     }
 

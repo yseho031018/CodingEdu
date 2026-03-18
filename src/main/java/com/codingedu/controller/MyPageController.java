@@ -1,8 +1,10 @@
 package com.codingedu.controller;
 
+import com.codingedu.entity.ChallengeParticipation;
 import com.codingedu.entity.LessonCourse;
 import com.codingedu.entity.QuizResult;
 import com.codingedu.entity.User;
+import com.codingedu.service.ChallengeService;
 import com.codingedu.service.LessonService;
 import com.codingedu.service.PostService;
 import com.codingedu.service.QuizService;
@@ -25,13 +27,16 @@ public class MyPageController {
     private final LessonService lessonService;
     private final QuizService quizService;
     private final PostService postService;
+    private final ChallengeService challengeService;
 
     public MyPageController(UserService userService, LessonService lessonService,
-                            QuizService quizService, PostService postService) {
+                            QuizService quizService, PostService postService,
+                            ChallengeService challengeService) {
         this.userService = userService;
         this.lessonService = lessonService;
         this.quizService = quizService;
         this.postService = postService;
+        this.challengeService = challengeService;
     }
 
     @GetMapping
@@ -68,6 +73,11 @@ public class MyPageController {
         model.addAttribute("bestGrade", bestGrade);
         model.addAttribute("recentPosts", postService.getRecentPostsByUser(user));
         model.addAttribute("postCount", postCount);
+
+        // 챌린지 참여 현황
+        List<com.codingedu.entity.ChallengeParticipation> joinedChallenges =
+                challengeService.getJoinedParticipations(user);
+        model.addAttribute("joinedChallenges", joinedChallenges);
 
         return "mypage";
     }

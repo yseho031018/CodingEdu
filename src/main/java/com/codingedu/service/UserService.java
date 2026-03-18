@@ -38,4 +38,39 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
+
+    @Transactional
+    public void updateNickname(String username, String newNickname) {
+        // 닉네임 중복 체크 (현재 사용자 제외)
+        User existingUser = userRepository.findByNickname(newNickname).orElse(null);
+        if (existingUser != null && !existingUser.getUsername().equals(username)) {
+            throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
+        }
+        
+        User user = findByUsername(username);
+        user.setNickname(newNickname);
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void updateEmail(String username, String newEmail) {
+        User user = findByUsername(username);
+        user.setEmail(newEmail);
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public boolean updatePassword(String username, String oldPassword, String newPassword) {
+        User user = findByUsername(username);
+        
+        // 이전 비밀번호 검증
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            return false;
+        }
+        
+        // 새로운 비밀번호로 업데이트
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        return true;
+    }
 }

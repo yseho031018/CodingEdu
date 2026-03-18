@@ -1,12 +1,11 @@
 package com.codingedu.controller;
 
-import com.codingedu.entity.Comment;
 import com.codingedu.entity.Post;
 import com.codingedu.entity.User;
-import com.codingedu.repository.CommentRepository;
-import com.codingedu.repository.PostRepository;
-import com.codingedu.repository.UserRepository;
 import com.codingedu.security.CustomUserDetails;
+import com.codingedu.service.CommentService;
+import com.codingedu.service.PostService;
+import com.codingedu.service.UserService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,14 +15,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class CommentController {
 
-    private final CommentRepository commentRepository;
-    private final PostRepository postRepository;
-    private final UserRepository userRepository;
+    private final CommentService commentService;
+    private final PostService postService;
+    private final UserService userService;
 
-    public CommentController(CommentRepository commentRepository, PostRepository postRepository, UserRepository userRepository) {
-        this.commentRepository = commentRepository;
-        this.postRepository = postRepository;
-        this.userRepository = userRepository;
+    public CommentController(CommentService commentService, PostService postService, UserService userService) {
+        this.commentService = commentService;
+        this.postService = postService;
+        this.userService = userService;
     }
 
     // 댓글 등록
@@ -31,27 +30,14 @@ public class CommentController {
     public String addComment(@PathVariable(name = "postId") Long postId,
                              @RequestParam(name = "content") String content,
                              @AuthenticationPrincipal CustomUserDetails userDetails) {
-        
         if (userDetails == null) {
-            return "redirect:/login"; // 로그인 안 한 사용자는 튕겨냄
+            return "redirect:/login";
         }
 
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
-        User author = userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new IllegalArgumentException("회원 정보가 없습니다."));
+        Post post = postService.getPostById(postId);
+        User author = userService.findByUsername(userDetails.getUsername());
+        commentService.addComment(content, post, author);
 
-        // 댓글 엔티티 생성 및 보관
-        Comment comment = new Comment();
-        comment.setContent(content);
-        comment.setPost(post);
-        comment.setAuthor(author);
-        commentRepository.save(comment);
-
-        // 해당 게시글의 댓글 개수 1 증가
-        post.setCommentCount(post.getCommentCount() + 1);
-        postRepository.save(post);
-
-        return "redirect:/community/" + postId; // 저장 완료 후 원래 게시글로 다시 이동!
+        return "redirect:/community/" + postId;
     }
 }

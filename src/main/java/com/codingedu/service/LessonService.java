@@ -61,6 +61,10 @@ public class LessonService {
         }
     }
 
+    public int getTotalCompletedCount(User user) {
+        return progressRepository.countByUser(user);
+    }
+
     public boolean hasCourseData() {
         return courseRepository.count() > 0;
     }

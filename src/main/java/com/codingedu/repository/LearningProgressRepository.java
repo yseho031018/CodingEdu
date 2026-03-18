@@ -12,4 +12,5 @@ public interface LearningProgressRepository extends JpaRepository<LearningProgre
     List<LearningProgress> findByUserAndLang(User user, String lang);
     boolean existsByUserAndLangAndLessonIdx(User user, String lang, int lessonIdx);
     int countByUserAndLang(User user, String lang);
+    int countByUser(User user);
 }

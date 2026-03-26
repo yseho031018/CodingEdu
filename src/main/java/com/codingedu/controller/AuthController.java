@@ -9,6 +9,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Controller
 public class AuthController {
 
@@ -33,19 +36,24 @@ public class AuthController {
     // 회원가입 폼 제출시 DB 저장 처리
     @PostMapping("/register")
     public String registerProcess(@Valid User user, BindingResult bindingResult, Model model) {
+        Map<String, String> fieldErrors = new HashMap<>();
+
+        // Bean Validation 에러를 필드별로 수집
         if (bindingResult.hasErrors()) {
-            String errorMsg = bindingResult.getAllErrors().get(0).getDefaultMessage();
-            model.addAttribute("error", errorMsg);
-            return "register";
+            bindingResult.getFieldErrors().forEach(e ->
+                fieldErrors.putIfAbsent(e.getField(), e.getDefaultMessage()));
         }
 
-        if (userService.isUsernameTaken(user.getUsername())) {
-            model.addAttribute("error", "이미 존재하는 아이디입니다.");
-            return "register";
+        // 중복 체크 (형식은 맞지만 이미 사용 중인 경우)
+        if (!fieldErrors.containsKey("username") && userService.isUsernameTaken(user.getUsername())) {
+            fieldErrors.put("username", "이미 존재하는 아이디입니다.");
+        }
+        if (!fieldErrors.containsKey("nickname") && userService.isNicknameTaken(user.getNickname())) {
+            fieldErrors.put("nickname", "이미 사용하는 닉네임입니다.");
         }
 
-        if (userService.isNicknameTaken(user.getNickname())) {
-            model.addAttribute("error", "이미 사용하는 닉네임입니다.");
+        if (!fieldErrors.isEmpty()) {
+            model.addAttribute("fieldErrors", fieldErrors);
             return "register";
         }
 

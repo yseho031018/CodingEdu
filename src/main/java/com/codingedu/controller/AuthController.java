@@ -2,8 +2,10 @@ package com.codingedu.controller;
 
 import com.codingedu.entity.User;
 import com.codingedu.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -30,7 +32,13 @@ public class AuthController {
 
     // 회원가입 폼 제출시 DB 저장 처리
     @PostMapping("/register")
-    public String registerProcess(User user, Model model) {
+    public String registerProcess(@Valid User user, BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            String errorMsg = bindingResult.getAllErrors().get(0).getDefaultMessage();
+            model.addAttribute("error", errorMsg);
+            return "register";
+        }
+
         if (userService.isUsernameTaken(user.getUsername())) {
             model.addAttribute("error", "이미 존재하는 아이디입니다.");
             return "register";

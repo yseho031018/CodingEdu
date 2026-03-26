@@ -75,7 +75,7 @@ public class MyPageController {
         model.addAttribute("postCount", postCount);
 
         // 챌린지 참여 현황
-        List<com.codingedu.entity.ChallengeParticipation> joinedChallenges =
+        List<ChallengeParticipation> joinedChallenges =
                 challengeService.getJoinedParticipations(user);
         model.addAttribute("joinedChallenges", joinedChallenges);
 

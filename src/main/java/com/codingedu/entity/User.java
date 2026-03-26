@@ -1,6 +1,7 @@
 package com.codingedu.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,15 +14,25 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "아이디를 입력해주세요.")
+    @Size(min = 4, max = 50, message = "아이디는 4~50자 사이여야 합니다.")
+    @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "아이디는 영문, 숫자, 밑줄(_)만 사용 가능합니다.")
     @Column(nullable = false, unique = true, length = 50)
     private String username;
 
+    @NotBlank(message = "비밀번호를 입력해주세요.")
+    @Size(min = 8, max = 100, message = "비밀번호는 8자 이상이어야 합니다.")
     @Column(nullable = false)
     private String password;
 
+    @NotBlank(message = "닉네임을 입력해주세요.")
+    @Size(min = 2, max = 50, message = "닉네임은 2~50자 사이여야 합니다.")
     @Column(nullable = false, unique = true, length = 50)
     private String nickname;
 
+    @NotBlank(message = "이메일을 입력해주세요.")
+    @Email(message = "올바른 이메일 형식이 아닙니다.")
+    @Size(max = 100, message = "이메일은 100자를 초과할 수 없습니다.")
     @Column(nullable = false, length = 100)
     private String email;
 

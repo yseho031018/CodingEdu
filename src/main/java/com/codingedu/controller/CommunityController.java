@@ -26,15 +26,19 @@ public class CommunityController {
         this.commentService = commentService;
     }
 
-    // 1. 커뮤니티 목록 보기 (페이지네이션)
+    // 1. 커뮤니티 목록 보기 (페이지네이션 + 검색)
     @GetMapping
     public String list(@RequestParam(name = "category", defaultValue = "all") String category,
                        @RequestParam(name = "page", defaultValue = "0") int page,
+                       @RequestParam(name = "keyword", defaultValue = "") String keyword,
                        Model model) {
-        Page<Post> postPage = postService.getPostsByCategory(category, page);
+        Page<Post> postPage = keyword.isBlank()
+                ? postService.getPostsByCategory(category, page)
+                : postService.searchPosts(category, keyword, page);
         model.addAttribute("postPage", postPage);
         model.addAttribute("currentCategory", category);
         model.addAttribute("currentPage", page);
+        model.addAttribute("keyword", keyword);
         return "community";
     }
 

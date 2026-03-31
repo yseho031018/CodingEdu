@@ -29,6 +29,14 @@ public class PostService {
         return postRepository.findByCategoryOrderByCreatedAtDesc(category, pageable);
     }
 
+    public Page<Post> searchPosts(String category, String keyword, int page) {
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        if ("all".equals(category)) {
+            return postRepository.searchByKeyword(keyword, pageable);
+        }
+        return postRepository.searchByCategoryAndKeyword(category, keyword, pageable);
+    }
+
     public Post getPostById(Long id) {
         return postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));

@@ -66,6 +66,26 @@
         .page-btn.active { background: var(--blue); color: var(--white); border-color: var(--blue); }
         .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
+        .search-bar {
+            display: flex; gap: 10px; margin-bottom: 24px;
+        }
+        .search-bar input {
+            flex: 1; padding: 12px 18px; border-radius: 50px; border: 2px solid #eaeaea;
+            font-size: .95rem; outline: none; transition: border-color .2s;
+        }
+        .search-bar input:focus { border-color: var(--blue); }
+        .search-bar button {
+            padding: 12px 22px; border-radius: 50px; border: none;
+            background: var(--blue); color: white; font-weight: 800; cursor: pointer;
+            transition: background .2s; white-space: nowrap;
+        }
+        .search-bar button:hover { background: var(--blue-mid); }
+        .search-result-info {
+            font-size: .9rem; color: var(--text-sub); margin-bottom: 16px;
+            padding: 10px 16px; background: var(--blue-light); border-radius: 10px;
+        }
+        .search-result-info strong { color: var(--blue); }
+
         .sidebar-box {
             background: var(--white); border-radius: 20px; padding: 28px;
             box-shadow: 0 4px 16px rgba(0,0,0,0.05); border: 1px solid #eee;
@@ -99,32 +119,7 @@
 <body>
 
 <!-- NAV -->
-<nav>
-    <a href="/" class="logo">
-        <span class="logo-icon">💻</span>
-        Code<span>Edu</span>
-    </a>
-    <div class="nav-links">
-        <a href="/learn">학습하기</a>
-        <a href="/quiz">퀴즈</a>
-        <a href="/challenge">챌린지</a>
-        <a href="/community" style="color: var(--blue-mid); font-weight: 800;">커뮤니티</a>
-    </div>
-    <div class="nav-right" style="display:flex; align-items:center; gap:12px;">
-        <button class="btn-search">🔍</button>
-        <div sec:authorize="isAnonymous()">
-            <a href="/login" class="btn-login" style="text-decoration:none; display:inline-block;">로그인</a>
-            <a href="/register" class="btn-login" style="background:#fff; color:var(--blue); border:2px solid var(--blue); display:inline-block; padding:8px 18px;">회원가입</a>
-        </div>
-        <div sec:authorize="isAuthenticated()" style="display:flex; align-items:center; gap:12px;">
-            <span style="font-weight:700; font-size:.9rem; color:var(--text);"><span sec:authentication="principal.nickname">사용자</span>님 환영해요!</span>
-            <a href="/settings" class="btn-login" style="background:var(--yellow-dark); color:var(--white); text-decoration:none; display:inline-block; padding:8px 16px;">⚙️ 설정</a>
-            <form th:action="@{/logout}" method="post" style="margin:0;">
-                <button type="submit" class="btn-login" style="background:#555;">로그아웃</button>
-            </form>
-        </div>
-    </div>
-</nav>
+<nav th:replace="~{index :: nav}"></nav>
 
 <!-- PAGE HEADER -->
 <header class="page-header" style="background: linear-gradient(135deg, #E1BEE7 0%, #F3E5F5 100%);">
@@ -143,6 +138,23 @@
                 <a th:href="@{/community(category='tips')}" class="community-tab" th:classappend="${currentCategory == 'tips'} ? 'active'">🔥 꿀팁/노하우</a>
                 <a th:href="@{/community(category='study')}" class="community-tab" th:classappend="${currentCategory == 'study'} ? 'active'">📚 스터디 모집</a>
                 <a th:href="@{/community(category='free')}" class="community-tab" th:classappend="${currentCategory == 'free'} ? 'active'">☕ 자유게시판</a>
+            </div>
+
+            <!-- 검색바 -->
+            <form th:action="@{/community}" method="get" class="search-bar">
+                <input type="hidden" name="category" th:value="${currentCategory}" />
+                <input type="text" name="keyword" th:value="${keyword}"
+                       placeholder="제목 또는 내용으로 검색..." />
+                <button type="submit">🔍 검색</button>
+            </form>
+
+            <!-- 검색 결과 안내 -->
+            <div th:if="${keyword != null and !keyword.isBlank()}" class="search-result-info">
+                <strong th:text="'&quot;' + ${keyword} + '&quot;'">"검색어"</strong>
+                검색 결과 —
+                <strong th:text="${postPage.totalElements} + '건'">0건</strong>
+                <a th:href="@{/community(category=${currentCategory})}"
+                   style="margin-left:12px; color:#888; font-size:.85rem;">✕ 검색 초기화</a>
             </div>
 
             <!-- 글쓰기 -->
@@ -178,16 +190,16 @@
             <div class="pagination" th:if="${postPage.totalPages > 1}">
                 <button class="page-btn"
                         th:disabled="${!postPage.hasPrevious()}"
-                        th:onclick="|location.href='@{/community(category=${currentCategory}, page=${currentPage - 1})}'|">«</button>
+                        th:onclick="|location.href='@{/community(category=${currentCategory}, page=${currentPage - 1}, keyword=${keyword})}'|">«</button>
                 <th:block th:each="i : ${#numbers.sequence(0, postPage.totalPages - 1)}">
                     <button class="page-btn"
                             th:classappend="${i == currentPage} ? 'active'"
                             th:text="${i + 1}"
-                            th:onclick="|location.href='@{/community(category=${currentCategory}, page=${i})}'|">1</button>
+                            th:onclick="|location.href='@{/community(category=${currentCategory}, page=${i}, keyword=${keyword})}'|">1</button>
                 </th:block>
                 <button class="page-btn"
                         th:disabled="${!postPage.hasNext()}"
-                        th:onclick="|location.href='@{/community(category=${currentCategory}, page=${currentPage + 1})}'|">»</button>
+                        th:onclick="|location.href='@{/community(category=${currentCategory}, page=${currentPage + 1}, keyword=${keyword})}'|">»</button>
             </div>
         </div>
 
@@ -234,11 +246,7 @@
 </section>
 
 <!-- FOOTER -->
-<footer>
-    <div class="f-logo">💻 Code<span>Edu</span></div>
-    <div>© 2025 CodeEdu. 코딩은 즐거워요! 🎈</div>
-    <div>개인정보처리방침 · 이용약관 · 문의하기</div>
-</footer>
+<footer th:replace="~{index :: footer}"></footer>
 
 <script>
     // 카테고리 탭은 서버사이드 라우팅으로 교체했으므로, JS 필터링 최소화

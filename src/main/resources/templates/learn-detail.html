@@ -25,52 +25,6 @@
             height: calc(100vh - 64px);
             overflow-y: auto;
         }
-        /* 언어 선택 – 아이콘 그리드 (상단 고정) */
-        .sidebar-header {
-            padding: 12px 14px 10px;
-            border-bottom: 1px solid #eee;
-            flex-shrink: 0;
-        }
-        .lang-selector-label {
-            font-size: .7rem;
-            font-weight: 700;
-            color: #bbb;
-            letter-spacing: .05em;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-        }
-        .lang-selector {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 6px;
-        }
-        .lang-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 3px;
-            padding: 7px 4px;
-            border-radius: 10px;
-            border: 2px solid transparent;
-            background: #f5f5f5;
-            cursor: pointer;
-            transition: all .15s;
-        }
-        .lang-btn:hover { background: #E3F2FD; border-color: #90CAF9; }
-        .lang-btn.active { background: #E3F2FD; border-color: #1565C0; }
-        .lang-btn .lb-icon { font-size: 1.3rem; line-height: 1; }
-        .lang-btn .lb-name {
-            font-size: .6rem;
-            font-weight: 700;
-            color: #555;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
-        }
-        .lang-btn.active .lb-name { color: #1565C0; }
-
         /* 토픽 목록 – 나머지 공간 전부 */
         .sidebar-topics {
             padding: 8px 0;
@@ -152,6 +106,7 @@
             position: relative;
             cursor: pointer;
         }
+        .video-wrap { cursor: default; }
         .video-wrap:hover .play-btn { transform: scale(1.1); }
         .video-thumb-bg {
             position: absolute;
@@ -180,6 +135,9 @@
             justify-content: center;
             transition: transform .2s;
             box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            cursor: pointer;
+            border: none;
+            z-index: 2;
         }
         .play-btn::after {
             content: '';
@@ -190,16 +148,48 @@
             border-left: 24px solid #fff;
             margin-left: 4px;
         }
-        .yt-label {
+        .play-btn.playing::after {
+            border-left: 8px solid #fff;
+            border-right: 8px solid #fff;
+            height: 20px;
+            width: 0;
+            margin-left: 0;
+            border-top: none;
+            border-bottom: none;
+            box-shadow: 8px 0 0 #fff;
+        }
+        .video-progress-wrap {
             position: absolute;
-            bottom: 16px;
+            bottom: 0; left: 0; right: 0;
+            height: 5px;
+            background: rgba(255,255,255,0.2);
+            z-index: 2;
+        }
+        .video-progress-bar {
+            height: 100%;
+            background: #ff0000;
+            width: 0%;
+            transition: width .3s linear;
+        }
+        .video-status {
+            position: absolute;
+            bottom: 12px;
             left: 16px;
-            background: rgba(0,0,0,.7);
+            color: rgba(255,255,255,.8);
+            font-size: .8rem;
+            font-weight: 600;
+            z-index: 2;
+        }
+        .video-done-badge {
+            position: absolute;
+            top: 12px; right: 12px;
+            background: #4CAF50;
             color: #fff;
             font-size: .8rem;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-weight: 600;
+            font-weight: 800;
+            padding: 5px 12px;
+            border-radius: 20px;
+            z-index: 2;
         }
 
         /* 본문 */
@@ -260,6 +250,8 @@
         .nav-btn:hover { border-color: #1565C0; color: #1565C0; background: #f0f7ff; }
         .nav-btn.next { background: #1565C0; color: #fff; border-color: #1565C0; }
         .nav-btn.next:hover { background: #1E88E5; }
+        @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(21,101,192,.5)} 50%{box-shadow:0 0 0 8px rgba(21,101,192,0)} }
+        .nav-btn.pulse { animation: pulse 1.2s infinite; }
         .nav-btn:disabled { opacity: .35; cursor: not-allowed; }
         .nav-btn:disabled:hover { border-color: #e8e8e8; color: #555; background: #fff; }
 
@@ -331,41 +323,6 @@
 
     <!-- ── 사이드바 ── -->
     <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="lang-selector-label">언어 선택</div>
-            <div class="lang-selector" id="langSelector">
-                <button class="lang-btn" data-lang="html" onclick="selectLang('html', this)">
-                    <span class="lb-icon">🌐</span><span class="lb-name">HTML</span>
-                </button>
-                <button class="lang-btn" data-lang="css" onclick="selectLang('css', this)">
-                    <span class="lb-icon">🎨</span><span class="lb-name">CSS</span>
-                </button>
-                <button class="lang-btn" data-lang="javascript" onclick="selectLang('javascript', this)">
-                    <span class="lb-icon">⚡</span><span class="lb-name">JS</span>
-                </button>
-                <button class="lang-btn" data-lang="typescript" onclick="selectLang('typescript', this)">
-                    <span class="lb-icon">🔷</span><span class="lb-name">TS</span>
-                </button>
-                <button class="lang-btn" data-lang="java" onclick="selectLang('java', this)">
-                    <span class="lb-icon">☕</span><span class="lb-name">Java</span>
-                </button>
-                <button class="lang-btn" data-lang="kotlin" onclick="selectLang('kotlin', this)">
-                    <span class="lb-icon">🌱</span><span class="lb-name">Kotlin</span>
-                </button>
-                <button class="lang-btn" data-lang="c" onclick="selectLang('c', this)">
-                    <span class="lb-icon">🔧</span><span class="lb-name">C</span>
-                </button>
-                <button class="lang-btn" data-lang="cpp" onclick="selectLang('cpp', this)">
-                    <span class="lb-icon">⚙️</span><span class="lb-name">C++</span>
-                </button>
-                <button class="lang-btn" data-lang="swift" onclick="selectLang('swift', this)">
-                    <span class="lb-icon">📱</span><span class="lb-name">Swift</span>
-                </button>
-                <button class="lang-btn" data-lang="python" onclick="selectLang('python', this)">
-                    <span class="lb-icon">🐍</span><span class="lb-name">Python</span>
-                </button>
-            </div>
-        </div>
         <div class="sidebar-topics">
             <div class="topics-label">토픽 목록</div>
             <div id="topicList"></div>
@@ -872,13 +829,17 @@ function renderLesson(idx) {
             ${course.date} &nbsp;|&nbsp; <span>공개</span>
         </div>
 
-        <div class="video-wrap" onclick="alert('강의 영상 준비 중입니다!')">
+        <div class="video-wrap" id="videoWrap">
             <div class="video-thumb-bg">
                 <div class="video-thumb-icon">${course.icon}</div>
                 <div class="video-thumb-title">${course.title} - ${l.label}</div>
             </div>
-            <div class="play-btn"></div>
-            <div class="yt-label">▶ 강의 영상 보기</div>
+            ${completedIndices.has(idx) ? '<div class="video-done-badge">✅ 시청 완료</div>' : ''}
+            <button class="play-btn" id="playBtn" onclick="toggleVideo(${idx})"></button>
+            <div class="video-status" id="videoStatus">${completedIndices.has(idx) ? '시청 완료' : '▶ 재생하여 강의를 완료하세요'}</div>
+            <div class="video-progress-wrap">
+                <div class="video-progress-bar" id="videoProgressBar" style="width:${completedIndices.has(idx) ? '100' : '0'}%"></div>
+            </div>
         </div>
 
         <div class="lesson-body">
@@ -894,17 +855,10 @@ function renderLesson(idx) {
                 ${idx === 0 ? "disabled" : ""}>
                 ← 이전 강의
             </button>
-            ${isLoggedIn ? `
-            <button class="nav-btn" id="completeBtn"
-                onclick="markComplete(${idx})"
-                style="flex:none; background:${completedIndices.has(idx) ? '#E8F5E9' : '#f5f5f5'};
-                       color:${completedIndices.has(idx) ? '#2E7D32' : '#555'};
-                       border-color:${completedIndices.has(idx) ? '#4CAF50' : '#ddd'};">
-                ${completedIndices.has(idx) ? '✅ 완료됨' : '☑️ 완료 표시'}
-            </button>` : ''}
-            <button class="nav-btn next"
-                onclick="selectLesson(${idx + 1})"
-                ${idx === course.lessons.length - 1 ? "disabled" : ""}>
+            <button class="nav-btn next" id="nextBtn"
+                onclick="handleNext(${idx})"
+                ${idx === course.lessons.length - 1 ? "disabled" : ""}
+                ${isLoggedIn && !completedIndices.has(idx) ? 'disabled style="opacity:.4;cursor:not-allowed;" title="영상을 끝까지 시청하면 활성화됩니다"' : ""}>
                 다음 강의 →
             </button>
         </div>
@@ -916,7 +870,85 @@ function renderLesson(idx) {
 function selectLesson(idx) {
     const course = COURSES[currentLang];
     if (idx < 0 || idx >= course.lessons.length) return;
+    if (videoTimer) { clearInterval(videoTimer); videoTimer = null; }
+    videoProgress = 0;
     renderLesson(idx);
+}
+
+// 영상 재생/일시정지 토글
+let videoTimer = null;
+let videoProgress = 0; // 0~100
+const VIDEO_DURATION = 30; // 시뮬레이션 재생 시간(초) - 실제 영상 연동 시 교체
+
+function toggleVideo(idx) {
+    if (completedIndices.has(idx)) return; // 이미 완료된 강의는 재생 불필요
+    const playBtn = document.getElementById('playBtn');
+    if (videoTimer) {
+        // 일시정지
+        clearInterval(videoTimer);
+        videoTimer = null;
+        playBtn.classList.remove('playing');
+        document.getElementById('videoStatus').textContent = '⏸ 일시정지됨';
+    } else {
+        // 재생 시작
+        playBtn.classList.add('playing');
+        videoTimer = setInterval(() => {
+            videoProgress = Math.min(100, videoProgress + (100 / VIDEO_DURATION / 10));
+            const bar = document.getElementById('videoProgressBar');
+            if (bar) bar.style.width = videoProgress + '%';
+
+            const elapsed = Math.floor(videoProgress * VIDEO_DURATION / 100);
+            const remain = VIDEO_DURATION - elapsed;
+            const status = document.getElementById('videoStatus');
+            if (status) status.textContent = `▶ 재생 중 · 남은 시간 ${remain}초`;
+
+            if (videoProgress >= 100) {
+                clearInterval(videoTimer);
+                videoTimer = null;
+                onVideoEnded(idx);
+            }
+        }, 100);
+    }
+}
+
+function onVideoEnded(idx) {
+    const playBtn = document.getElementById('playBtn');
+    if (playBtn) { playBtn.classList.remove('playing'); playBtn.disabled = true; }
+    const status = document.getElementById('videoStatus');
+    if (status) status.textContent = '시청 완료';
+    const bar = document.getElementById('videoProgressBar');
+    if (bar) bar.style.background = '#4CAF50';
+
+    // 완료 뱃지 표시
+    const wrap = document.getElementById('videoWrap');
+    if (wrap && !wrap.querySelector('.video-done-badge')) {
+        const badge = document.createElement('div');
+        badge.className = 'video-done-badge';
+        badge.textContent = '✅ 시청 완료';
+        wrap.appendChild(badge);
+    }
+
+    // 다음 강의 버튼 활성화
+    const nextBtn = document.getElementById('nextBtn');
+    if (nextBtn) {
+        nextBtn.disabled = false;
+        nextBtn.style.opacity = '1';
+        nextBtn.style.cursor = 'pointer';
+        nextBtn.title = '';
+        nextBtn.classList.add('pulse');
+    }
+}
+
+async function handleNext(idx) {
+    const course = COURSES[currentLang];
+    if (isLoggedIn && !completedIndices.has(idx)) {
+        await markComplete(idx);
+    }
+    if (idx < course.lessons.length - 1) {
+        videoProgress = 0;
+        videoTimer = null;
+        selectLesson(idx + 1);
+    }
 }
 
 async function markComplete(lessonIdx) {

@@ -417,70 +417,70 @@
       <div class="lang-name">HTML</div>
       <div class="lang-desc">웹 페이지 구조</div>
       <span class="lang-badge badge-intro">입문</span>
-      <div class="lang-bar-wrap"><div class="lang-bar" style="width:90%"></div></div>
+      <div class="lang-bar-wrap"><div class="lang-bar" th:style="${'width:' + (langProgressMap != null and langProgressMap['html'] != null ? langProgressMap['html'] : 0) + '%'}"></div></div>
     </div>
     <div class="lang-card" data-cat="web" data-lang="css">
       <div class="lang-icon">🎨</div>
       <div class="lang-name">CSS</div>
       <div class="lang-desc">웹 페이지 스타일링</div>
       <span class="lang-badge badge-intro">입문</span>
-      <div class="lang-bar-wrap"><div class="lang-bar" style="width:85%"></div></div>
+      <div class="lang-bar-wrap"><div class="lang-bar" th:style="${'width:' + (langProgressMap != null and langProgressMap['css'] != null ? langProgressMap['css'] : 0) + '%'}"></div></div>
     </div>
     <div class="lang-card" data-cat="web" data-lang="javascript">
       <div class="lang-icon">⚡</div>
       <div class="lang-name">JavaScript</div>
       <div class="lang-desc">웹 동적 기능</div>
       <span class="lang-badge badge-intro">입문</span>
-      <div class="lang-bar-wrap"><div class="lang-bar" style="width:80%"></div></div>
+      <div class="lang-bar-wrap"><div class="lang-bar" th:style="${'width:' + (langProgressMap != null and langProgressMap['javascript'] != null ? langProgressMap['javascript'] : 0) + '%'}"></div></div>
     </div>
     <div class="lang-card" data-cat="web" data-lang="typescript">
       <div class="lang-icon">🔷</div>
       <div class="lang-name">TypeScript</div>
       <div class="lang-desc">타입 안전 JavaScript</div>
       <span class="lang-badge badge-basic">초급</span>
-      <div class="lang-bar-wrap"><div class="lang-bar" style="width:60%"></div></div>
+      <div class="lang-bar-wrap"><div class="lang-bar" th:style="${'width:' + (langProgressMap != null and langProgressMap['typescript'] != null ? langProgressMap['typescript'] : 0) + '%'}"></div></div>
     </div>
     <div class="lang-card" data-cat="java" data-lang="java">
       <div class="lang-icon">☕</div>
       <div class="lang-name">Java</div>
       <div class="lang-desc">객체지향 프로그래밍</div>
       <span class="lang-badge badge-intro">입문</span>
-      <div class="lang-bar-wrap"><div class="lang-bar" style="width:75%"></div></div>
+      <div class="lang-bar-wrap"><div class="lang-bar" th:style="${'width:' + (langProgressMap != null and langProgressMap['java'] != null ? langProgressMap['java'] : 0) + '%'}"></div></div>
     </div>
     <div class="lang-card" data-cat="java" data-lang="kotlin">
       <div class="lang-icon">🌱</div>
       <div class="lang-name">Kotlin</div>
       <div class="lang-desc">현대적 JVM 언어</div>
       <span class="lang-badge badge-basic">초급</span>
-      <div class="lang-bar-wrap"><div class="lang-bar" style="width:55%"></div></div>
+      <div class="lang-bar-wrap"><div class="lang-bar" th:style="${'width:' + (langProgressMap != null and langProgressMap['kotlin'] != null ? langProgressMap['kotlin'] : 0) + '%'}"></div></div>
     </div>
     <div class="lang-card" data-cat="c" data-lang="c">
       <div class="lang-icon">🔧</div>
       <div class="lang-name">C언어</div>
       <div class="lang-desc">프로그래밍 기초</div>
       <span class="lang-badge badge-intro">입문</span>
-      <div class="lang-bar-wrap"><div class="lang-bar" style="width:70%"></div></div>
+      <div class="lang-bar-wrap"><div class="lang-bar" th:style="${'width:' + (langProgressMap != null and langProgressMap['c'] != null ? langProgressMap['c'] : 0) + '%'}"></div></div>
     </div>
     <div class="lang-card" data-cat="c" data-lang="cpp">
       <div class="lang-icon">⚙️</div>
       <div class="lang-name">C++</div>
       <div class="lang-desc">고성능 프로그래밍</div>
       <span class="lang-badge badge-basic">초급</span>
-      <div class="lang-bar-wrap"><div class="lang-bar" style="width:50%"></div></div>
+      <div class="lang-bar-wrap"><div class="lang-bar" th:style="${'width:' + (langProgressMap != null and langProgressMap['cpp'] != null ? langProgressMap['cpp'] : 0) + '%'}"></div></div>
     </div>
     <div class="lang-card" data-cat="mobile" data-lang="swift">
       <div class="lang-icon">📱</div>
       <div class="lang-name">Swift</div>
       <div class="lang-desc">iOS 앱 개발</div>
       <span class="lang-badge badge-basic">초급</span>
-      <div class="lang-bar-wrap"><div class="lang-bar" style="width:45%"></div></div>
+      <div class="lang-bar-wrap"><div class="lang-bar" th:style="${'width:' + (langProgressMap != null and langProgressMap['swift'] != null ? langProgressMap['swift'] : 0) + '%'}"></div></div>
     </div>
     <div class="lang-card" data-cat="etc" data-lang="python">
       <div class="lang-icon">🐍</div>
       <div class="lang-name">Python</div>
       <div class="lang-desc">AI / 데이터 분석</div>
       <span class="lang-badge badge-intro">입문</span>
-      <div class="lang-bar-wrap"><div class="lang-bar" style="width:88%"></div></div>
+      <div class="lang-bar-wrap"><div class="lang-bar" th:style="${'width:' + (langProgressMap != null and langProgressMap['python'] != null ? langProgressMap['python'] : 0) + '%'}"></div></div>
     </div>
   </div>
 </section>
@@ -530,7 +530,7 @@
   // 카드 클릭 → 해당 언어 강의 페이지로 바로 이동
   document.querySelectorAll('.lang-card').forEach(card => {
     card.addEventListener('click', () => {
-      location.href = '/learn?lang=' + card.dataset.lang;
+      location.href = '/learn/' + card.dataset.lang;
     });
   });
 

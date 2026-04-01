@@ -52,12 +52,23 @@ public class HomeController {
                     .min((a, b) -> gradeRank(a) - gradeRank(b))
                     .orElse(null);
 
+            // 언어별 학습 진도율 (0~100)
+            var completedCountMap = lessonService.getCompletedCountMap(user);
+            java.util.Map<String, Integer> langProgressMap = allCourses.stream()
+                    .collect(java.util.stream.Collectors.toMap(
+                            c -> c.getLang(),
+                            c -> c.getLessonCount() > 0
+                                    ? (int) Math.round(completedCountMap.getOrDefault(c.getLang(), 0) * 100.0 / c.getLessonCount())
+                                    : 0
+                    ));
+
             model.addAttribute("dashUser", user);
             model.addAttribute("totalLessons", totalLessons);
             model.addAttribute("completedLessons", completed);
             model.addAttribute("totalQuizzesTaken", totalQuizzesTaken);
             model.addAttribute("bestGrade", bestGrade);
             model.addAttribute("recentPosts", postService.getRecentPostsByUser(user));
+            model.addAttribute("langProgressMap", langProgressMap);
         }
         return "index";
     }

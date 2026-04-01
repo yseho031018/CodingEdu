@@ -7,10 +7,13 @@ import com.codingedu.service.CommentService;
 import com.codingedu.service.PostService;
 import com.codingedu.service.UserService;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @Controller
 @RequestMapping("/community")
@@ -74,9 +77,26 @@ public class CommunityController {
         model.addAttribute("post", post);
         model.addAttribute("comments", commentService.getCommentsByPostId(id));
         if (userDetails != null) {
+            User user = userService.findByUsername(userDetails.getUsername());
             model.addAttribute("currentUsername", userDetails.getUsername());
+            model.addAttribute("isLiked", postService.isLikedByUser(post, user));
         }
         return "community-detail";
+    }
+
+    // 10. 좋아요 토글 (AJAX)
+    @PostMapping("/{id}/like")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> toggleLike(
+            @PathVariable(name = "id") Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).body(Map.of("error", "로그인이 필요합니다."));
+        }
+        Post post = postService.getPostById(id);
+        User user = userService.findByUsername(userDetails.getUsername());
+        boolean liked = postService.toggleLike(post, user);
+        return ResponseEntity.ok(Map.of("liked", liked, "likeCount", post.getLikeCount()));
     }
 
     // 5. 글 수정 폼 보여주기

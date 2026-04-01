@@ -26,6 +26,9 @@ public class Post {
     @Column(nullable = false)
     private int commentCount;
 
+    @Column(nullable = false)
+    private int likeCount;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -38,6 +41,7 @@ public class Post {
         this.createdAt = LocalDateTime.now();
         this.views = 0;
         this.commentCount = 0;
+        this.likeCount = 0;
     }
 
     // Getters and Setters
@@ -105,4 +109,7 @@ public class Post {
     public void setAuthor(User author) {
         this.author = author;
     }
+
+    public int getLikeCount() { return likeCount; }
+    public void setLikeCount(int likeCount) { this.likeCount = likeCount; }
 }

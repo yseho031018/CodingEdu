@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>알림 - CodeEdu</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <style>
+        .notif-container {
+            max-width: 700px; margin: 40px auto 60px; background: var(--white);
+            border-radius: 20px; padding: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+        }
+        .notif-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 28px; border-bottom: 2px dashed #eaeaea; padding-bottom: 20px;
+        }
+        .notif-header h2 { font-size: 1.5rem; font-weight: 900; color: var(--text); }
+        .notif-item {
+            display: flex; align-items: flex-start; gap: 16px;
+            padding: 18px; border-radius: 12px; margin-bottom: 10px;
+            border: 1px solid #f0f0f0; background: #f9f9f9; transition: background .15s;
+        }
+        .notif-item:hover { background: #f0f4ff; }
+        .notif-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 2px; }
+        .notif-body { flex: 1; }
+        .notif-msg { font-size: .95rem; color: #333; margin-bottom: 6px; line-height: 1.5; }
+        .notif-time { font-size: .8rem; color: #aaa; }
+        .notif-link { text-decoration: none; color: inherit; display: block; }
+        .notif-link:hover .notif-msg { color: var(--blue); }
+        .empty-msg { text-align: center; padding: 60px 0; color: #aaa; font-size: .95rem; }
+        .btn-back {
+            background: var(--blue-light); color: var(--blue); padding: 10px 24px;
+            border-radius: 50px; font-weight: 800; text-decoration: none;
+            font-size: .9rem; transition: all .2s;
+        }
+        .btn-back:hover { background: var(--blue); color: #fff; }
+    </style>
+</head>
+<body style="background: var(--gray);">
+
+<nav th:replace="~{index :: nav}"></nav>
+
+<div class="notif-container">
+    <div class="notif-header">
+        <h2>🔔 알림</h2>
+        <a href="/community" class="btn-back">커뮤니티로</a>
+    </div>
+
+    <div th:if="${notifications.isEmpty()}" class="empty-msg">
+        새로운 알림이 없습니다 ✨
+    </div>
+
+    <div th:each="n : ${notifications}">
+        <a th:href="${n.postId != null ? '/community/' + n.postId : '#'}" class="notif-link">
+            <div class="notif-item">
+                <div class="notif-icon">💬</div>
+                <div class="notif-body">
+                    <div class="notif-msg" th:text="${n.message}">알림 내용</div>
+                    <div class="notif-time" th:text="${#temporals.format(n.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</div>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<footer th:replace="~{index :: footer}"></footer>
+
+</body>
+</html>

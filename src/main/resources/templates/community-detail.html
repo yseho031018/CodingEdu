@@ -51,6 +51,17 @@
             padding: 4px 8px; border-radius: 6px; transition: all .2s;
         }
         .btn-comment-delete:hover { color: #c0392b; background: #FFF0F0; }
+
+        .like-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 24px; border-radius: 50px; border: 2px solid #eee;
+            background: #fff; cursor: pointer; font-size: .95rem; font-weight: 700;
+            color: #888; transition: all .2s; margin-top: 24px;
+        }
+        .like-btn:hover { border-color: #e74c3c; color: #e74c3c; background: #fff5f5; }
+        .like-btn.liked { border-color: #e74c3c; color: #e74c3c; background: #fff5f5; }
+        .like-btn .heart { font-size: 1.1rem; transition: transform .2s; }
+        .like-btn:hover .heart, .like-btn.liked .heart { transform: scale(1.2); }
     </style>
 </head>
 <body style="background: var(--gray);">
@@ -78,6 +89,21 @@
     <!-- 내용 영역: white-space: pre-wrap 으로 엔터 유지 -->
     <div class="detail-content" th:text="${post.content}">
         게시글 내용
+    </div>
+
+    <!-- 좋아요 버튼 -->
+    <div style="margin-top: 30px; padding-top: 24px; border-top: 1px solid #f0f0f0;">
+        <button id="likeBtn" class="like-btn" th:classappend="${isLiked} ? 'liked' : ''"
+                sec:authorize="isAuthenticated()"
+                th:data-post-id="${post.id}"
+                th:data-liked="${isLiked}">
+            <span class="heart" th:text="${isLiked} ? '❤️' : '🤍'">🤍</span>
+            <span id="likeCount" th:text="${post.likeCount}">0</span>
+            <span>좋아요</span>
+        </button>
+        <div sec:authorize="isAnonymous()" style="display:inline-block; margin-top:12px; color:#888; font-size:.9rem;">
+            <span>🤍 <strong th:text="${post.likeCount}">0</strong> 좋아요</span>
+        </div>
     </div>
 
     <!-- 댓글 영역 -->
@@ -144,5 +170,35 @@
 <!-- FOOTER -->
 <footer th:replace="~{index :: footer}"></footer>
 
+<script>
+    const likeBtn = document.getElementById('likeBtn');
+    if (likeBtn) {
+        likeBtn.addEventListener('click', function () {
+            const postId = this.dataset.postId;
+            const csrfToken = document.cookie.split(';')
+                .map(c => c.trim())
+                .find(c => c.startsWith('XSRF-TOKEN='));
+            const token = csrfToken ? decodeURIComponent(csrfToken.split('=')[1]) : '';
+
+            fetch(`/community/${postId}/like`, {
+                method: 'POST',
+                headers: { 'X-XSRF-TOKEN': token }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) { alert(data.error); return; }
+                document.getElementById('likeCount').textContent = data.likeCount;
+                const heart = likeBtn.querySelector('.heart');
+                if (data.liked) {
+                    likeBtn.classList.add('liked');
+                    heart.textContent = '❤️';
+                } else {
+                    likeBtn.classList.remove('liked');
+                    heart.textContent = '🤍';
+                }
+            });
+        });
+    }
+</script>
 </body>
 </html>

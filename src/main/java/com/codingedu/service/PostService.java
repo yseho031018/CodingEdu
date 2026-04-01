@@ -1,7 +1,9 @@
 package com.codingedu.service;
 
 import com.codingedu.entity.Post;
+import com.codingedu.entity.PostLike;
 import com.codingedu.entity.User;
+import com.codingedu.repository.PostLikeRepository;
 import com.codingedu.repository.PostRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,9 +18,35 @@ public class PostService {
     private static final int PAGE_SIZE = 10;
 
     private final PostRepository postRepository;
+    private final PostLikeRepository postLikeRepository;
 
-    public PostService(PostRepository postRepository) {
+    public PostService(PostRepository postRepository, PostLikeRepository postLikeRepository) {
         this.postRepository = postRepository;
+        this.postLikeRepository = postLikeRepository;
+    }
+
+    public boolean isLikedByUser(Post post, User user) {
+        return postLikeRepository.existsByUserAndPost(user, post);
+    }
+
+    // 좋아요 토글 - true: 좋아요 추가, false: 취소
+    @Transactional
+    public boolean toggleLike(Post post, User user) {
+        java.util.Optional<PostLike> existing = postLikeRepository.findByUserAndPost(user, post);
+        if (existing.isPresent()) {
+            postLikeRepository.delete(existing.get());
+            post.setLikeCount(Math.max(0, post.getLikeCount() - 1));
+            postRepository.save(post);
+            return false;
+        } else {
+            PostLike like = new PostLike();
+            like.setUser(user);
+            like.setPost(post);
+            postLikeRepository.save(like);
+            post.setLikeCount(post.getLikeCount() + 1);
+            postRepository.save(post);
+            return true;
+        }
     }
 
     public Page<Post> getPostsByCategory(String category, int page) {

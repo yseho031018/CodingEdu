@@ -15,10 +15,12 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final PostService postService;
+    private final NotificationService notificationService;
 
-    public CommentService(CommentRepository commentRepository, PostService postService) {
+    public CommentService(CommentRepository commentRepository, PostService postService, NotificationService notificationService) {
         this.commentRepository = commentRepository;
         this.postService = postService;
+        this.notificationService = notificationService;
     }
 
     public List<Comment> getCommentsByPostId(Long postId) {
@@ -32,8 +34,8 @@ public class CommentService {
         comment.setPost(post);
         comment.setAuthor(author);
         commentRepository.save(comment);
-
         postService.incrementCommentCount(post);
+        notificationService.createCommentNotification(post, author);
 
         return comment;
     }

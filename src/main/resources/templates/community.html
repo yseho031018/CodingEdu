@@ -10,18 +10,31 @@
         .community-main { flex: 1; }
         .community-sidebar { width: 320px; flex-shrink: 0; display: flex; flex-direction: column; gap: 30px; }
 
-        .community-tabs { display: flex; gap: 10px; border-bottom: 2px solid #eaeaea; padding-bottom: 20px; margin-bottom: 30px; overflow-x: auto; }
+        .community-tabs {
+            display: flex; gap: 10px; border-bottom: 2px solid #eaeaea;
+            padding-bottom: 0; margin-bottom: 30px; overflow-x: auto;
+            position: relative;
+        }
         .community-tab {
             padding: 10px 24px; border: none; background: transparent; font-size: 1rem;
-            font-weight: 700; color: var(--text-sub); cursor: pointer; transition: color .2s;
-            position: relative; white-space: nowrap;
+            font-weight: 700; color: var(--text-sub); cursor: pointer; transition: color .25s;
+            position: relative; white-space: nowrap; text-decoration: none;
+            padding-bottom: 18px;
         }
         .community-tab:hover { color: var(--blue); }
         .community-tab.active { color: var(--blue); }
-        .community-tab.active::after {
-            content: ''; position: absolute; bottom: -22px; left: 0; width: 100%; height: 4px;
+        .tab-indicator {
+            position: absolute; bottom: 0; height: 4px;
             background: var(--blue); border-radius: 4px 4px 0 0;
+            transition: left .3s cubic-bezier(.4,0,.2,1), width .3s cubic-bezier(.4,0,.2,1);
+            pointer-events: none;
         }
+        @keyframes slideInFromRight {
+            from { opacity: 0; transform: translateX(32px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        .post-list { animation: slideInFromRight .3s ease; }
+        .exiting { animation: none; opacity: 0; transform: translateX(-24px); transition: opacity .15s, transform .15s; }
 
         .community-actions { display: flex; justify-content: flex-end; margin-bottom: 24px; }
         .btn-write {
@@ -132,12 +145,13 @@
         <!-- 왼쪽: 게시판 메인 -->
         <div class="community-main">
             <!-- 탭 메뉴 -->
-            <div class="community-tabs">
+            <div class="community-tabs" id="communityTabs">
                 <a th:href="@{/community(category='all')}" class="community-tab" th:classappend="${currentCategory == 'all'} ? 'active'">전체보기</a>
                 <a th:href="@{/community(category='qna')}" class="community-tab" th:classappend="${currentCategory == 'qna'} ? 'active'">💡 에러/질문(Q&A)</a>
                 <a th:href="@{/community(category='tips')}" class="community-tab" th:classappend="${currentCategory == 'tips'} ? 'active'">🔥 꿀팁/노하우</a>
                 <a th:href="@{/community(category='study')}" class="community-tab" th:classappend="${currentCategory == 'study'} ? 'active'">📚 스터디 모집</a>
                 <a th:href="@{/community(category='free')}" class="community-tab" th:classappend="${currentCategory == 'free'} ? 'active'">☕ 자유게시판</a>
+                <div class="tab-indicator" id="tabIndicator"></div>
             </div>
 
             <!-- 검색바 -->
@@ -250,7 +264,53 @@
 <footer th:replace="~{index :: footer}"></footer>
 
 <script>
-    // 카테고리 탭은 서버사이드 라우팅으로 교체했으므로, JS 필터링 최소화
+    (function () {
+        const tabs = document.querySelectorAll('#communityTabs .community-tab');
+        const indicator = document.getElementById('tabIndicator');
+        const tabsEl = document.getElementById('communityTabs');
+        const postList = document.querySelector('.post-list');
+
+        function moveIndicator(tab) {
+            const tabsRect = tabsEl.getBoundingClientRect();
+            const tabRect = tab.getBoundingClientRect();
+            indicator.style.left = (tabRect.left - tabsRect.left + tabsEl.scrollLeft) + 'px';
+            indicator.style.width = tabRect.width + 'px';
+        }
+
+        // 페이지 로드 시 인디케이터 즉시 위치 (애니메이션 없이)
+        const activeTab = document.querySelector('#communityTabs .community-tab.active');
+        if (activeTab) {
+            indicator.style.transition = 'none';
+            moveIndicator(activeTab);
+            // 다음 프레임부터 transition 복원
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    indicator.style.transition = '';
+                });
+            });
+        }
+
+        // 탭 클릭 시 슬라이드 아웃 후 이동
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function (e) {
+                if (this.classList.contains('active')) return;
+                e.preventDefault();
+                const href = this.href;
+
+                // 인디케이터 먼저 슬라이드
+                moveIndicator(this);
+
+                // 콘텐츠 페이드아웃
+                if (postList) {
+                    postList.style.transition = 'opacity .15s, transform .15s';
+                    postList.style.opacity = '0';
+                    postList.style.transform = 'translateX(-20px)';
+                }
+
+                setTimeout(() => { window.location.href = href; }, 180);
+            });
+        });
+    })();
 </script>
 </body>
 </html>

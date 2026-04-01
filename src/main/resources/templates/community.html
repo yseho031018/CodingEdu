@@ -63,7 +63,7 @@
         .post-content { flex: 1; }
         .post-content h4 { font-size: 1.25rem; font-weight: 800; color: var(--text); margin-bottom: 10px; }
         .post-item:hover .post-content h4 { color: var(--blue); }
-        .post-content p { font-size: .95rem; color: #666; margin-bottom: 16px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .post-content p { font-size: .9rem; color: #999; margin-bottom: 12px; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .post-meta { display: flex; gap: 16px; font-size: .85rem; color: #888; flex-wrap: wrap; }
         .post-meta span { display: flex; align-items: center; gap: 6px; }
         .post-meta .author { font-weight: 700; color: #555; }
@@ -190,7 +190,7 @@
                          th:text="${post.category == 'qna' ? '질문' : post.category == 'tips' ? '꿀팁' : post.category == 'study' ? '스터디' : '자유'}">카테고리</div>
                     <div class="post-content">
                         <h4 th:text="${post.title}">게시글 제목</h4>
-                        <p th:text="${post.content}">게시글 내용 미리보기</p>
+                        <p th:text="${post.content != null ? post.content.split('\n')[0] : ''}"></p>
                         <div class="post-meta">
                             <span class="author" th:text="${post.author.nickname}">작성자</span>
                             <span class="date" th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">작성일짜</span>

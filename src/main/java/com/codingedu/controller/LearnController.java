@@ -55,6 +55,7 @@ public class LearnController {
         model.addAttribute("lang", safeLang);
         model.addAttribute("langTitle", safeLang.substring(0, 1).toUpperCase() + safeLang.substring(1));
         model.addAttribute("course", course);
+        model.addAttribute("isLoggedIn", userDetails != null);
 
         if (userDetails != null) {
             User user = userService.findByUsername(userDetails.getUsername());

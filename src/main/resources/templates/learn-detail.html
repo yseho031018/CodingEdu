@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta th:name="_csrf" th:content="${_csrf.token}"/>
+    <meta th:name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title th:text="${langTitle + ' - CodeEdu'}">학습하기 - CodeEdu</title>
     <link rel="stylesheet" href="/css/common.css">
     <style>
@@ -57,6 +59,17 @@
             border-left-color: #1565C0;
             font-weight: 700;
         }
+        .topic-item.done { color: #2E7D32; }
+        .topic-item.done .topic-label { text-decoration: line-through; opacity: .7; }
+        .topic-item.done.active { color: #1565C0; }
+        .topic-item.done.active .topic-label { text-decoration: none; opacity: 1; }
+        .topic-check {
+            width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: .7rem; font-weight: 900;
+        }
+        .topic-check.checked { background: #4CAF50; color: #fff; }
+        .topic-check.unchecked { display: none; }
         .topic-item.sub {
             padding-left: 28px;
             font-size: .8rem;
@@ -104,92 +117,32 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            cursor: pointer;
         }
-        .video-wrap { cursor: default; }
-        .video-wrap:hover .play-btn { transform: scale(1.1); }
         .video-thumb-bg {
-            position: absolute;
-            inset: 0;
+            position: absolute; inset: 0;
             background: linear-gradient(135deg, #1a1a2e 0%, #2d3561 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 12px;
+            display: flex; align-items: center; justify-content: center;
+            flex-direction: column; gap: 12px;
         }
         .video-thumb-icon { font-size: 4rem; opacity: .4; }
-        .video-thumb-title {
-            font-size: 1rem;
-            color: rgba(255,255,255,.6);
-            font-weight: 600;
-        }
+        .video-thumb-title { font-size: 1rem; color: rgba(255,255,255,.6); font-weight: 600; }
+
         .play-btn {
             position: absolute;
-            width: 72px;
-            height: 72px;
-            background: #ff0000;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform .2s;
+            width: 72px; height: 72px;
+            background: #ff0000; border-radius: 16px; border: none;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 2;
             box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-            cursor: pointer;
-            border: none;
-            z-index: 2;
+            transition: transform .2s;
         }
+        .play-btn:hover { transform: scale(1.1); }
         .play-btn::after {
-            content: '';
-            width: 0;
-            height: 0;
+            content: ''; width: 0; height: 0;
             border-top: 14px solid transparent;
             border-bottom: 14px solid transparent;
             border-left: 24px solid #fff;
             margin-left: 4px;
-        }
-        .play-btn.playing::after {
-            border-left: 8px solid #fff;
-            border-right: 8px solid #fff;
-            height: 20px;
-            width: 0;
-            margin-left: 0;
-            border-top: none;
-            border-bottom: none;
-            box-shadow: 8px 0 0 #fff;
-        }
-        .video-progress-wrap {
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            height: 5px;
-            background: rgba(255,255,255,0.2);
-            z-index: 2;
-        }
-        .video-progress-bar {
-            height: 100%;
-            background: #ff0000;
-            width: 0%;
-            transition: width .3s linear;
-        }
-        .video-status {
-            position: absolute;
-            bottom: 12px;
-            left: 16px;
-            color: rgba(255,255,255,.8);
-            font-size: .8rem;
-            font-weight: 600;
-            z-index: 2;
-        }
-        .video-done-badge {
-            position: absolute;
-            top: 12px; right: 12px;
-            background: #4CAF50;
-            color: #fff;
-            font-size: .8rem;
-            font-weight: 800;
-            padding: 5px 12px;
-            border-radius: 20px;
-            z-index: 2;
         }
 
         /* 본문 */
@@ -337,12 +290,13 @@
 <!-- 모바일 토글 버튼 -->
 <button class="sidebar-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
 
-<script>
+<script th:inline="javascript">
 const COURSES = {
     html: {
         title: "WEB1 - HTML & Internet",
         icon: "🌐",
         date: "2025-01-15",
+        videoId: "pQN-pnXPaVg",
         lessons: [
             { id: 0, label: "프로젝트의 동기", sub: false,
               title: "이 강의를 만든 이유",
@@ -394,6 +348,7 @@ const COURSES = {
     css: {
         title: "WEB2 - CSS",
         icon: "🎨",
+        videoId: "1Rs2ND1ryYc",
         date: "2025-02-01",
         lessons: [
             { id: 0, label: "CSS란 무엇인가?", sub: false,
@@ -431,6 +386,7 @@ const COURSES = {
     javascript: {
         title: "WEB3 - JavaScript",
         icon: "⚡",
+        videoId: "W6NZfCO5SIk",
         date: "2025-02-20",
         lessons: [
             { id: 0, label: "JavaScript 소개", sub: false,
@@ -468,6 +424,7 @@ const COURSES = {
     typescript: {
         title: "TypeScript - 타입 안전 개발",
         icon: "🔷",
+        videoId: "BwuLxPH8IDs",
         date: "2025-03-05",
         lessons: [
             { id: 0, label: "TypeScript 소개", sub: false,
@@ -495,6 +452,7 @@ const COURSES = {
     java: {
         title: "Java - 객체지향 프로그래밍",
         icon: "☕",
+        videoId: "eIrMbAQSU34",
         date: "2025-01-20",
         lessons: [
             { id: 0, label: "Java 소개 및 환경 설정", sub: false,
@@ -527,6 +485,7 @@ const COURSES = {
     kotlin: {
         title: "Kotlin - 현대적 JVM 언어",
         icon: "🌱",
+        videoId: "F9UC9DY-vIU",
         date: "2025-03-10",
         lessons: [
             { id: 0, label: "Kotlin 소개", sub: false,
@@ -554,6 +513,7 @@ const COURSES = {
     c: {
         title: "C언어 - 프로그래밍 기초",
         icon: "🔧",
+        videoId: "KJgsSFOSQv0",
         date: "2025-01-10",
         lessons: [
             { id: 0, label: "C언어 소개", sub: false,
@@ -586,6 +546,7 @@ const COURSES = {
     cpp: {
         title: "C++ - 고성능 프로그래밍",
         icon: "⚙️",
+        videoId: "vLnPwxZdW4Y",
         date: "2025-02-10",
         lessons: [
             { id: 0, label: "C++와 C의 차이", sub: false,
@@ -613,6 +574,7 @@ const COURSES = {
     swift: {
         title: "Swift - iOS 앱 개발",
         icon: "📱",
+        videoId: "comQ1-x2a1Q",
         date: "2025-02-25",
         lessons: [
             { id: 0, label: "Swift 소개", sub: false,
@@ -637,100 +599,10 @@ const COURSES = {
               code: 'import SwiftUI\n\nstruct ContentView: View {\n    @State private var count = 0\n    @State private var name = ""\n\n    var body: some View {\n        VStack(spacing: 24) {\n            Text("카운터: \\(count)")\n                .font(.largeTitle)\n                .fontWeight(.bold)\n\n            HStack {\n                Button("➖") { count -= 1 }\n                    .buttonStyle(.bordered)\n                Button("➕") { count += 1 }\n                    .buttonStyle(.borderedProminent)\n            }\n\n            TextField("이름 입력", text: $name)\n                .textFieldStyle(.roundedBorder)\n\n            if !name.isEmpty {\n                Text("안녕하세요, \\(name)님!")\n            }\n        }\n        .padding()\n    }\n}' }
         ]
     },
-    typescript: {
-        title: "TypeScript - 타입 안전한 JS",
-        icon: "💙",
-        date: "2025-03-01",
-        lessons: [
-            { id: 0, label: "TypeScript 소개", sub: false,
-              title: "TypeScript란 무엇인가?",
-              desc: "TypeScript는 Microsoft가 개발한 JavaScript의 상위 집합(Superset)입니다. 정적 타입 시스템을 추가하여 코드 오류를 컴파일 단계에서 미리 잡을 수 있습니다. 브라우저나 Node.js에서 실행할 때는 JavaScript로 트랜스파일됩니다.",
-              points: ["JavaScript 코드가 그대로 TypeScript에서 동작", "컴파일 시점에 타입 오류 검출", "VSCode 자동완성, 리팩터링 지원 강화"],
-              code: '// TypeScript 기본 타입 예시\nconst name: string = "코딩에듀";\nlet score: number = 100;\nconst isActive: boolean = true;\n\n// 타입 추론 (명시 불필요)\nlet message = "Hello!";  // string으로 추론\n\n// 함수 타입 지정\nfunction add(a: number, b: number): number {\n    return a + b;\n}\n\nconsole.log(add(3, 5));  // 8\n// add("3", 5);  // ❌ 컴파일 오류!' },
-            { id: 1, label: "인터페이스와 타입", sub: false,
-              title: "interface와 type alias",
-              desc: "TypeScript의 핵심인 interface와 type으로 복잡한 데이터 구조를 명확하게 정의합니다. 객체 형태를 미리 약속하면 실수를 줄이고 협업이 쉬워집니다.",
-              points: ["interface: 객체 구조 정의 (확장 가능)", "type: 복잡한 타입 조합 (유니온, 인터섹션)", "readonly, optional(?) 프로퍼티 활용"],
-              code: '// 인터페이스 정의\ninterface User {\n    id: number;\n    name: string;\n    email?: string;      // 선택적 프로퍼티\n    readonly role: string; // 읽기 전용\n}\n\n// type alias\ntype Status = "active" | "inactive" | "banned";\n\n// 인터페이스 확장\ninterface Admin extends User {\n    permissions: string[];\n}\n\nconst user: User = { id: 1, name: "김타입", role: "user" };\nconst status: Status = "active";' },
-            { id: 2, label: "제네릭(Generic)", sub: false,
-              title: "제네릭으로 재사용 가능한 코드 작성",
-              desc: "제네릭(Generic)은 타입을 변수처럼 사용하는 기법입니다. 다양한 타입에 동작하는 함수나 클래스를 타입 안전하게 작성할 수 있습니다.",
-              points: ["<T>로 타입 매개변수 선언", "배열, 함수, 클래스 모두 제네릭 적용 가능", "extends로 타입 제한 가능"],
-              code: '// 제네릭 함수\nfunction identity<T>(arg: T): T {\n    return arg;\n}\n\n// 제네릭 인터페이스\ninterface ApiResponse<T> {\n    data: T;\n    status: number;\n    message: string;\n}\n\n// 활용 예시\nconst response: ApiResponse<User[]> = {\n    data: [{ id: 1, name: "홍길동", role: "user" }],\n    status: 200,\n    message: "success"\n};\n\n// 배열 첫 요소 반환 (타입 안전)\nfunction first<T>(arr: T[]): T | undefined {\n    return arr[0];\n}' },
-            { id: 3, label: "유니온 & 타입 가드", sub: false,
-              title: "유니온 타입과 타입 좁히기",
-              desc: "유니온 타입(|)으로 여러 타입을 허용하고, 타입 가드로 런타임에 타입을 안전하게 좁혀 처리합니다.",
-              points: ["A | B: A 또는 B 타입", "typeof, instanceof로 타입 가드", "discriminated union 패턴"],
-              code: '// 유니온 타입\ntype StringOrNumber = string | number;\n\nfunction printLength(value: StringOrNumber): void {\n    if (typeof value === "string") {\n        // 이 블록에서 value는 string\n        console.log("문자 길이:", value.length);\n    } else {\n        // 이 블록에서 value는 number\n        console.log("숫자:", value.toFixed(2));\n    }\n}\n\n// Discriminated Union 패턴\ntype Shape =\n    | { kind: "circle"; radius: number }\n    | { kind: "rect"; width: number; height: number };\n\nfunction area(shape: Shape): number {\n    switch (shape.kind) {\n        case "circle": return Math.PI * shape.radius ** 2;\n        case "rect":   return shape.width * shape.height;\n    }\n}' },
-            { id: 4, label: "tsconfig & 실전 팁", sub: false,
-              title: "TypeScript 설정과 실무 활용",
-              desc: "tsconfig.json으로 TypeScript 컴파일 옵션을 설정합니다. strict 모드, 경로 별칭, 선언 파일(.d.ts) 등 실무에서 꼭 알아야 할 설정을 학습합니다.",
-              points: ["strict: true로 엄격한 타입 검사", "paths로 import 경로 별칭 설정", "unknown vs any: unknown이 더 안전"],
-              code: '// tsconfig.json 핵심 설정\n{\n  "compilerOptions": {\n    "target": "ES2020",\n    "module": "ESNext",\n    "strict": true,         // 엄격 모드 활성화\n    "noImplicitAny": true,  // any 타입 묵시적 사용 금지\n    "paths": {\n      "@/*": ["./src/*"]    // 경로 별칭\n    }\n  }\n}\n\n// any 대신 unknown 사용\nfunction parseData(raw: unknown): string {\n    if (typeof raw === "string") return raw;\n    if (typeof raw === "number") return String(raw);\n    throw new Error("파싱 불가");\n}' }
-        ]
-    },
-    java: {
-        title: "Java 기초 - 객체지향 프로그래밍",
-        icon: "☕",
-        date: "2025-03-01",
-        lessons: [
-            { id: 0, label: "Java 소개와 JVM", sub: false,
-              title: "Java와 JVM 이해하기",
-              desc: "Java는 1995년 Sun Microsystems가 발표한 객체지향 언어입니다. 'Write Once, Run Anywhere' 철학으로 JVM(Java Virtual Machine) 위에서 어떤 OS에서도 동일하게 실행됩니다. Android 앱, 서버 백엔드, 빅데이터 처리 등 광범위하게 사용됩니다.",
-              points: ["JVM: 바이트코드(.class)를 OS에 맞게 실행", "JDK: 개발 도구 포함 / JRE: 실행 환경만", "강타입 언어 - 변수에 타입 명시 필수"],
-              code: '// Java 첫 번째 프로그램\npublic class HelloWorld {\n    public static void main(String[] args) {\n        // 콘솔 출력\n        System.out.println("Hello, Java!");\n\n        // 변수 선언\n        String name = "코딩에듀";\n        int year = 2025;\n\n        System.out.printf("%s에서 Java를 배워요! (%d)%n",\n                          name, year);\n    }\n}' },
-            { id: 1, label: "변수와 자료형", sub: false,
-              title: "Java 기본 자료형과 참조형",
-              desc: "Java의 자료형은 기본형(Primitive)과 참조형(Reference)으로 나뉩니다. 기본형은 값을 직접 저장하고, 참조형은 객체의 주소를 저장합니다.",
-              points: ["기본형: int, long, double, boolean, char 등", "참조형: String, 배열, 사용자 정의 클래스", "자동 형 변환(묵시적)과 강제 형 변환(명시적)"],
-              code: '// 기본 자료형\nint age = 25;              // 4바이트 정수\nlong bigNum = 123456789L;  // 8바이트 정수\ndouble pi = 3.14159;       // 8바이트 실수\nboolean isJava = true;     // true / false\nchar letter = \'A\';         // 2바이트 문자\n\n// 참조형\nString greeting = "안녕하세요!";\nint[] scores = {85, 92, 78, 96};\n\n// 형 변환\nint i = 10;\ndouble d = i;            // 자동 변환 (int → double)\nint back = (int) 3.99;   // 강제 변환 → 3 (소수점 버림)\n\n// 문자열 연산\nSystem.out.println("점수: " + scores[0]);' },
-            { id: 2, label: "조건문과 반복문", sub: false,
-              title: "프로그램 흐름 제어",
-              desc: "if-else, switch로 조건 분기를 처리하고 for, while, do-while, 향상된 for문으로 반복 작업을 수행합니다.",
-              points: ["switch-case: 정수/문자열 비교에 효율적", "향상된 for: 배열/컬렉션 순회에 간결", "break/continue: 루프 흐름 제어"],
-              code: '// 조건문\nint score = 87;\nif (score >= 90) {\n    System.out.println("A학점");\n} else if (score >= 80) {\n    System.out.println("B학점");  // 출력\n} else {\n    System.out.println("C학점");\n}\n\n// switch (Java 14+ 화살표 문법)\nString grade = switch (score / 10) {\n    case 10, 9 -> "A";\n    case 8     -> "B";\n    case 7     -> "C";\n    default    -> "F";\n};\n\n// 향상된 for\nint[] nums = {1, 2, 3, 4, 5};\nint sum = 0;\nfor (int n : nums) sum += n;\nSystem.out.println("합계: " + sum);  // 15' },
-            { id: 3, label: "클래스와 객체", sub: false,
-              title: "객체지향의 핵심: 클래스와 인스턴스",
-              desc: "클래스는 객체의 설계도입니다. 필드(상태)와 메서드(행동)를 하나로 묶어 실세계를 모델링합니다. 캡슐화, 상속, 다형성을 통해 유지보수하기 좋은 코드를 작성합니다.",
-              points: ["캡슐화: private 필드 + public getter/setter", "생성자(Constructor): 객체 초기화", "this: 현재 인스턴스 참조"],
-              code: 'public class Person {\n    // 필드 (캡슐화)\n    private String name;\n    private int age;\n\n    // 생성자\n    public Person(String name, int age) {\n        this.name = name;\n        this.age = age;\n    }\n\n    // 메서드\n    public void introduce() {\n        System.out.printf("안녕하세요! %s이고 %d살입니다.%n",\n                           name, age);\n    }\n\n    // getter\n    public String getName() { return name; }\n    public int getAge()     { return age; }\n}\n\n// 사용\nPerson p = new Person("홍길동", 25);\np.introduce();\nSystem.out.println(p.getName());' },
-            { id: 4, label: "컬렉션과 제네릭", sub: false,
-              title: "ArrayList, HashMap, 제네릭",
-              desc: "Java의 컬렉션 프레임워크는 자료구조를 표준화합니다. List, Map, Set을 활용하면 배열보다 유연하게 데이터를 관리할 수 있습니다.",
-              points: ["ArrayList: 동적 크기 배열", "HashMap: 키-값 저장, O(1) 탐색", "제네릭<T>: 타입 안전한 컬렉션"],
-              code: 'import java.util.*;\n\n// ArrayList\nList<String> langs = new ArrayList<>();\nlangs.add("Java");\nlangs.add("Python");\nlangs.add("Kotlin");\nSystem.out.println(langs.size());  // 3\n\nfor (String lang : langs) {\n    System.out.println("▶ " + lang);\n}\n\n// HashMap\nMap<String, Integer> scores = new HashMap<>();\nscores.put("Alice", 95);\nscores.put("Bob",   87);\nscores.put("Carol", 92);\n\n// 반복\nfor (Map.Entry<String, Integer> entry : scores.entrySet()) {\n    System.out.printf("%s: %d%n",\n                       entry.getKey(), entry.getValue());\n}' }
-        ]
-    },
-    kotlin: {
-        title: "Kotlin - Android 공식 언어",
-        icon: "🟣",
-        date: "2025-03-05",
-        lessons: [
-            { id: 0, label: "Kotlin 소개", sub: false,
-              title: "왜 Kotlin인가?",
-              desc: "Kotlin은 JetBrains가 개발하고 Google이 Android 공식 언어로 채택한 언어입니다. Java와 100% 호환되며 더 간결하고 안전한 문법을 제공합니다. Null 안전성이 내장되어 NullPointerException을 근본적으로 줄여줍니다.",
-              points: ["Java 대비 코드 40% 감소", "Null 안전성 내장 - NPE 방지", "함수형 + 객체지향 멀티패러다임"],
-              code: '// Kotlin 첫 번째 코드\nfun main() {\n    println("Hello, Kotlin!")\n\n    // 타입 추론\n    val name = "코딩에듀"  // val: 불변 (const)\n    var count = 0          // var: 가변\n    count++\n\n    // 문자열 템플릿\n    println("$name: ${count}번 방문")\n\n    // Null 안전성\n    var nickname: String? = null  // null 허용\n    println(nickname?.length ?: "이름 없음")  // 안전 호출\n}' },
-            { id: 1, label: "변수, 함수, Null 안전성", sub: false,
-              title: "Kotlin의 핵심 문법",
-              desc: "val/var로 변수를 선언하고, fun으로 함수를 정의합니다. 타입 추론, 기본값 인수, 확장 함수 등 Kotlin의 생산성 높은 문법을 학습합니다.",
-              points: ["val: 재할당 불가 (Java final), var: 가변", "?: 안전 호출, ?: Elvis 연산자, !! 강제 해제", "확장 함수: 기존 클래스에 메서드 추가"],
-              code: '// 함수 선언\nfun greet(name: String, greeting: String = "안녕하세요"): String {\n    return "$greeting, $name님!"\n}\n\n// 단일 표현식 함수\nfun double(x: Int) = x * 2\n\n// 확장 함수\nfun String.shout() = this.uppercase() + "!!!"\n\nfun main() {\n    println(greet("홍길동"))\n    println(double(5))\n    println("kotlin".shout())  // KOTLIN!!!\n\n    // Null 안전성\n    val text: String? = null\n    val len = text?.length ?: -1  // -1 (null이므로)\n    println(len)\n}' },
-            { id: 2, label: "클래스와 데이터 클래스", sub: false,
-              title: "OOP와 data class",
-              desc: "Kotlin의 클래스는 Java보다 훨씬 간결합니다. data class는 equals, hashCode, toString, copy를 자동 생성합니다. sealed class로 상태를 안전하게 모델링합니다.",
-              points: ["주 생성자: class Person(val name: String)", "data class: 보일러플레이트 자동 생성", "sealed class: 제한된 계층 구조"],
-              code: '// 일반 클래스\nclass Animal(val name: String, private var sound: String) {\n    fun speak() = "$name: $sound!"\n}\n\n// 데이터 클래스 (equals, hashCode, toString, copy 자동 생성)\ndata class User(\n    val id: Int,\n    val name: String,\n    val email: String\n)\n\n// sealed class (상태 모델링)\nsealed class Result<out T>\ndata class Success<T>(val data: T) : Result<T>()\ndata class Error(val message: String) : Result<Nothing>()\n\nfun main() {\n    val cat = Animal("고양이", "야옹")\n    println(cat.speak())\n\n    val user1 = User(1, "홍길동", "hong@email.com")\n    val user2 = user1.copy(name = "김철수")  // 불변 복사\n    println(user1)\n    println(user2)\n}' },
-            { id: 3, label: "코루틴 기초", sub: false,
-              title: "Kotlin Coroutines 입문",
-              desc: "코루틴(Coroutine)은 Kotlin의 비동기 프로그래밍 솔루션입니다. 스레드보다 가볍고 콜백 없이 순차적인 코드로 비동기 작업을 처리할 수 있습니다.",
-              points: ["suspend fun: 일시 중단 가능한 함수", "launch: 결과가 필요 없는 코루틴", "async/await: 결과를 반환하는 비동기 작업"],
-              code: 'import kotlinx.coroutines.*\n\n// suspend 함수\nsuspend fun fetchUser(id: Int): String {\n    delay(1000)  // 1초 지연 (Thread.sleep과 달리 스레드 차단 없음)\n    return "User#$id"\n}\n\nfun main() = runBlocking {\n    println("시작")\n\n    // launch: fire-and-forget\n    val job = launch {\n        println("코루틴 실행 중...")\n        delay(500)\n        println("코루틴 완료")\n    }\n\n    // async: 결과 반환\n    val user = async { fetchUser(1) }\n    println("가져온 유저: ${user.await()}")\n\n    job.join()\n    println("모두 완료")\n}' }
-        ]
-    },
     python: {
-        title: "Python - AI & 데이터 분석",
+        title: "Python - AI &amp; 데이터 분석",
         icon: "🐍",
+        videoId: "_uQrJ0TkZlc",
         date: "2025-01-05",
         lessons: [
             { id: 0, label: "Python 소개", sub: false,
@@ -747,26 +619,28 @@ const COURSES = {
               title: "def와 import로 코드 구조화",
               desc: "함수로 코드를 재사용하고, 모듈과 패키지로 기능을 분리합니다. 데코레이터로 함수에 기능을 추가할 수 있습니다.",
               points: ["def로 함수 정의, return으로 반환", "기본 인수, 가변 인수(*args, **kwargs)", "import로 표준/외부 라이브러리 활용"],
-              code: 'import random\nfrom datetime import datetime\n\ndef greet(name, greeting="안녕하세요"):\n    """인사 메시지를 반환합니다."""\n    now = datetime.now().strftime("%H:%M")\n    return f"[{now}] {greeting}, {name}님!"\n\n# *args: 가변 인수\ndef sum_all(*numbers):\n    return sum(numbers)\n\nprint(greet("홍길동"))\nprint(sum_all(1, 2, 3, 4, 5))  # 15\nprint(random.choice(["A", "B", "C"]))' },
+              code: 'import random\nfrom datetime import datetime\n\ndef greet(name, greeting="안녕하세요"):\n    now = datetime.now().strftime("%H:%M")\n    return f"[{now}] {greeting}, {name}님!"\n\ndef sum_all(*numbers):\n    return sum(numbers)\n\nprint(greet("홍길동"))\nprint(sum_all(1, 2, 3, 4, 5))  # 15' },
             { id: 3, label: "클래스와 OOP", sub: false,
               title: "Python 객체지향 프로그래밍",
               desc: "Python에서 class로 객체를 설계하고 상속으로 코드를 재사용합니다. 매직 메서드로 연산자를 오버로딩할 수 있습니다.",
               points: ["__init__: 생성자", "self: 인스턴스 참조", "__str__, __repr__: 문자열 표현"],
-              code: 'class Animal:\n    def __init__(self, name, sound):\n        self.name = name\n        self.sound = sound\n\n    def speak(self):\n        return f"{self.name}: {self.sound}!"\n\n    def __str__(self):\n        return f"Animal({self.name})"\n\nclass Dog(Animal):\n    def __init__(self, name):\n        super().__init__(name, "멍멍")\n\n    def fetch(self):\n        return f"{self.name}이(가) 공을 가져옵니다!"\n\ndog = Dog("바둑이")\nprint(dog.speak())  # 바둑이: 멍멍!\nprint(dog.fetch())' },
+              code: 'class Animal:\n    def __init__(self, name, sound):\n        self.name = name\n        self.sound = sound\n\n    def speak(self):\n        return f"{self.name}: {self.sound}!"\n\nclass Dog(Animal):\n    def __init__(self, name):\n        super().__init__(name, "멍멍")\n\n    def fetch(self):\n        return f"{self.name}이(가) 공을 가져옵니다!"\n\ndog = Dog("바둑이")\nprint(dog.speak())\nprint(dog.fetch())' },
             { id: 4, label: "Pandas 데이터 분석", sub: false,
               title: "Pandas로 데이터 다루기",
               desc: "Pandas는 Python 데이터 분석의 핵심 라이브러리입니다. DataFrame으로 표 형태의 데이터를 효율적으로 처리합니다.",
               points: ["DataFrame: 행과 열로 구성된 2차원 데이터", "groupby: 그룹별 집계", "matplotlib으로 시각화"],
-              code: 'import pandas as pd\n\n# 데이터 생성\ndata = {\n    "이름": ["김철수", "이영희", "박민준", "최지아"],\n    "점수": [85, 92, 78, 96],\n    "학년": [2, 3, 1, 3]\n}\ndf = pd.DataFrame(data)\n\n# 기본 분석\nprint(df.describe())              # 통계 요약\nprint(df[df["점수"] >= 90])      # 90점 이상 필터\nprint(df.groupby("학년")["점수"].mean())  # 학년별 평균\n\n# 저장\ndf.to_csv("scores.csv", index=False)' }
+              code: 'import pandas as pd\n\ndata = {\n    "이름": ["김철수", "이영희", "박민준", "최지아"],\n    "점수": [85, 92, 78, 96],\n    "학년": [2, 3, 1, 3]\n}\ndf = pd.DataFrame(data)\n\nprint(df.describe())\nprint(df[df["점수"] >= 90])\nprint(df.groupby("학년")["점수"].mean())' }
         ]
     }
 };
 
 // 서버에서 주입된 값
-const initialLang       = /*[[${lang}]]*/ 'html';
-const completedIndices  = new Set(/*[[${completedIndices}]]*/ []);
-const isLoggedIn        = /*[[${completedIndices != null}]]*/ false;
-const csrfToken         = document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] || '';
+const initialLang      = /*[[${lang}]]*/ 'html';
+// completedIndices: 서버가 주입. 비로그인 시 '__GUEST__' 문자열이 들어옴
+const _rawIndices      = /*[[${completedIndices != null ? completedIndices : '__GUEST__'}]]*/ '__GUEST__';
+const isLoggedIn       = (_rawIndices !== '__GUEST__');
+const completedIndices = isLoggedIn ? new Set(_rawIndices) : new Set();
+const csrfToken        = document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] || '';
 
 let currentLang = (initialLang && COURSES[initialLang]) ? initialLang : 'html';
 let currentLesson = 0;
@@ -788,11 +662,12 @@ function renderTopics() {
     const list = document.getElementById("topicList");
     list.innerHTML = course.lessons.map((l, i) => {
         const done = completedIndices.has(i);
+        const isActive = i === currentLesson;
         return `
-            <div class="topic-item ${l.sub ? 'sub' : ''} ${i === currentLesson ? 'active' : ''}"
-                 onclick="selectLesson(${i})" style="display:flex;justify-content:space-between;align-items:center;">
-                <span>${l.label}</span>
-                ${done ? '<span style="color:#4CAF50;font-size:.8rem;">✅</span>' : ''}
+            <div class="topic-item ${l.sub ? 'sub' : ''} ${isActive ? 'active' : ''} ${done ? 'done' : ''}"
+                 onclick="selectLesson(${i})" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                <span class="topic-label">${l.label}</span>
+                <span class="topic-check ${done ? 'checked' : 'unchecked'}">✓</span>
             </div>
         `;
     }).join("");
@@ -830,16 +705,11 @@ function renderLesson(idx) {
         </div>
 
         <div class="video-wrap" id="videoWrap">
-            <div class="video-thumb-bg">
+            <div class="video-thumb-bg" id="videoThumb">
                 <div class="video-thumb-icon">${course.icon}</div>
                 <div class="video-thumb-title">${course.title} - ${l.label}</div>
             </div>
-            ${completedIndices.has(idx) ? '<div class="video-done-badge">✅ 시청 완료</div>' : ''}
-            <button class="play-btn" id="playBtn" onclick="toggleVideo(${idx})"></button>
-            <div class="video-status" id="videoStatus">${completedIndices.has(idx) ? '시청 완료' : '▶ 재생하여 강의를 완료하세요'}</div>
-            <div class="video-progress-wrap">
-                <div class="video-progress-bar" id="videoProgressBar" style="width:${completedIndices.has(idx) ? '100' : '0'}%"></div>
-            </div>
+            <button class="play-btn" onclick="playVideo('${l.videoId || course.videoId}', ${idx})"></button>
         </div>
 
         <div class="lesson-body">
@@ -856,10 +726,8 @@ function renderLesson(idx) {
                 ← 이전 강의
             </button>
             <button class="nav-btn next" id="nextBtn"
-                onclick="handleNext(${idx})"
-                ${idx === course.lessons.length - 1 ? "disabled" : ""}
-                ${isLoggedIn && !completedIndices.has(idx) ? 'disabled style="opacity:.4;cursor:not-allowed;" title="영상을 끝까지 시청하면 활성화됩니다"' : ""}>
-                다음 강의 →
+                onclick="completeAndNext(${idx})">
+                ${completedIndices.has(idx) ? '다음 강의 →' : '✅ 완료 후 다음 강의 →'}
             </button>
         </div>
     `;
@@ -867,110 +735,48 @@ function renderLesson(idx) {
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+function playVideo(videoId, idx) {
+    const wrap = document.getElementById('videoWrap');
+    if (!wrap || !videoId) return;
+    wrap.innerHTML = `<iframe
+        src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0"
+        style="position:absolute;inset:0;width:100%;height:100%;border:none;"
+        allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+}
+
 function selectLesson(idx) {
     const course = COURSES[currentLang];
     if (idx < 0 || idx >= course.lessons.length) return;
-    if (videoTimer) { clearInterval(videoTimer); videoTimer = null; }
-    videoProgress = 0;
     renderLesson(idx);
 }
 
-// 영상 재생/일시정지 토글
-let videoTimer = null;
-let videoProgress = 0; // 0~100
-const VIDEO_DURATION = 30; // 시뮬레이션 재생 시간(초) - 실제 영상 연동 시 교체
-
-function toggleVideo(idx) {
-    if (completedIndices.has(idx)) return; // 이미 완료된 강의는 재생 불필요
-    const playBtn = document.getElementById('playBtn');
-    if (videoTimer) {
-        // 일시정지
-        clearInterval(videoTimer);
-        videoTimer = null;
-        playBtn.classList.remove('playing');
-        document.getElementById('videoStatus').textContent = '⏸ 일시정지됨';
-    } else {
-        // 재생 시작
-        playBtn.classList.add('playing');
-        videoTimer = setInterval(() => {
-            videoProgress = Math.min(100, videoProgress + (100 / VIDEO_DURATION / 10));
-            const bar = document.getElementById('videoProgressBar');
-            if (bar) bar.style.width = videoProgress + '%';
-
-            const elapsed = Math.floor(videoProgress * VIDEO_DURATION / 100);
-            const remain = VIDEO_DURATION - elapsed;
-            const status = document.getElementById('videoStatus');
-            if (status) status.textContent = `▶ 재생 중 · 남은 시간 ${remain}초`;
-
-            if (videoProgress >= 100) {
-                clearInterval(videoTimer);
-                videoTimer = null;
-                onVideoEnded(idx);
-            }
-        }, 100);
-    }
-}
-
-function onVideoEnded(idx) {
-    const playBtn = document.getElementById('playBtn');
-    if (playBtn) { playBtn.classList.remove('playing'); playBtn.disabled = true; }
-    const status = document.getElementById('videoStatus');
-    if (status) status.textContent = '시청 완료';
-    const bar = document.getElementById('videoProgressBar');
-    if (bar) bar.style.background = '#4CAF50';
-
-    // 완료 뱃지 표시
-    const wrap = document.getElementById('videoWrap');
-    if (wrap && !wrap.querySelector('.video-done-badge')) {
-        const badge = document.createElement('div');
-        badge.className = 'video-done-badge';
-        badge.textContent = '✅ 시청 완료';
-        wrap.appendChild(badge);
-    }
-
-    // 다음 강의 버튼 활성화
-    const nextBtn = document.getElementById('nextBtn');
-    if (nextBtn) {
-        nextBtn.disabled = false;
-        nextBtn.style.opacity = '1';
-        nextBtn.style.cursor = 'pointer';
-        nextBtn.title = '';
-        nextBtn.classList.add('pulse');
-    }
-}
-
-async function handleNext(idx) {
+async function completeAndNext(idx) {
     const course = COURSES[currentLang];
+    const btn = document.getElementById('nextBtn');
+    if (btn) { btn.disabled = true; btn.textContent = '저장 중...'; }
+
     if (isLoggedIn && !completedIndices.has(idx)) {
-        await markComplete(idx);
+        try {
+            const csrfToken = document.querySelector('meta[name="_csrf"]')?.content || '';
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';
+            const res = await fetch(`/api/learn/${currentLang}/complete`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', [csrfHeader]: csrfToken },
+                body: JSON.stringify({ lessonIdx: idx })
+            });
+            if (res.ok) {
+                completedIndices.add(idx);
+                renderTopics();
+            }
+        } catch (e) { console.error(e); }
     }
+
     if (idx < course.lessons.length - 1) {
-        videoProgress = 0;
-        videoTimer = null;
         selectLesson(idx + 1);
+    } else {
+        showCompleteToast(false, idx);
+        if (btn) { btn.disabled = false; btn.textContent = '다음 강의 →'; }
     }
-}
-
-async function markComplete(lessonIdx) {
-    try {
-        const res = await fetch(`/api/learn/${currentLang}/complete`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-XSRF-TOKEN': getCsrfToken()
-            },
-            body: JSON.stringify({ lessonIdx })
-        });
-        if (res.ok) {
-            completedIndices.add(lessonIdx);
-            renderTopics();
-            renderLesson(lessonIdx);
-
-            const course = COURSES[currentLang];
-            const hasNext = lessonIdx < course.lessons.length - 1;
-            showCompleteToast(hasNext, lessonIdx);
-        }
-    } catch (e) { console.error(e); }
 }
 
 function showCompleteToast(hasNext, lessonIdx) {
@@ -1017,10 +823,7 @@ function showCompleteToast(hasNext, lessonIdx) {
     setTimeout(() => { if (toast.parentNode) toast.remove(); }, 6000);
 }
 
-function getCsrfToken() {
-    const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
-    return match ? decodeURIComponent(match[1]) : '';
-}
+
 
 function escHtml(str) {
     return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");

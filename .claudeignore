@@ -1,0 +1,41 @@
+# Maven 빌드 결과물 (이거 제일 중요!! 토큰 폭탄 방지)
+target/
+*.class
+*.jar
+*.war
+
+# Maven 관련
+.mvn/
+mvnw
+mvnw.cmd
+
+# Logs & temp files
+logs/
+*.log
+*.tmp
+
+# Secrets & config (절대 AI가 읽지 말아야 할 것들)
+.env
+application-*.properties
+application-*.yml
+*.key
+*.pem
+keystore/
+truststore/
+
+# IDE & OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# 테스트 관련 (필요하면 주석 풀기)
+# target/test-classes/
+# surefire-reports/
+
+# 기타 큰 파일이나 불필요한 것
+data/
+*.db
+*.h2.db

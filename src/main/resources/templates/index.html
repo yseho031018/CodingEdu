@@ -278,6 +278,28 @@
   .typing::after { content: '|'; animation: blink-cursor .7s step-end infinite; }
   @keyframes blink-cursor { 50%{opacity:0} }
 
+  /* ── 반응형 ── */
+  @media (max-width: 900px) {
+    .hero { flex-direction: column; text-align: center; padding: 48px 5% 36px; min-height: auto; }
+    .hero-text { max-width: 100%; }
+    .hero-robot { display: none; }
+    .badge-float { display: none; }
+    .hero-stats { justify-content: center; gap: 20px; }
+    .hero h1 { font-size: 2.2rem; }
+    .hero h2 { font-size: 1.05rem; }
+  }
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 1.8rem; }
+    .hero-stats { gap: 12px; }
+    .stat-num { font-size: 1.1rem; }
+    .cards-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+    .lang-card { padding: 18px 14px; }
+    .lang-icon { font-size: 2rem; }
+    .features-grid { grid-template-columns: 1fr; }
+    .cta-banner h2 { font-size: 1.6rem; }
+    section { padding: 48px 4%; }
+  }
+
 </style>
 </head>
 <body>
@@ -317,7 +339,36 @@
         </form>
     </div>
   </div>
+  <!-- 햄버거 버튼 (모바일) -->
+  <button class="nav-hamburger" id="nav-hamburger" aria-label="메뉴 열기">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<!-- 모바일 메뉴 -->
+<div th:fragment="mobile-menu" class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="/learn">📚 학습하기</a>
+  <a href="/quiz">🧩 퀴즈</a>
+  <a href="/challenge">🏆 챌린지</a>
+  <a href="/community">💬 커뮤니티</a>
+  <div class="mobile-divider"></div>
+  <th:block sec:authorize="isAnonymous()">
+    <a href="/login">🔑 로그인</a>
+    <a href="/register">✏️ 회원가입</a>
+  </th:block>
+  <th:block sec:authorize="isAuthenticated()">
+    <a href="/mypage">👤 마이페이지</a>
+    <a href="/notifications">🔔 알림</a>
+    <a href="/settings">⚙️ 설정</a>
+    <a sec:authorize="hasRole('ADMIN')" href="/admin">🛠 관리자</a>
+    <div class="mobile-btn-wrap">
+      <form th:action="@{/logout}" method="post">
+        <button type="submit" class="btn-login" style="background:#555; width:100%;">로그아웃</button>
+      </form>
+    </div>
+  </th:block>
+</div>
+<div class="nav-overlay" id="nav-overlay"></div>
 
 <!-- HERO -->
 <section class="hero">
@@ -521,11 +572,14 @@
 </div>
 
 <!-- FOOTER -->
+<th:block th:fragment="footer">
 <footer>
   <div class="f-logo">💻 Code<span>Edu</span></div>
   <div>© 2025 CodeEdu. 코딩은 즐거워요! 🎈</div>
   <div>개인정보처리방침 · 이용약관 · 문의하기</div>
 </footer>
+<script src="/js/nav.js"></script>
+</th:block>
 
 <script>
   // 카드 클릭 → 해당 언어 강의 페이지로 바로 이동

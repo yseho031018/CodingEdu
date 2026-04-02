@@ -247,30 +247,8 @@
 <body>
 
 <!-- NAV -->
-<nav>
-    <a href="/" class="logo">
-        <span class="logo-icon">💻</span>
-        Code<span>Edu</span>
-    </a>
-    <div class="nav-links">
-        <a href="/learn" style="color: var(--blue-mid); font-weight: 800;">학습하기</a>
-        <a href="/quiz">퀴즈</a>
-        <a href="/challenge">챌린지</a>
-        <a href="/community">커뮤니티</a>
-    </div>
-    <div class="nav-right" style="display:flex; align-items:center; gap:12px;">
-        <div sec:authorize="isAnonymous()">
-            <a href="/login" class="btn-login" style="text-decoration:none; display:inline-block;">로그인</a>
-            <a href="/register" class="btn-login" style="background:#fff; color:var(--blue); border:2px solid var(--blue); display:inline-block; padding:8px 18px;">회원가입</a>
-        </div>
-        <div sec:authorize="isAuthenticated()" style="display:flex; align-items:center; gap:12px;">
-            <span style="font-weight:700; font-size:.9rem; color:var(--text);"><span sec:authentication="principal.nickname">사용자</span>님 환영해요!</span>
-            <form th:action="@{/logout}" method="post" style="margin:0;">
-                <button type="submit" class="btn-login" style="background:#555;">로그아웃</button>
-            </form>
-        </div>
-    </div>
-</nav>
+<nav th:replace="~{index :: nav}"></nav>
+<div th:replace="~{index :: mobile-menu}"></div>
 
 <div class="learn-wrap">
 
@@ -835,5 +813,6 @@ if (activeBtn) activeBtn.classList.add("active");
 renderTopics();
 renderLesson(0);
 </script>
+<script src="/js/nav.js"></script>
 </body>
 </html>

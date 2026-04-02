@@ -174,8 +174,13 @@
 
         /* 반응형 */
         @media (max-width: 768px) {
-            .mypage-layout { grid-template-columns: 1fr; }
-            .profile-card { position: static; }
+            .mypage-layout { grid-template-columns: 1fr; padding: 24px 4%; gap: 20px; }
+            .profile-card { position: static; padding: 24px 20px; }
+            .profile-avatar { width: 64px; height: 64px; font-size: 1.6rem; }
+            .big-progress-circle { width: 80px; height: 80px; font-size: 1.1rem; }
+            .stat-row { gap: 8px; }
+            .stat-box { padding: 12px 8px; }
+            .block-title { font-size: 1rem; }
         }
     </style>
 </head>
@@ -183,6 +188,7 @@
 
 <!-- NAV -->
 <nav th:replace="~{index :: nav}"></nav>
+<div th:replace="~{index :: mobile-menu}"></div>
 
 <!-- PAGE HEADER -->
 <section class="page-header">

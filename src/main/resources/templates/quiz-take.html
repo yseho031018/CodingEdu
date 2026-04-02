@@ -41,7 +41,10 @@
         }
         .quiz-info-title { font-size: 1.05rem; font-weight: 900; color: var(--text); }
         .quiz-topic { font-size: .78rem; color: #888; font-weight: 700; margin-bottom: 2px; }
-        .quiz-timer { font-size: .9rem; font-weight: 900; color: var(--blue); background: var(--blue-light); padding: 6px 14px; border-radius: 50px; }
+        .quiz-timer { font-size: .9rem; font-weight: 900; color: var(--blue); background: var(--blue-light); padding: 6px 14px; border-radius: 50px; transition: background .3s, color .3s; }
+        .quiz-timer.warn { background: #FFF3E0; color: #E65100; }
+        .quiz-timer.danger { background: #FFEBEE; color: #C62828; animation: timerPulse .6s ease-in-out infinite; }
+        @keyframes timerPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
 
         /* 진행률 */
         .progress-wrap { flex-shrink: 0; }
@@ -232,17 +235,27 @@
 
     // 타이머
     const timerEl = document.getElementById('timer-display');
+    const timerWrap = timerEl.closest('.quiz-timer');
     let remaining = parseInt(timerEl.dataset.seconds, 10);
     function updateTimer() {
         const m = String(Math.floor(remaining / 60)).padStart(2, '0');
         const s = String(remaining % 60).padStart(2, '0');
         timerEl.textContent = m + ':' + s;
-        if (remaining <= 60) timerEl.style.color = '#C62828';
+        timerWrap.classList.remove('warn', 'danger');
+        if (remaining <= 30) timerWrap.classList.add('danger');
+        else if (remaining <= 60) timerWrap.classList.add('warn');
     }
     updateTimer();
     const iv = setInterval(() => {
-        if (remaining <= 0) { clearInterval(iv); timerEl.textContent = '시간 초과!'; return; }
         remaining--;
+        if (remaining <= 0) {
+            clearInterval(iv);
+            timerEl.textContent = '시간 초과!';
+            timerWrap.classList.add('danger');
+            // 미답변 항목 포함해서 자동 제출
+            document.getElementById('quiz-form').submit();
+            return;
+        }
         updateTimer();
     }, 1000);
 </script>

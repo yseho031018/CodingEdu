@@ -284,9 +284,14 @@
                         <div class="quiz-history-meta"
                              th:text="${#temporals.format(r.createdAt, 'yyyy.MM.dd HH:mm')}">2024.01.01 00:00</div>
                     </div>
-                    <div class="quiz-score-pill"
-                         th:text="${r.score} + '/' + ${r.totalQuestions} + ' (' + ${r.percentage} + '%)'">
-                        5/5 (100%)
+                    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+                        <div class="quiz-score-pill"
+                             th:text="${r.score} + '/' + ${r.totalQuestions} + ' (' + ${r.percentage} + '%)'">
+                            5/5 (100%)
+                        </div>
+                        <div th:if="${r.totalQuestions - r.score > 0}"
+                             style="font-size:.75rem; color:#E53935; font-weight:700;"
+                             th:text="'오답 ' + ${r.totalQuestions - r.score} + '개'">오답 0개</div>
                     </div>
                 </a>
             </div>

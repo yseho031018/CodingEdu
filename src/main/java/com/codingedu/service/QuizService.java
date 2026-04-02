@@ -2,6 +2,7 @@ package com.codingedu.service;
 
 import com.codingedu.entity.*;
 import com.codingedu.repository.QuizRepository;
+import com.codingedu.repository.QuizResultDetailRepository;
 import com.codingedu.repository.QuizResultRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,10 +16,13 @@ public class QuizService {
 
     private final QuizRepository quizRepository;
     private final QuizResultRepository quizResultRepository;
+    private final QuizResultDetailRepository detailRepository;
 
-    public QuizService(QuizRepository quizRepository, QuizResultRepository quizResultRepository) {
+    public QuizService(QuizRepository quizRepository, QuizResultRepository quizResultRepository,
+                       QuizResultDetailRepository detailRepository) {
         this.quizRepository = quizRepository;
         this.quizResultRepository = quizResultRepository;
+        this.detailRepository = detailRepository;
     }
 
     public List<Quiz> getQuizzesByDifficulty(String difficulty) {
@@ -46,23 +50,39 @@ public class QuizService {
     public QuizResult submitQuiz(Long quizId, Map<Long, Long> userAnswers, User user) {
         Quiz quiz = getQuizById(quizId);
         int score = 0;
-        for (Question question : quiz.getQuestions()) {
-            Long selectedChoiceId = userAnswers.get(question.getId());
-            if (selectedChoiceId != null) {
-                for (Choice choice : question.getChoices()) {
-                    if (choice.getId().equals(selectedChoiceId) && choice.isCorrect()) {
-                        score++;
-                        break;
-                    }
-                }
-            }
-        }
+
         QuizResult result = new QuizResult();
         result.setUser(user);
         result.setQuiz(quiz);
-        result.setScore(score);
         result.setTotalQuestions(quiz.getQuestions().size());
+
+        for (Question question : quiz.getQuestions()) {
+            Long selectedChoiceId = userAnswers.get(question.getId());
+            Choice selectedChoice = null;
+            boolean correct = false;
+
+            for (Choice choice : question.getChoices()) {
+                if (choice.getId().equals(selectedChoiceId)) {
+                    selectedChoice = choice;
+                    if (choice.isCorrect()) { correct = true; score++; }
+                    break;
+                }
+            }
+
+            QuizResultDetail detail = new QuizResultDetail();
+            detail.setResult(result);
+            detail.setQuestion(question);
+            detail.setSelectedChoice(selectedChoice);
+            detail.setCorrect(correct);
+            result.getDetails().add(detail);
+        }
+
+        result.setScore(score);
         return quizResultRepository.save(result);
+    }
+
+    public List<QuizResultDetail> getResultDetails(QuizResult result) {
+        return detailRepository.findByResultOrderByQuestionOrderNumAsc(result);
     }
 
     public boolean hasData() {

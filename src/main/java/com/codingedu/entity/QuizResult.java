@@ -2,6 +2,8 @@ package com.codingedu.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "quiz_results")
@@ -27,6 +29,9 @@ public class QuizResult {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "result", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<QuizResultDetail> details = new ArrayList<>();
 
     @PrePersist
     public void prePersist() {
@@ -58,4 +63,6 @@ public class QuizResult {
     public void setTotalQuestions(int totalQuestions) { this.totalQuestions = totalQuestions; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public List<QuizResultDetail> getDetails() { return details; }
+    public void setDetails(List<QuizResultDetail> details) { this.details = details; }
 }

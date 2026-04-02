@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 public class QuizController {
@@ -96,12 +97,9 @@ public class QuizController {
 
         Quiz quiz = quizService.getQuizById(id);
 
-        // flash attribute에서 userAnswers 읽기 (없으면 null)
-        @SuppressWarnings("unchecked")
-        Map<Long, Long> userAnswers = (Map<Long, Long>) model.getAttribute("userAnswers");
-
-        // 템플릿에서 사용하기 쉬운 뷰 모델 생성
-        List<QuestionView> questionViews = buildQuestionViews(quiz, userAnswers);
+        // DB에 저장된 answer details로 뷰 모델 생성
+        var details = quizService.getResultDetails(quizResult);
+        List<QuestionView> questionViews = buildQuestionViewsFromDetails(details);
 
         model.addAttribute("quizResult", quizResult);
         model.addAttribute("quiz", quiz);
@@ -109,24 +107,24 @@ public class QuizController {
         return "quiz-result";
     }
 
-    // ── 헬퍼: 문제별 채점 뷰 모델 ───────────────────────────────────
-    private List<QuestionView> buildQuestionViews(Quiz quiz, Map<Long, Long> userAnswers) {
+    // ── 헬퍼: DB details로 채점 뷰 모델 생성 ───────────────────────
+    private List<QuestionView> buildQuestionViewsFromDetails(
+            List<com.codingedu.entity.QuizResultDetail> details) {
         List<QuestionView> views = new ArrayList<>();
-        for (Question question : quiz.getQuestions()) {
-            Long selectedId = (userAnswers != null) ? userAnswers.get(question.getId()) : null;
-            boolean isCorrect = false;
+        for (var detail : details) {
+            Question question = detail.getQuestion();
+            Long selectedId = detail.getSelectedChoice() != null ? detail.getSelectedChoice().getId() : null;
             List<ChoiceView> choiceViews = new ArrayList<>();
             for (Choice choice : question.getChoices()) {
                 boolean selected = choice.getId().equals(selectedId);
-                if (selected && choice.isCorrect()) isCorrect = true;
                 String status;
                 if (choice.isCorrect()) status = "correct";
                 else if (selected) status = "wrong-selected";
                 else status = "neutral";
                 choiceViews.add(new ChoiceView(choice, status));
             }
-            String cardStatus = (selectedId == null) ? "unanswered" : (isCorrect ? "correct" : "wrong");
-            views.add(new QuestionView(question, choiceViews, cardStatus, isCorrect));
+            String cardStatus = (selectedId == null) ? "unanswered" : (detail.isCorrect() ? "correct" : "wrong");
+            views.add(new QuestionView(question, choiceViews, cardStatus, detail.isCorrect()));
         }
         return views;
     }

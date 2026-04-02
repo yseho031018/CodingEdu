@@ -5,10 +5,13 @@ import com.codingedu.entity.Choice;
 import com.codingedu.entity.LessonCourse;
 import com.codingedu.entity.Question;
 import com.codingedu.entity.Quiz;
+import com.codingedu.entity.User;
 import com.codingedu.repository.ChallengeRepository;
 import com.codingedu.repository.LessonCourseRepository;
 import com.codingedu.repository.QuizRepository;
+import com.codingedu.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,18 +24,25 @@ public class DataInitializer implements CommandLineRunner {
     private final QuizRepository quizRepository;
     private final LessonCourseRepository lessonCourseRepository;
     private final ChallengeRepository challengeRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public DataInitializer(QuizRepository quizRepository,
                            LessonCourseRepository lessonCourseRepository,
-                           ChallengeRepository challengeRepository) {
+                           ChallengeRepository challengeRepository,
+                           UserRepository userRepository,
+                           PasswordEncoder passwordEncoder) {
         this.quizRepository = quizRepository;
         this.lessonCourseRepository = lessonCourseRepository;
         this.challengeRepository = challengeRepository;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     @Transactional
     public void run(String... args) {
+        seedAdminUser();
         seedLessonCourses();
         seedChallenges();
         if (quizRepository.count() > 0) return; // 이미 데이터가 있으면 건너뜀
@@ -164,6 +174,19 @@ public class DataInitializer implements CommandLineRunner {
                         c("@FetchType.EAGER", false), c("fetch = FetchType.LAZY", true), c("@Lazy", false), c("@LazyLoad", false))
                 })
         ));
+    }
+
+    // ── 관리자 계정 자동 생성 ────────────────────────────────────────
+    private void seedAdminUser() {
+        if (userRepository.findByUsername("admin").isPresent()) return;
+        User admin = new User();
+        admin.setUsername("admin");
+        admin.setPassword(passwordEncoder.encode("admin1234!"));
+        admin.setNickname("관리자");
+        admin.setEmail("admin@codingedu.com");
+        admin.setRole("ROLE_ADMIN");
+        userRepository.save(admin);
+        System.out.println("[DataInitializer] 관리자 계정 생성 완료 — ID: admin / PW: admin1234!");
     }
 
     // ── 강의 코스 시드 (upsert) ──────────────────────────────────────

@@ -26,6 +26,7 @@ public class SecurityConfig {
                 .csrfTokenRequestHandler(requestHandler)
             )
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/", "/learn", "/learn/**", "/quiz", "/challenge", "/challenge/**", "/community", "/login", "/register", "/forgot-password", "/forgot-password/**", "/css/**", "/js/**", "/images/**").permitAll()
                 .anyRequest().authenticated()
             )

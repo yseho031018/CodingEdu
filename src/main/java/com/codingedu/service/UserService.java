@@ -76,6 +76,18 @@ public class UserService {
         return userRepository.findByUsernameAndEmail(username, email).isPresent();
     }
 
+    public java.util.List<User> findAllUsers() {
+        return userRepository.findAll(org.springframework.data.domain.Sort.by("id").ascending());
+    }
+
+    @Transactional
+    public void updateRole(Long userId, String role) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
+        user.setRole(role);
+        userRepository.save(user);
+    }
+
     @Transactional
     public void resetPassword(String username, String email, String newPassword) {
         User user = userRepository.findByUsernameAndEmail(username, email)

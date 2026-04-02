@@ -68,4 +68,46 @@ public class QuizService {
     public boolean hasData() {
         return quizRepository.count() > 0;
     }
+
+    public long countAll() {
+        return quizRepository.count();
+    }
+
+    @Transactional
+    public Quiz createQuiz(String topic, String icon, String title, String description,
+                           String difficulty, int timeLimit) {
+        Quiz quiz = new Quiz();
+        quiz.setTopic(topic);
+        quiz.setIcon(icon);
+        quiz.setTitle(title);
+        quiz.setDescription(description);
+        quiz.setDifficulty(difficulty);
+        quiz.setTimeLimit(timeLimit);
+        return quizRepository.save(quiz);
+    }
+
+    @Transactional
+    public void addQuestion(Long quizId, String questionText, String explanation,
+                            List<String> choiceTexts, int correctIndex) {
+        Quiz quiz = getQuizById(quizId);
+        Question question = new Question();
+        question.setQuiz(quiz);
+        question.setQuestionText(questionText);
+        question.setExplanation(explanation);
+        question.setOrderNum(quiz.getQuestions().size() + 1);
+        for (int i = 0; i < choiceTexts.size(); i++) {
+            Choice choice = new Choice();
+            choice.setQuestion(question);
+            choice.setChoiceText(choiceTexts.get(i));
+            choice.setCorrect(i == correctIndex);
+            question.getChoices().add(choice);
+        }
+        quiz.getQuestions().add(question);
+        quizRepository.save(quiz);
+    }
+
+    @Transactional
+    public void deleteQuiz(Long id) {
+        quizRepository.deleteById(id);
+    }
 }

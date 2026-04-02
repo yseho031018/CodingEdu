@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 - CodeEdu</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <style>
+        :root { --admin-bg: #f4f6fb; }
+        body { background: var(--admin-bg); }
+
+        /* ── 레이아웃 ── */
+        .admin-wrap { max-width: 1200px; margin: 0 auto; padding: 32px 20px 60px; }
+        .admin-header { margin-bottom: 28px; }
+        .admin-header h1 { font-size: 1.75rem; font-weight: 900; color: #1a1a2e; }
+        .admin-header p { color: #888; font-size: .9rem; margin-top: 4px; }
+
+        /* ── 탭 ── */
+        .tab-bar { display: flex; gap: 4px; border-bottom: 2px solid #e0e4ef; margin-bottom: 28px; }
+        .tab-btn {
+            padding: 10px 22px; font-size: .9rem; font-weight: 700; color: #888;
+            background: none; border: none; cursor: pointer; border-bottom: 2px solid transparent;
+            margin-bottom: -2px; transition: color .15s, border-color .15s;
+        }
+        .tab-btn.active { color: #1565C0; border-bottom-color: #1565C0; }
+        .tab-btn:hover:not(.active) { color: #555; }
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+
+        /* ── 통계 카드 ── */
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
+        .stat-card {
+            background: #fff; border-radius: 16px; padding: 24px 20px; text-align: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,.06);
+        }
+        .stat-card .num { font-size: 2.5rem; font-weight: 900; color: #1565C0; line-height: 1; }
+        .stat-card .lbl { font-size: .85rem; color: #888; margin-top: 6px; font-weight: 600; }
+
+        /* ── 섹션 ── */
+        .section-card { background: #fff; border-radius: 16px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,.06); margin-bottom: 20px; }
+        .section-card h2 { font-size: 1.1rem; font-weight: 800; color: #1a1a2e; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0; }
+
+        /* ── 테이블 ── */
+        .admin-table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+        .admin-table th { background: #f8f9fc; font-weight: 700; color: #555; padding: 10px 14px; text-align: left; border-bottom: 1px solid #e8ecf5; }
+        .admin-table td { padding: 10px 14px; border-bottom: 1px solid #f2f4f8; color: #333; vertical-align: middle; }
+        .admin-table tr:last-child td { border-bottom: none; }
+        .admin-table tr:hover td { background: #fafbff; }
+
+        /* ── 뱃지 ── */
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: .75rem; font-weight: 700; }
+        .badge-admin { background: #fff3e0; color: #e65100; }
+        .badge-user  { background: #e8f5e9; color: #2e7d32; }
+        .badge-active   { background: #e3f2fd; color: #1565C0; }
+        .badge-upcoming { background: #fff8e1; color: #f57f17; }
+        .badge-easy   { background: #e8f5e9; color: #2e7d32; }
+        .badge-medium { background: #fff8e1; color: #f57f17; }
+        .badge-hard   { background: #fce4ec; color: #c62828; }
+
+        /* ── 버튼 ── */
+        .btn-sm {
+            padding: 5px 12px; border-radius: 8px; font-size: .78rem; font-weight: 700;
+            border: none; cursor: pointer; transition: background .15s;
+        }
+        .btn-danger { background: #fce4ec; color: #c62828; }
+        .btn-danger:hover { background: #ffcdd2; }
+        .btn-primary { background: #e3f2fd; color: #1565C0; }
+        .btn-primary:hover { background: #bbdefb; }
+        .btn-success { background: #e8f5e9; color: #2e7d32; }
+        .btn-success:hover { background: #c8e6c9; }
+
+        /* ── 폼 ── */
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+        .form-group { display: flex; flex-direction: column; gap: 4px; }
+        .form-group label { font-size: .8rem; font-weight: 700; color: #666; }
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 8px 12px; border: 1.5px solid #e0e4ef; border-radius: 8px;
+            font-size: .875rem; background: #f9fafb; transition: border-color .15s;
+            font-family: inherit;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none; border-color: #1565C0; background: #fff;
+        }
+        .form-group textarea { resize: vertical; min-height: 70px; }
+        .btn-add {
+            padding: 10px 24px; background: #1565C0; color: #fff; border: none;
+            border-radius: 10px; font-size: .875rem; font-weight: 700; cursor: pointer;
+            transition: background .15s; align-self: flex-end;
+        }
+        .btn-add:hover { background: #1E88E5; }
+
+        /* ── 알림 토스트 ── */
+        .flash-msg {
+            background: #e8f5e9; border-left: 4px solid #4CAF50; color: #2e7d32;
+            padding: 12px 18px; border-radius: 8px; font-weight: 700; font-size: .9rem;
+            margin-bottom: 20px;
+        }
+
+        /* ── 문제 추가 패널 ── */
+        .question-panel { background: #f8f9fc; border-radius: 12px; padding: 20px; margin-top: 16px; }
+        .question-panel h3 { font-size: 1rem; font-weight: 800; color: #333; margin-bottom: 16px; }
+        .choice-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .choice-row input[type=radio] { width: 18px; height: 18px; cursor: pointer; }
+        .choice-row input[type=text] { flex: 1; }
+        .quiz-detail-row td { background: #f8f9fc; }
+    </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="/" class="logo" style="text-decoration:none;">
+    <span class="logo-icon">💻</span>
+    Code<span>Edu</span>
+  </a>
+  <div class="nav-links">
+    <a href="/learn">학습하기</a>
+    <a href="/quiz">퀴즈</a>
+    <a href="/challenge">챌린지</a>
+    <a href="/community">커뮤니티</a>
+  </div>
+  <div class="nav-right" style="display:flex; align-items:center; gap:12px;">
+    <div sec:authorize="isAuthenticated()" style="display:flex; align-items:center; gap:12px;">
+      <a href="/mypage" style="font-weight:700; font-size:.9rem; color:var(--text); text-decoration:none;">
+        👤 <span sec:authentication="principal.nickname">사용자</span>님
+      </a>
+      <a href="/admin" style="font-weight:700; font-size:.9rem; color:#e65100; text-decoration:none;">🛠 관리자</a>
+      <form th:action="@{/logout}" method="post" style="margin:0;">
+        <button type="submit" class="btn-login" style="background:#555;">로그아웃</button>
+      </form>
+    </div>
+  </div>
+</nav>
+
+<div class="admin-wrap">
+    <div class="admin-header">
+        <h1>🛠 관리자 페이지</h1>
+        <p>퀴즈, 챌린지, 사용자를 관리합니다.</p>
+    </div>
+
+    <!-- 플래시 메시지 -->
+    <div class="flash-msg" th:if="${msg}" th:text="${msg}"></div>
+
+    <!-- 탭 -->
+    <div class="tab-bar">
+        <button class="tab-btn" th:classappend="${activeTab == 'dashboard'} ? ' active'" onclick="switchTab('dashboard')">📊 대시보드</button>
+        <button class="tab-btn" th:classappend="${activeTab == 'users'} ? ' active'" onclick="switchTab('users')">👥 사용자</button>
+        <button class="tab-btn" th:classappend="${activeTab == 'quizzes'} ? ' active'" onclick="switchTab('quizzes')">🧩 퀴즈</button>
+        <button class="tab-btn" th:classappend="${activeTab == 'challenges'} ? ' active'" onclick="switchTab('challenges')">🏆 챌린지</button>
+    </div>
+
+    <!-- 대시보드 탭 -->
+    <div class="tab-pane" th:classappend="${activeTab == 'dashboard'} ? ' active'" id="tab-dashboard">
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="num" th:text="${userCount}">0</div>
+                <div class="lbl">총 회원</div>
+            </div>
+            <div class="stat-card">
+                <div class="num" th:text="${quizCount}">0</div>
+                <div class="lbl">퀴즈</div>
+            </div>
+            <div class="stat-card">
+                <div class="num" th:text="${challengeCount}">0</div>
+                <div class="lbl">챌린지</div>
+            </div>
+            <div class="stat-card">
+                <div class="num" th:text="${courseCount}">0</div>
+                <div class="lbl">강의 코스</div>
+            </div>
+        </div>
+        <div class="section-card">
+            <h2>빠른 이동</h2>
+            <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                <button class="btn-add" onclick="switchTab('users')">👥 사용자 관리</button>
+                <button class="btn-add" onclick="switchTab('quizzes')" style="background:#4CAF50;">🧩 퀴즈 관리</button>
+                <button class="btn-add" onclick="switchTab('challenges')" style="background:#FF9800;">🏆 챌린지 관리</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 사용자 탭 -->
+    <div class="tab-pane" th:classappend="${activeTab == 'users'} ? ' active'" id="tab-users">
+        <div class="section-card">
+            <h2>회원 목록 (<span th:text="${userCount}">0</span>명)</h2>
+            <div style="overflow-x:auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th><th>아이디</th><th>닉네임</th><th>이메일</th><th>권한</th><th>가입일</th><th>변경</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="u : ${users}">
+                            <td th:text="${u.id}"></td>
+                            <td th:text="${u.username}"></td>
+                            <td th:text="${u.nickname}"></td>
+                            <td th:text="${u.email}"></td>
+                            <td>
+                                <span class="badge" th:classappend="${u.role == 'ROLE_ADMIN'} ? ' badge-admin' : ' badge-user'"
+                                      th:text="${u.role == 'ROLE_ADMIN'} ? '관리자' : '일반'"></span>
+                            </td>
+                            <td th:text="${u.createdAt != null ? #temporals.format(u.createdAt, 'yyyy-MM-dd') : '-'}"></td>
+                            <td>
+                                <form th:action="@{/admin/users/{id}/role(id=${u.id})}" method="post" style="display:flex; gap:6px; align-items:center;">
+                                    <select name="role" style="padding:4px 8px; border-radius:6px; border:1.5px solid #e0e4ef; font-size:.8rem;">
+                                        <option value="ROLE_USER"  th:selected="${u.role == 'ROLE_USER'}">일반</option>
+                                        <option value="ROLE_ADMIN" th:selected="${u.role == 'ROLE_ADMIN'}">관리자</option>
+                                    </select>
+                                    <button type="submit" class="btn-sm btn-primary">변경</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 퀴즈 탭 -->
+    <div class="tab-pane" th:classappend="${activeTab == 'quizzes'} ? ' active'" id="tab-quizzes">
+
+        <!-- 퀴즈 추가 폼 -->
+        <div class="section-card">
+            <h2>새 퀴즈 추가</h2>
+            <form th:action="@{/admin/quizzes/add}" method="post">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>아이콘 (이모지)</label>
+                        <input type="text" name="icon" placeholder="⚡" maxlength="5" required>
+                    </div>
+                    <div class="form-group">
+                        <label>토픽 (예: JavaScript)</label>
+                        <input type="text" name="topic" placeholder="JavaScript" required>
+                    </div>
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>제목</label>
+                        <input type="text" name="title" placeholder="자바스크립트 기초 퀴즈" required>
+                    </div>
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>설명</label>
+                        <textarea name="description" placeholder="퀴즈 설명을 입력하세요" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>난이도</label>
+                        <select name="difficulty" required>
+                            <option value="easy">쉬움</option>
+                            <option value="medium" selected>보통</option>
+                            <option value="hard">어려움</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>제한 시간 (분)</label>
+                        <input type="number" name="timeLimit" value="10" min="1" max="60" required>
+                    </div>
+                </div>
+                <div style="margin-top:16px;">
+                    <button type="submit" class="btn-add">+ 퀴즈 추가</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 퀴즈 목록 -->
+        <div class="section-card">
+            <h2>퀴즈 목록 (<span th:text="${quizCount}">0</span>개)</h2>
+            <div style="overflow-x:auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr><th>ID</th><th>아이콘</th><th>토픽</th><th>제목</th><th>난이도</th><th>문제 수</th><th>시간(분)</th><th>관리</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="q : ${quizzes}">
+                            <td th:text="${q.id}"></td>
+                            <td th:text="${q.icon}"></td>
+                            <td th:text="${q.topic}"></td>
+                            <td th:text="${q.title}"></td>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${q.difficulty == 'easy'} ? ' badge-easy' : (${q.difficulty == 'medium'} ? ' badge-medium' : ' badge-hard')"
+                                      th:text="${q.difficulty == 'easy'} ? '쉬움' : (${q.difficulty == 'medium'} ? '보통' : '어려움')"></span>
+                            </td>
+                            <td th:text="${q.questionCount}"></td>
+                            <td th:text="${q.timeLimit}"></td>
+                            <td style="display:flex; gap:6px; flex-wrap:wrap;">
+                                <a th:href="@{/admin(tab='quizzes', quizId=${q.id})}" class="btn-sm btn-success">+ 문제</a>
+                                <form th:action="@{/admin/quizzes/{id}/delete(id=${q.id})}" method="post" onsubmit="return confirm('삭제하시겠습니까?')">
+                                    <button type="submit" class="btn-sm btn-danger">삭제</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(quizzes)}">
+                            <td colspan="8" style="text-align:center; color:#aaa; padding:20px;">퀴즈가 없습니다.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 문제 추가 패널 (특정 퀴즈 선택 시) -->
+        <div class="section-card" th:if="${selectedQuiz != null}">
+            <h2 th:text="'[' + ${selectedQuiz.icon} + ' ' + ${selectedQuiz.title} + '] 문제 추가'">문제 추가</h2>
+
+            <!-- 기존 문제 목록 -->
+            <div th:if="${!#lists.isEmpty(selectedQuiz.questions)}" style="margin-bottom:20px;">
+                <div th:each="q, qs : ${selectedQuiz.questions}" style="background:#f8f9fc; border-radius:10px; padding:14px 18px; margin-bottom:10px;">
+                    <div style="font-weight:700; color:#333; margin-bottom:8px;" th:text="'Q' + ${qs.count} + '. ' + ${q.questionText}"></div>
+                    <div th:each="c : ${q.choices}" style="display:flex; align-items:center; gap:8px; font-size:.85rem; color:#555; margin-bottom:4px;">
+                        <span th:text="${c.correct} ? '✅' : '⬜'"></span>
+                        <span th:text="${c.choiceText}"></span>
+                    </div>
+                    <div th:if="${q.explanation != null and !q.explanation.isEmpty()}" style="margin-top:8px; font-size:.82rem; color:#888;">
+                        💡 <span th:text="${q.explanation}"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-panel">
+                <h3>새 문제 추가</h3>
+                <form th:action="@{/admin/quizzes/{quizId}/questions/add(quizId=${selectedQuiz.id})}" method="post">
+                    <div class="form-group" style="margin-bottom:12px;">
+                        <label>문제 내용</label>
+                        <textarea name="questionText" placeholder="문제를 입력하세요" required></textarea>
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <label style="font-size:.8rem; font-weight:700; color:#666; display:block; margin-bottom:8px;">보기 (정답을 라디오로 선택)</label>
+                        <div class="choice-row" th:each="i : ${#numbers.sequence(0, 3)}">
+                            <input type="radio" name="correctIndex" th:value="${i}" th:required="${i == 0}">
+                            <input type="text" th:name="'choiceTexts'" th:placeholder="'보기 ' + ${i + 1}" required>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom:16px;">
+                        <label>해설 (선택)</label>
+                        <input type="text" name="explanation" placeholder="정답 해설을 입력하세요 (선택사항)">
+                    </div>
+                    <button type="submit" class="btn-add" style="background:#4CAF50;">+ 문제 추가</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 챌린지 탭 -->
+    <div class="tab-pane" th:classappend="${activeTab == 'challenges'} ? ' active'" id="tab-challenges">
+
+        <!-- 챌린지 추가 폼 -->
+        <div class="section-card">
+            <h2>새 챌린지 추가</h2>
+            <form th:action="@{/admin/challenges/add}" method="post">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>아이콘 (이모지)</label>
+                        <input type="text" name="icon" placeholder="🚀" maxlength="5" required>
+                    </div>
+                    <div class="form-group">
+                        <label>상태</label>
+                        <select name="status" required>
+                            <option value="active">진행중</option>
+                            <option value="upcoming">예정</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>제목</label>
+                        <input type="text" name="title" placeholder="챌린지 제목" required>
+                    </div>
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>설명</label>
+                        <textarea name="description" placeholder="챌린지 설명" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>시작일</label>
+                        <input type="date" name="startDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>종료일 (선택)</label>
+                        <input type="date" name="endDate">
+                    </div>
+                    <div class="form-group">
+                        <label>총 과제 수</label>
+                        <input type="number" name="totalTasks" value="5" min="1" required>
+                    </div>
+                    <div class="form-group" style="justify-content:flex-end;">
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding-top:20px;">
+                            <input type="checkbox" name="featured" value="true" style="width:18px; height:18px;">
+                            <span>인기 챌린지 (featured)</span>
+                        </label>
+                    </div>
+                </div>
+                <div style="margin-top:16px;">
+                    <button type="submit" class="btn-add" style="background:#FF9800;">+ 챌린지 추가</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 챌린지 목록 -->
+        <div class="section-card">
+            <h2>챌린지 목록 (<span th:text="${challengeCount}">0</span>개)</h2>
+            <div style="overflow-x:auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr><th>ID</th><th>아이콘</th><th>제목</th><th>상태</th><th>시작일</th><th>종료일</th><th>과제</th><th>관리</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="c : ${challenges}">
+                            <td th:text="${c.id}"></td>
+                            <td th:text="${c.icon}"></td>
+                            <td th:text="${c.title}"></td>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${c.status == 'active'} ? ' badge-active' : ' badge-upcoming'"
+                                      th:text="${c.status == 'active'} ? '진행중' : '예정'"></span>
+                            </td>
+                            <td th:text="${c.startDate}"></td>
+                            <td th:text="${c.endDate != null ? c.endDate : '-'}"></td>
+                            <td th:text="${c.totalTasks}"></td>
+                            <td style="display:flex; gap:6px; flex-wrap:wrap;">
+                                <form th:action="@{/admin/challenges/{id}/status(id=${c.id})}" method="post" style="display:inline;">
+                                    <select name="status" style="padding:4px 8px; border-radius:6px; border:1.5px solid #e0e4ef; font-size:.8rem;">
+                                        <option value="active"   th:selected="${c.status == 'active'}">진행중</option>
+                                        <option value="upcoming" th:selected="${c.status == 'upcoming'}">예정</option>
+                                    </select>
+                                    <button type="submit" class="btn-sm btn-primary">변경</button>
+                                </form>
+                                <form th:action="@{/admin/challenges/{id}/delete(id=${c.id})}" method="post" onsubmit="return confirm('삭제하시겠습니까?')">
+                                    <button type="submit" class="btn-sm btn-danger">삭제</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(challenges)}">
+                            <td colspan="8" style="text-align:center; color:#aaa; padding:20px;">챌린지가 없습니다.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function switchTab(name) {
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    document.querySelectorAll('.tab-btn')[['dashboard','users','quizzes','challenges'].indexOf(name)].classList.add('active');
+    // URL 업데이트 (새로고침 없이)
+    const url = new URL(window.location);
+    url.searchParams.set('tab', name);
+    url.searchParams.delete('quizId');
+    history.replaceState(null, '', url);
+}
+</script>
+</body>
+</html>

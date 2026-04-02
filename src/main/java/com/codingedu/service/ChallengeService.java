@@ -106,4 +106,42 @@ public class ChallengeService {
     public boolean hasData() {
         return challengeRepository.count() > 0;
     }
+
+    public List<Challenge> getAllChallenges() {
+        return challengeRepository.findAll(org.springframework.data.domain.Sort.by("id").ascending());
+    }
+
+    public long countAll() {
+        return challengeRepository.count();
+    }
+
+    @Transactional
+    public Challenge createChallenge(String title, String description, String icon,
+                                     String status, boolean featured,
+                                     LocalDate startDate, LocalDate endDate,
+                                     int totalTasks) {
+        Challenge c = new Challenge();
+        c.setTitle(title);
+        c.setDescription(description);
+        c.setIcon(icon);
+        c.setStatus(status);
+        c.setFeatured(featured);
+        c.setStartDate(startDate);
+        c.setEndDate(endDate);
+        c.setTotalTasks(totalTasks);
+        c.setParticipantCount(0);
+        return challengeRepository.save(c);
+    }
+
+    @Transactional
+    public void updateStatus(Long id, String status) {
+        Challenge c = getChallengeById(id);
+        c.setStatus(status);
+        challengeRepository.save(c);
+    }
+
+    @Transactional
+    public void deleteChallenge(Long id) {
+        challengeRepository.deleteById(id);
+    }
 }

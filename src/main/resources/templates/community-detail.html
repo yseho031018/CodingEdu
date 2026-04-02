@@ -78,7 +78,8 @@
         <h2 th:text="${post.title}">게시글 제목</h2>
         <div class="detail-meta">
             <div class="meta-left">
-                <span class="meta-author" th:text="${post.author.nickname}">작성자</span>
+                <a class="meta-author" th:href="@{/user/{nick}(nick=${post.author.nickname})}"
+                   th:text="${post.author.nickname}" style="text-decoration:none; color:inherit;">작성자</a>
                 <span class="meta-date" th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</span>
             </div>
             <div class="meta-right">

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${profileUser.nickname} + '님의 프로필 - CodeEdu'">프로필 - CodeEdu</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <style>
+        .profile-wrap { max-width: 960px; margin: 0 auto; padding: 40px 20px 80px; }
+
+        /* ── 프로필 카드 ── */
+        .profile-hero {
+            background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+            border-radius: 24px; padding: 36px; margin-bottom: 28px;
+            display: flex; align-items: center; gap: 28px;
+            box-shadow: 0 4px 20px rgba(0,0,0,.06);
+        }
+        .avatar-big {
+            width: 96px; height: 96px; border-radius: 50%;
+            background: #1565C0; color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.4rem; font-weight: 900; flex-shrink: 0;
+        }
+        .profile-info h1 { font-size: 1.7rem; font-weight: 900; color: #1a1a2e; margin-bottom: 4px; }
+        .profile-info .username { font-size: .9rem; color: #888; margin-bottom: 16px; }
+        .profile-stats { display: flex; gap: 20px; flex-wrap: wrap; }
+        .p-stat { text-align: center; background: #fff; border-radius: 12px; padding: 10px 18px; min-width: 70px; }
+        .p-stat .num { font-size: 1.4rem; font-weight: 900; color: #1565C0; }
+        .p-stat .lbl { font-size: .72rem; color: #888; font-weight: 600; margin-top: 2px; }
+
+        /* ── 섹션 ── */
+        .section-card { background: #fff; border-radius: 20px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,.05); margin-bottom: 20px; }
+        .section-card h2 { font-size: 1.05rem; font-weight: 800; color: #1a1a2e; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #f0f0f0; }
+
+        /* ── 학습 진도 ── */
+        .progress-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+        .prog-item { background: #f8f9fc; border-radius: 12px; padding: 12px 14px; }
+        .prog-item-top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .prog-icon { font-size: 1.3rem; }
+        .prog-name { font-size: .85rem; font-weight: 700; color: #333; }
+        .prog-bar-wrap { background: #e8ecf5; border-radius: 6px; height: 6px; }
+        .prog-bar { height: 6px; border-radius: 6px; background: linear-gradient(90deg, #1E88E5, #F9A825); }
+        .prog-pct { font-size: .75rem; color: #888; margin-top: 4px; text-align: right; }
+
+        /* ── 퀴즈 이력 ── */
+        .quiz-list { display: flex; flex-direction: column; gap: 8px; }
+        .quiz-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: #f8f9fc; border-radius: 12px; }
+        .grade-dot { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .85rem; font-weight: 900; flex-shrink: 0; }
+        .grade-A { background: linear-gradient(135deg,#4CAF50,#2E7D32); color:#fff; }
+        .grade-B { background: linear-gradient(135deg,#2196F3,#1565C0); color:#fff; }
+        .grade-C { background: linear-gradient(135deg,#FF9800,#E65100); color:#fff; }
+        .grade-D { background: linear-gradient(135deg,#FF5722,#BF360C); color:#fff; }
+        .grade-F { background: linear-gradient(135deg,#9E9E9E,#424242); color:#fff; }
+        .quiz-info { flex: 1; }
+        .quiz-title { font-size: .88rem; font-weight: 700; color: #333; }
+        .quiz-meta { font-size: .75rem; color: #aaa; margin-top: 2px; }
+        .quiz-score { font-size: .82rem; font-weight: 700; color: #1565C0; }
+
+        /* ── 게시글 ── */
+        .post-list-mini { display: flex; flex-direction: column; gap: 8px; }
+        .post-mini { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #f8f9fc; border-radius: 12px; text-decoration: none; color: var(--text); transition: background .15s; }
+        .post-mini:hover { background: #e8f0fe; }
+        .post-mini-title { flex: 1; font-size: .88rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .post-mini-date { font-size: .75rem; color: #aaa; flex-shrink: 0; }
+
+        /* ── 챌린지 완료 ── */
+        .challenge-list { display: flex; flex-wrap: wrap; gap: 10px; }
+        .challenge-chip { display: inline-flex; align-items: center; gap: 6px; background: #E8F5E9; color: #2E7D32; padding: 6px 14px; border-radius: 50px; font-size: .82rem; font-weight: 700; }
+
+        /* ── 빈 상태 ── */
+        .empty { text-align: center; color: #bbb; padding: 20px; font-size: .88rem; }
+
+        @media (max-width: 600px) {
+            .profile-hero { flex-direction: column; text-align: center; padding: 24px; }
+            .profile-stats { justify-content: center; }
+            .progress-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<nav th:replace="~{index :: nav}"></nav>
+<div th:replace="~{index :: mobile-menu}"></div>
+
+<div class="profile-wrap">
+
+    <!-- 프로필 헤더 -->
+    <div class="profile-hero">
+        <div class="avatar-big" th:text="${#strings.toUpperCase(#strings.substring(profileUser.nickname,0,1))}">U</div>
+        <div class="profile-info">
+            <h1 th:text="${profileUser.nickname}">닉네임</h1>
+            <div class="username" th:text="'@' + ${profileUser.username}">@username</div>
+            <div class="profile-stats">
+                <div class="p-stat">
+                    <div class="num" th:text="${completedLessons}">0</div>
+                    <div class="lbl">완료 강의</div>
+                </div>
+                <div class="p-stat">
+                    <div class="num" th:text="${totalQuizzes}">0</div>
+                    <div class="lbl">퀴즈 응시</div>
+                </div>
+                <div class="p-stat">
+                    <div class="num" th:text="${postCount}">0</div>
+                    <div class="lbl">작성 글</div>
+                </div>
+                <div class="p-stat" th:if="${bestGrade != null}">
+                    <div class="num" th:text="${bestGrade}">-</div>
+                    <div class="lbl">최고 등급</div>
+                </div>
+                <div class="p-stat" th:if="${!completedChallenges.isEmpty()}">
+                    <div class="num" th:text="${completedChallenges.size()}">0</div>
+                    <div class="lbl">챌린지 완료</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 학습 진도 -->
+    <div class="section-card" th:if="${!langProgressMap.isEmpty()}">
+        <h2>📚 학습 진도</h2>
+        <div class="progress-grid">
+            <div class="prog-item" th:each="course : ${allCourses}" th:if="${completedCountMap[course.lang] > 0}">
+                <div class="prog-item-top">
+                    <span class="prog-icon" th:text="${course.icon}">🌐</span>
+                    <span class="prog-name" th:text="${course.title}">HTML</span>
+                </div>
+                <div class="prog-bar-wrap">
+                    <div class="prog-bar" th:style="'width:' + ${langProgressMap[course.lang] ?: 0} + '%'"></div>
+                </div>
+                <div class="prog-pct"
+                     th:text="${completedCountMap[course.lang]} + ' / ' + ${course.lessonCount} + ' (' + ${langProgressMap[course.lang] ?: 0} + '%)'"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 퀴즈 이력 -->
+    <div class="section-card" th:if="${!recentQuizResults.isEmpty()}">
+        <h2>🧩 최근 퀴즈 결과</h2>
+        <div class="quiz-list">
+            <div class="quiz-item" th:each="r : ${recentQuizResults}">
+                <div class="grade-dot" th:classappend="'grade-' + ${r.grade}" th:text="${r.grade}">A</div>
+                <div class="quiz-info">
+                    <div class="quiz-title" th:text="${r.quiz.icon} + ' ' + ${r.quiz.title}">퀴즈명</div>
+                    <div class="quiz-meta" th:text="${#temporals.format(r.createdAt, 'yyyy.MM.dd')}">날짜</div>
+                </div>
+                <div class="quiz-score" th:text="${r.score} + '/' + ${r.totalQuestions}">5/5</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 챌린지 완료 -->
+    <div class="section-card" th:if="${!completedChallenges.isEmpty()}">
+        <h2>🏅 완료한 챌린지</h2>
+        <div class="challenge-list">
+            <span class="challenge-chip" th:each="p : ${completedChallenges}">
+                <span th:text="${p.challenge.icon}">🚀</span>
+                <span th:text="${p.challenge.title}">챌린지명</span>
+            </span>
+        </div>
+    </div>
+
+    <!-- 최근 게시글 -->
+    <div class="section-card" th:if="${!recentPosts.isEmpty()}">
+        <h2>💬 최근 게시글</h2>
+        <div class="post-list-mini">
+            <a class="post-mini" th:each="p : ${recentPosts}" th:href="@{/community/{id}(id=${p.id})}">
+                <span class="post-mini-title" th:text="${p.title}">제목</span>
+                <span class="post-mini-date" th:text="${#temporals.format(p.createdAt, 'MM.dd')}">01.01</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- 아무 활동이 없는 경우 -->
+    <div class="section-card" th:if="${completedLessons == 0 and totalQuizzes == 0 and postCount == 0}">
+        <div class="empty">아직 활동 기록이 없습니다.</div>
+    </div>
+
+</div>
+
+<footer th:replace="~{index :: footer}"></footer>
+</body>
+</html>

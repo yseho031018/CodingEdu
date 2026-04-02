@@ -1,6 +1,7 @@
 package com.codingedu.controller;
 
 import com.codingedu.entity.Challenge;
+import com.codingedu.entity.ChallengeParticipation;
 import com.codingedu.entity.User;
 import com.codingedu.service.ChallengeService;
 import com.codingedu.service.UserService;
@@ -8,10 +9,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Set;
@@ -69,13 +68,16 @@ public class ChallengeController {
                          Model model) {
         Challenge challenge = challengeService.getChallengeById(id);
         boolean joined = false;
+        ChallengeParticipation participation = null;
         if (userDetails != null) {
             User user = userService.findByUsername(userDetails.getUsername());
             joined = challengeService.isJoined(user, challenge);
+            if (joined) participation = challengeService.getParticipation(user, challenge);
         }
 
         model.addAttribute("challenge", challenge);
         model.addAttribute("joined", joined);
+        model.addAttribute("participation", participation);
         model.addAttribute("participantCount", challengeService.getTotalParticipantCount(challenge));
         model.addAttribute("daysLeft", challengeService.getDaysLeft(challenge));
         model.addAttribute("progressPct", challengeService.getProgressPct(challenge));
@@ -100,6 +102,19 @@ public class ChallengeController {
         User user = userService.findByUsername(userDetails.getUsername());
         Challenge challenge = challengeService.getChallengeById(id);
         challengeService.leave(user, challenge);
+        return "redirect:/challenge/" + id;
+    }
+
+    @PostMapping("/{id}/complete")
+    public String complete(@PathVariable Long id,
+                           @RequestParam(required = false) String githubUrl,
+                           @AuthenticationPrincipal UserDetails userDetails,
+                           RedirectAttributes ra) {
+        if (userDetails == null) return "redirect:/login";
+        User user = userService.findByUsername(userDetails.getUsername());
+        Challenge challenge = challengeService.getChallengeById(id);
+        challengeService.complete(user, challenge, githubUrl);
+        ra.addFlashAttribute("completeMsg", "🎉 챌린지 완료를 인증했습니다! 수고하셨어요!");
         return "redirect:/challenge/" + id;
     }
 }

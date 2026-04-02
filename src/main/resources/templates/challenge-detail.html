@@ -132,6 +132,13 @@
     <a href="/challenge" class="back-link">← 챌린지 목록으로</a>
 </div>
 
+<!-- 완료 인증 토스트 -->
+<div th:if="${completeMsg}"
+     style="max-width:1100px; margin:20px auto 0; padding:0 5%;">
+    <div style="background:#E8F5E9; border-left:4px solid #4CAF50; color:#2E7D32; padding:14px 18px; border-radius:10px; font-weight:700; font-size:.95rem;"
+         th:text="${completeMsg}"></div>
+</div>
+
 <div class="detail-layout">
 
     <!-- 메인 정보 -->
@@ -214,11 +221,39 @@
                         </form>
                     </th:block>
                     <th:block th:if="${joined}">
-                        <span class="btn-join joined" style="display:block;">✅ 참여중입니다!</span>
-                        <form th:action="@{/challenge/{id}/leave(id=${challenge.id})}" method="post">
-                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                            <button type="submit" class="btn-leave">참여 취소</button>
-                        </form>
+                        <!-- 완료 인증된 경우 -->
+                        <th:block th:if="${participation != null and participation.completed}">
+                            <div style="background:#E8F5E9; border-radius:12px; padding:16px; text-align:center; margin-bottom:12px;">
+                                <div style="font-size:1.5rem; margin-bottom:6px;">🏅</div>
+                                <div style="font-weight:800; color:#2E7D32; font-size:.95rem;">완료 인증됨!</div>
+                                <div style="font-size:.78rem; color:#888; margin-top:4px;"
+                                     th:text="${#temporals.format(participation.completedAt, 'yyyy.MM.dd HH:mm')}"></div>
+                                <a th:if="${participation.githubUrl != null}"
+                                   th:href="${participation.githubUrl}"
+                                   target="_blank" rel="noopener"
+                                   style="display:inline-block; margin-top:8px; font-size:.8rem; color:#1565C0; font-weight:700; word-break:break-all;">
+                                    🔗 GitHub 링크 보기
+                                </a>
+                            </div>
+                        </th:block>
+                        <!-- 완료 인증 안 된 경우 -->
+                        <th:block th:if="${participation == null or !participation.completed}">
+                            <span class="btn-join joined" style="display:block; margin-bottom:10px;">✅ 참여중입니다!</span>
+                            <!-- 완료 인증 폼 -->
+                            <details style="margin-bottom:10px;">
+                                <summary style="cursor:pointer; font-size:.85rem; font-weight:700; color:#1565C0; padding:8px 0;">🏁 완료 인증하기</summary>
+                                <form th:action="@{/challenge/{id}/complete(id=${challenge.id})}" method="post" style="margin-top:10px;">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                    <input type="url" name="githubUrl" placeholder="GitHub 링크 (선택사항)"
+                                           style="width:100%; padding:8px 12px; border:1.5px solid #e0e4ef; border-radius:8px; font-size:.82rem; margin-bottom:8px; box-sizing:border-box;">
+                                    <button type="submit" class="btn-join" style="background:#4CAF50; font-size:.85rem; padding:10px;">🎉 완료 인증</button>
+                                </form>
+                            </details>
+                            <form th:action="@{/challenge/{id}/leave(id=${challenge.id})}" method="post">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                <button type="submit" class="btn-leave">참여 취소</button>
+                            </form>
+                        </th:block>
                     </th:block>
                 </th:block>
                 <th:block th:if="${challenge.status == 'upcoming'}">

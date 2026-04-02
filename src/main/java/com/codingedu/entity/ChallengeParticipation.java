@@ -23,9 +23,19 @@ public class ChallengeParticipation {
     @Column(name = "joined_at")
     private LocalDateTime joinedAt;
 
+    @Column(name = "completed_at")
+    private LocalDateTime completedAt;
+
+    @Column(name = "github_url", length = 300)
+    private String githubUrl;
+
     @PrePersist
     public void prePersist() {
         this.joinedAt = LocalDateTime.now();
+    }
+
+    public boolean isCompleted() {
+        return completedAt != null;
     }
 
     // Getters and Setters
@@ -37,4 +47,8 @@ public class ChallengeParticipation {
     public void setChallenge(Challenge challenge) { this.challenge = challenge; }
     public LocalDateTime getJoinedAt() { return joinedAt; }
     public void setJoinedAt(LocalDateTime joinedAt) { this.joinedAt = joinedAt; }
+    public LocalDateTime getCompletedAt() { return completedAt; }
+    public void setCompletedAt(LocalDateTime completedAt) { this.completedAt = completedAt; }
+    public String getGithubUrl() { return githubUrl; }
+    public void setGithubUrl(String githubUrl) { this.githubUrl = githubUrl; }
 }

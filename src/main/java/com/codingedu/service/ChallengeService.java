@@ -82,6 +82,20 @@ public class ChallengeService {
         return participationRepository.existsByUserAndChallenge(user, challenge);
     }
 
+    public ChallengeParticipation getParticipation(User user, Challenge challenge) {
+        return participationRepository.findByUserAndChallenge(user, challenge).orElse(null);
+    }
+
+    @Transactional
+    public void complete(User user, Challenge challenge, String githubUrl) {
+        ChallengeParticipation p = participationRepository.findByUserAndChallenge(user, challenge)
+                .orElseThrow(() -> new IllegalArgumentException("참여 정보가 없습니다."));
+        if (p.isCompleted()) return;
+        p.setGithubUrl(githubUrl != null && !githubUrl.isBlank() ? githubUrl : null);
+        p.setCompletedAt(java.time.LocalDateTime.now());
+        participationRepository.save(p);
+    }
+
     @Transactional
     public void join(User user, Challenge challenge) {
         if (participationRepository.existsByUserAndChallenge(user, challenge)) return;

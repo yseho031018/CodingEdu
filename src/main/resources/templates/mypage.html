@@ -316,7 +316,9 @@
                    class="post-item">
                     <span style="font-size:1.3rem; margin-right:8px;" th:text="${p.challenge.icon}">🚀</span>
                     <span class="post-item-title" th:text="${p.challenge.title}">챌린지명</span>
-                    <span class="post-category-tag"
+                    <span th:if="${p.completed}"
+                          style="background:#E8F5E9; color:#2E7D32; font-size:.75rem; font-weight:700; padding:3px 8px; border-radius:10px;">🏅 완료</span>
+                    <span th:if="${!p.completed}" class="post-category-tag"
                           th:text="${p.challenge.status == 'active' ? '진행중' : '예정'}">진행중</span>
                     <span class="post-item-meta"
                           th:text="'참여: ' + ${#temporals.format(p.joinedAt, 'MM.dd')}">01.01</span>

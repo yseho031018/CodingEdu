@@ -28,13 +28,16 @@ nav {
 }
 .logo span { color: var(--yellow-dark); }
 .logo-icon { font-size: 1.6rem; }
-.nav-links { display: flex; gap: 28px; align-items: center; }
+.nav-links {
+  display: flex; gap: 28px; align-items: center;
+  position: absolute; left: 50%; transform: translateX(-50%);
+}
 .nav-links a {
   text-decoration: none; color: var(--text); font-size: .95rem; font-weight: 500;
   transition: color .2s;
 }
 .nav-links a:hover { color: var(--blue-mid); }
-.nav-right { display: flex; align-items: center; gap: 12px; }
+.nav-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
 .btn-search {
   background: none; border: none; cursor: pointer; font-size: 1.2rem; color: var(--text-sub);
   transition: color .2s;
@@ -43,78 +46,10 @@ nav {
 .btn-login {
   background: var(--blue); color: var(--white); border: none;
   padding: 8px 20px; border-radius: 50px; font-size: .9rem; font-weight: 600;
-  cursor: pointer; transition: background .2s, transform .1s;
+  cursor: pointer; transition: background .2s, transform .1s; text-decoration: none;
 }
 .btn-login:hover { background: var(--blue-mid); transform: translateY(-1px); }
 
-/* ── 햄버거 버튼 ── */
-.nav-hamburger {
-  display: none;
-  flex-direction: column; justify-content: center; align-items: center;
-  gap: 5px; width: 40px; height: 40px;
-  background: none; border: none; cursor: pointer; padding: 4px; border-radius: 8px;
-  transition: background .15s;
-}
-.nav-hamburger:hover { background: var(--gray); }
-.nav-hamburger span {
-  display: block; width: 22px; height: 2px;
-  background: var(--text); border-radius: 2px;
-  transition: transform .25s, opacity .25s;
-}
-.nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-.nav-hamburger.open span:nth-child(2) { opacity: 0; }
-.nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
-/* ── 모바일 메뉴 ── */
-.nav-mobile-menu {
-  display: none;
-  position: fixed; top: 64px; left: 0; right: 0;
-  background: var(--white); z-index: 200;
-  flex-direction: column;
-  box-shadow: 0 8px 24px rgba(0,0,0,.12);
-  transform: translateY(-8px); opacity: 0;
-  transition: transform .2s, opacity .2s;
-  pointer-events: none;
-  max-height: calc(100vh - 64px); overflow-y: auto;
-}
-.nav-mobile-menu.open {
-  transform: translateY(0); opacity: 1;
-  pointer-events: auto;
-}
-.nav-mobile-menu a, .nav-mobile-menu .mobile-btn-wrap {
-  display: block; padding: 14px 5%;
-  font-size: 1rem; font-weight: 600; color: var(--text);
-  text-decoration: none; border-bottom: 1px solid #f0f0f0;
-  transition: background .15s;
-}
-.nav-mobile-menu a:hover { background: var(--gray); color: var(--blue); }
-.nav-mobile-menu .mobile-divider {
-  height: 1px; background: #eee; margin: 4px 0;
-}
-.nav-mobile-menu form { margin: 0; }
-.nav-mobile-menu .mobile-btn-wrap { padding: 12px 5%; }
-.nav-mobile-menu button.btn-login {
-  width: 100%; text-align: center;
-}
-
-/* ── 모바일 오버레이 ── */
-.nav-overlay {
-  display: none;
-  position: fixed; inset: 64px 0 0 0; background: rgba(0,0,0,.35); z-index: 199;
-  opacity: 0; transition: opacity .2s;
-}
-.nav-overlay.show { display: block; opacity: 1; }
-
-/* ── 반응형: 768px 이하 ── */
-@media (max-width: 768px) {
-  .nav-links, .nav-right { display: none !important; }
-  .nav-hamburger { display: flex; }
-  .nav-mobile-menu { display: flex; }
-
-  .page-header h1 { font-size: 1.6rem; }
-  .page-header p { font-size: .95rem; }
-  section { padding: 48px 4%; }
-}
 
 /* FOOTER */
 footer {

@@ -133,7 +133,7 @@
 
 <!-- NAV -->
 <nav th:replace="~{index :: nav}"></nav>
-<div th:replace="~{index :: mobile-menu}"></div>
+
 
 <!-- PAGE HEADER -->
 <header class="page-header" style="background: linear-gradient(135deg, #E1BEE7 0%, #F3E5F5 100%);">
@@ -193,8 +193,7 @@
                         <h4 th:text="${post.title}">게시글 제목</h4>
                         <p th:text="${post.content != null ? post.content.split('\n')[0] : ''}"></p>
                         <div class="post-meta">
-                            <a class="author" th:href="@{/user/{nick}(nick=${post.author.nickname})}"
-                               th:text="${post.author.nickname}" style="text-decoration:none; color:inherit;">작성자</a>
+                            <span class="author" th:text="${post.author.nickname}">작성자</span>
                             <span class="date" th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">작성일짜</span>
                             <span class="views" th:text="'👁️ ' + ${post.views}">조회수</span>
                             <span th:text="'💬 ' + ${post.commentCount}">댓글수</span>

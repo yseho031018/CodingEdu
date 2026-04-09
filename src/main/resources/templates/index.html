@@ -1,431 +1,134 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="ko" data-theme="light" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CodeEdu - 코딩은 즐거워요!</title>
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  :root {
-    --yellow: #FFD600;
-    --yellow-light: #FFF9C4;
-    --yellow-dark: #F9A825;
-    --blue: #1565C0;
-    --blue-mid: #1E88E5;
-    --blue-light: #E3F2FD;
-    --white: #FFFFFF;
-    --gray: #F5F5F5;
-    --text: #1A1A2E;
-    --text-sub: #555;
-  }
-  body { font-family: 'Segoe UI', 'Malgun Gothic', sans-serif; color: var(--text); background: var(--white); }
-
-  /* NAV */
-  nav {
-    position: sticky; top: 0; z-index: 100;
-    background: var(--white);
-    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-    padding: 0 5%;
-    display: flex; align-items: center; justify-content: space-between;
-    height: 64px;
-  }
-  .logo {
-    font-size: 1.5rem; font-weight: 900; color: var(--blue);
-    display: flex; align-items: center; gap: 8px;
-  }
-  .logo span { color: var(--yellow-dark); }
-  .logo-icon { font-size: 1.6rem; }
-  .nav-links { display: flex; gap: 28px; align-items: center; }
-  .nav-links a {
-    text-decoration: none; color: var(--text); font-size: .95rem; font-weight: 500;
-    transition: color .2s;
-  }
-  .nav-links a:hover { color: var(--blue-mid); }
-  .nav-right { display: flex; align-items: center; gap: 12px; }
-  .btn-search {
-    background: none; border: none; cursor: pointer; font-size: 1.2rem; color: var(--text-sub);
-    transition: color .2s;
-  }
-  .btn-search:hover { color: var(--blue-mid); }
-  .btn-login {
-    background: var(--blue); color: var(--white); border: none;
-    padding: 8px 20px; border-radius: 50px; font-size: .9rem; font-weight: 600;
-    cursor: pointer; transition: background .2s, transform .1s;
-  }
-  .btn-login:hover { background: var(--blue-mid); transform: translateY(-1px); }
-
-  /* HERO */
-  .hero {
-    background: linear-gradient(135deg, #FFF9C4 0%, #FFD600 50%, #FFA000 100%);
-    padding: 80px 5% 60px;
-    display: flex; align-items: center; justify-content: space-between;
-    overflow: hidden; position: relative; min-height: 520px;
-  }
-  .hero::before {
-    content: ''; position: absolute; top: -80px; right: -80px;
-    width: 400px; height: 400px;
-    background: rgba(255,255,255,0.15); border-radius: 50%;
-  }
-  .hero::after {
-    content: ''; position: absolute; bottom: -100px; left: 30%;
-    width: 300px; height: 300px;
-    background: rgba(255,255,255,0.1); border-radius: 50%;
-  }
-  .hero-text { flex: 1; max-width: 520px; z-index: 1; }
-  .hero-badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: var(--white); color: var(--blue); padding: 6px 14px;
-    border-radius: 50px; font-size: .85rem; font-weight: 700;
-    margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-  }
-  .hero h1 {
-    font-size: 3rem; font-weight: 900; color: var(--blue); line-height: 1.2;
-    margin-bottom: 12px;
-  }
-  .hero h2 {
-    font-size: 1.25rem; font-weight: 500; color: #333;
-    margin-bottom: 36px; line-height: 1.6;
-  }
-  .btn-start {
-    background: var(--blue); color: var(--white);
-    padding: 16px 36px; border-radius: 50px; border: none;
-    font-size: 1.1rem; font-weight: 700; cursor: pointer;
-    box-shadow: 0 4px 20px rgba(21,101,192,0.35);
-    transition: transform .15s, box-shadow .15s;
-    display: inline-flex; align-items: center; gap: 8px;
-  }
-  .btn-start:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(21,101,192,0.4); }
-  .hero-stats {
-    display: flex; gap: 28px; margin-top: 36px;
-  }
-  .stat { text-align: center; }
-  .stat-num { font-size: 1.4rem; font-weight: 900; color: var(--blue); }
-  .stat-label { font-size: .75rem; color: #555; }
-
-  /* ROBOT */
-  .hero-robot { flex: 0 0 320px; display: flex; justify-content: center; z-index: 1; }
-  .robot {
-    width: 220px; height: 260px; position: relative;
-    animation: float 3s ease-in-out infinite;
-  }
-  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
-  .r-head {
-    width: 130px; height: 110px; background: var(--white);
-    border-radius: 30px; margin: 0 auto;
-    position: relative; box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-    border: 4px solid var(--blue);
-  }
-  .r-eye-wrap { display: flex; justify-content: center; gap: 22px; padding-top: 26px; }
-  .r-eye {
-    width: 28px; height: 28px; background: var(--blue);
-    border-radius: 50%; position: relative; overflow: hidden;
-  }
-  .r-eye::after {
-    content: ''; position: absolute; top: 5px; left: 5px;
-    width: 10px; height: 10px; background: #fff; border-radius: 50%;
-  }
-  .r-eye.blink { animation: blink 4s ease-in-out infinite; }
-  @keyframes blink { 0%,48%,52%,100%{transform:scaleY(1)} 50%{transform:scaleY(0.05)} }
-  .r-mouth {
-    width: 50px; height: 22px; background: var(--yellow);
-    border-radius: 0 0 25px 25px; margin: 12px auto 0;
-    border: 3px solid var(--blue); border-top: none;
-  }
-  .r-antenna {
-    width: 6px; height: 28px; background: var(--blue);
-    margin: 0 auto; border-radius: 3px;
-  }
-  .r-antenna::after {
-    content: ''; display: block; width: 14px; height: 14px;
-    background: var(--yellow-dark); border-radius: 50%; margin: -4px auto 0;
-    border: 3px solid var(--blue);
-    animation: pulse 1.5s ease-in-out infinite;
-  }
-  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.3)} }
-  .r-body {
-    width: 150px; background: var(--blue); border-radius: 20px;
-    margin: 12px auto 0; padding: 14px;
-    box-shadow: 0 8px 20px rgba(21,101,192,0.3);
-  }
-  .r-screen {
-    background: #0D47A1; border-radius: 10px; padding: 8px;
-    font-family: monospace; font-size: .65rem; color: #69FF47; line-height: 1.6;
-    height: 54px; overflow: hidden;
-  }
-  .r-arms { display: flex; justify-content: space-between; padding: 0 -10px; }
-  .r-arm {
-    width: 22px; height: 70px; background: var(--blue);
-    border-radius: 11px; margin-top: -30px;
-    box-shadow: 0 4px 10px rgba(21,101,192,0.25);
-  }
-  .r-arm.left { border-radius: 11px 4px 4px 11px; animation: armL 3s ease-in-out infinite; transform-origin: top; }
-  .r-arm.right { border-radius: 4px 11px 11px 4px; animation: armR 3s ease-in-out infinite; transform-origin: top; }
-  @keyframes armL { 0%,100%{transform:rotate(-5deg)} 50%{transform:rotate(-20deg)} }
-  @keyframes armR { 0%,100%{transform:rotate(5deg)} 50%{transform:rotate(20deg)} }
-  .r-legs { display: flex; justify-content: center; gap: 20px; margin-top: 8px; }
-  .r-leg {
-    width: 28px; height: 36px; background: var(--blue);
-    border-radius: 0 0 14px 14px;
-  }
-
-  /* FLOATING BADGES */
-  .badge-float {
-    position: absolute; background: var(--white);
-    border-radius: 14px; padding: 8px 14px;
-    font-size: .8rem; font-weight: 700; color: var(--blue);
-    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-    animation: floatBadge 3s ease-in-out infinite;
-  }
-  .badge-float.b1 { top: 80px; right: 60px; animation-delay: .5s; }
-  .badge-float.b2 { bottom: 80px; right: 100px; animation-delay: 1s; color: var(--yellow-dark); }
-  @keyframes floatBadge { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-
-  /* SECTION COMMON */
-  section { padding: 70px 5%; }
-  .section-title {
-    font-size: 1.8rem; font-weight: 900; color: var(--blue);
-    text-align: center; margin-bottom: 10px;
-  }
-  .section-sub { text-align: center; color: var(--text-sub); font-size: 1rem; margin-bottom: 40px; }
-
-  /* LANGUAGES */
-  .lang-section { background: var(--gray); }
-  .tabs { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 36px; }
-  .tab {
-    padding: 8px 20px; border-radius: 50px; border: 2px solid #ddd;
-    background: var(--white); font-size: .9rem; font-weight: 600; cursor: pointer;
-    transition: all .2s; color: var(--text-sub);
-  }
-  .tab.active, .tab:hover {
-    background: var(--blue); color: var(--white); border-color: var(--blue);
-  }
-  .cards-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;
-  }
-  .lang-card {
-    background: var(--white); border-radius: 20px; padding: 24px 20px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-    transition: transform .2s, box-shadow .2s; cursor: pointer;
-    border: 2px solid transparent; text-align: center;
-  }
-  .lang-card:hover {
-    transform: translateY(-6px); box-shadow: 0 10px 28px rgba(0,0,0,0.12);
-    border-color: var(--yellow);
-  }
-  .lang-icon { font-size: 2.4rem; margin-bottom: 12px; }
-  .lang-name { font-size: 1.1rem; font-weight: 800; margin-bottom: 4px; }
-  .lang-desc { font-size: .8rem; color: var(--text-sub); margin-bottom: 12px; }
-  .lang-badge {
-    display: inline-block; padding: 3px 12px; border-radius: 50px;
-    font-size: .75rem; font-weight: 700;
-  }
-  .badge-intro { background: #E8F5E9; color: #2E7D32; }
-  .badge-basic { background: #E3F2FD; color: #1565C0; }
-  .lang-bar-wrap { background: #eee; border-radius: 10px; height: 6px; margin-top: 14px; }
-  .lang-bar { height: 6px; border-radius: 10px; background: linear-gradient(90deg, var(--blue-mid), var(--yellow-dark)); }
-
-  /* FEATURES */
-  .features-section { background: var(--white); }
-  .features-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px;
-  }
-  .feature-card {
-    border-radius: 24px; padding: 32px 28px; text-align: center;
-    transition: transform .2s; cursor: pointer; position: relative; overflow: hidden;
-  }
-  .feature-card:hover { transform: translateY(-6px); }
-  .feature-card.quiz { background: linear-gradient(135deg, #FFF9C4, #FFD600); }
-  .feature-card.challenge { background: linear-gradient(135deg, #E3F2FD, #90CAF9); }
-  .feature-card.community { background: linear-gradient(135deg, #F3E5F5, #CE93D8); }
-  .feature-icon { font-size: 3rem; margin-bottom: 16px; }
-  .feature-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 10px; color: var(--blue); }
-  .feature-desc { font-size: .9rem; color: #444; line-height: 1.6; }
-  .feature-btn {
-    margin-top: 20px; display: inline-block;
-    padding: 10px 24px; border-radius: 50px;
-    background: var(--blue); color: var(--white);
-    font-size: .85rem; font-weight: 700; cursor: pointer; border: none;
-    transition: transform .15s;
-  }
-  .feature-btn:hover { transform: scale(1.05); }
-
-  /* CTA BANNER */
-  .cta-banner {
-    background: linear-gradient(135deg, var(--blue) 0%, #0D47A1 100%);
-    padding: 70px 5%; text-align: center; color: var(--white);
-  }
-  .cta-banner h2 { font-size: 2.2rem; font-weight: 900; margin-bottom: 12px; }
-  .cta-banner p { font-size: 1.05rem; opacity: .85; margin-bottom: 32px; }
-  .btn-cta-big {
-    background: var(--yellow); color: var(--blue);
-    padding: 16px 42px; border-radius: 50px; border: none;
-    font-size: 1.1rem; font-weight: 800; cursor: pointer;
-    box-shadow: 0 4px 20px rgba(255,214,0,0.35);
-    transition: transform .15s, box-shadow .15s;
-  }
-  .btn-cta-big:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(255,214,0,0.5); }
-
-  /* FOOTER */
-  footer {
-    background: var(--text); color: #aaa; padding: 32px 5%;
-    display: flex; justify-content: space-between; align-items: center; flex-wrap: gap;
-    font-size: .85rem;
-  }
-  footer .f-logo { color: var(--white); font-weight: 900; font-size: 1.1rem; }
-  footer .f-logo span { color: var(--yellow); }
-
-  /* TYPING */
-  .typing::after { content: '|'; animation: blink-cursor .7s step-end infinite; }
-  @keyframes blink-cursor { 50%{opacity:0} }
-
-  /* ── 반응형 ── */
-  @media (max-width: 900px) {
-    .hero { flex-direction: column; text-align: center; padding: 48px 5% 36px; min-height: auto; }
-    .hero-text { max-width: 100%; }
-    .hero-robot { display: none; }
-    .badge-float { display: none; }
-    .hero-stats { justify-content: center; gap: 20px; }
-    .hero h1 { font-size: 2.2rem; }
-    .hero h2 { font-size: 1.05rem; }
-  }
-  @media (max-width: 600px) {
-    .hero h1 { font-size: 1.8rem; }
-    .hero-stats { gap: 12px; }
-    .stat-num { font-size: 1.1rem; }
-    .cards-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
-    .lang-card { padding: 18px 14px; }
-    .lang-icon { font-size: 2rem; }
-    .features-grid { grid-template-columns: 1fr; }
-    .cta-banner h2 { font-size: 1.6rem; }
-    section { padding: 48px 4%; }
-  }
-
-</style>
+<!-- Prevent flash of wrong theme -->
+<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/common.css">
+<link rel="stylesheet" href="/css/tailwind.css">
+<link rel="stylesheet" href="/css/landing.css">
 </head>
-<body>
+<body class="page-index">
 
-<!-- NAV -->
+<!-- ══════ NAV ══════ -->
 <nav th:fragment="nav">
-  <a href="/" class="logo" style="text-decoration:none;">
-    <span class="logo-icon">💻</span>
-    Code<span>Edu</span>
+  <a href="/" class="logo">
+    <div class="logo-mark">💻</div>
+    <span class="logo-name">Code<em>Edu</em></span>
   </a>
+
   <div class="nav-links">
     <a href="/learn">학습하기</a>
     <a href="/quiz">퀴즈</a>
     <a href="/challenge">챌린지</a>
     <a href="/community">커뮤니티</a>
   </div>
-  <div class="nav-right" style="display:flex; align-items:center; gap:12px;">
-    <button class="btn-search">🔍</button>
-    <div sec:authorize="isAnonymous()">
-        <a href="/login" class="btn-login" style="text-decoration:none; display:inline-block;">로그인</a>
-        <a href="/register" class="btn-login" style="background:#fff; color:var(--blue); border:2px solid var(--blue); display:inline-block; padding:8px 18px; text-decoration:none;">회원가입</a>
+
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeToggle" title="테마 전환" aria-label="다크/라이트 모드 전환"></button>
+
+    <div sec:authorize="isAnonymous()" class="nav-right-auth">
+      <a href="/login" class="btn-login ghost">로그인</a>
+      <a href="/register" class="btn-login">회원가입</a>
     </div>
-    <div sec:authorize="isAuthenticated()" style="display:flex; align-items:center; gap:12px;">
-        <a href="/mypage" style="font-weight:700; font-size:.9rem; color:var(--text); text-decoration:none;">
-            👤 <span sec:authentication="principal.nickname">사용자</span>님
-        </a>
-        <a href="/notifications" style="position:relative; text-decoration:none; font-size:1.3rem; line-height:1;" title="알림">
-            🔔
-            <span th:if="${unreadNotificationCount > 0}"
-                  th:text="${unreadNotificationCount}"
-                  style="position:absolute; top:-6px; right:-8px; background:#e74c3c; color:#fff; font-size:.65rem; font-weight:800; border-radius:50%; min-width:18px; height:18px; display:flex; align-items:center; justify-content:center; padding:0 3px; line-height:1;">1</span>
-        </a>
-        <a href="/settings" class="btn-login" style="background:var(--yellow-dark); color:var(--white); text-decoration:none; display:inline-block; padding:8px 16px;">⚙️ 설정</a>
-        <a sec:authorize="hasRole('ADMIN')" href="/admin" class="btn-login" style="background:#e65100; color:#fff; text-decoration:none; display:inline-block; padding:8px 16px;">🛠 관리자</a>
-        <form th:action="@{/logout}" method="post" style="margin:0;">
-            <button type="submit" class="btn-login" style="background:#555;">로그아웃</button>
-        </form>
+
+    <div sec:authorize="isAuthenticated()" class="nav-right-auth">
+      <a href="/mypage" class="nav-user">
+        👤 <span sec:authentication="principal.nickname">사용자</span>님
+      </a>
+      <a href="/notifications" class="nav-notify" style="position:relative; text-decoration:none; font-size:1.2rem;" title="알림">
+        🔔
+        <span th:if="${unreadNotificationCount > 0}"
+              th:text="${unreadNotificationCount}"
+              style="position:absolute; top:-6px; right:-8px; background:var(--danger); color:#fff; font-size:.6rem; font-weight:800; border-radius:50%; min-width:16px; height:16px; display:flex; align-items:center; justify-content:center; padding:0 2px; line-height:1;">1</span>
+      </a>
+      <a href="/settings" class="btn-login ghost">⚙️ 설정</a>
+      <form th:action="@{/logout}" method="post" style="margin:0;">
+        <button type="submit" class="btn-login ghost">로그아웃</button>
+      </form>
     </div>
   </div>
 </nav>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-text">
+<!-- ══════ HERO ══════ -->
+<section class="hero" id="heroSection">
+  <div class="hero-grad-layer" id="heroGrad"></div>
+  <div class="hero-glow-follow" id="heroGlow"></div>
+  <div class="hero-text" id="heroText">
+
     <!-- 비로그인 -->
     <th:block sec:authorize="isAnonymous()">
-      <div class="hero-badge">🎉 코딩은 즐거워요!</div>
-      <h1>코딩이<br>처음인가요?</h1>
-      <h2>쉽고 재미있게 프로그래밍을<br>배워보세요!</h2>
-      <a href="/learn" class="btn-start" style="text-decoration:none;">시작하기 ▶</a>
+      <div class="hero-badge">🎉 지금 무료로 시작하세요</div>
+      <h1 class="hero-title-stack">
+        <span class="hero-title-line">코딩이</span>
+        <span class="hero-title-line"><em>처음</em>이어도</span>
+        <span class="hero-title-line">괜찮아요</span>
+      </h1>
+      <h2>쉽고 재미있게 프로그래밍을 배워보세요.<br>입문자도 즐겁게 성장할 수 있어요!</h2>
+      <div class="hero-actions">
+        <a href="/learn" class="btn-start">시작하기 →</a>
+        <a href="/register" class="btn-start-ghost">무료 회원가입</a>
+      </div>
     </th:block>
+
     <!-- 로그인 -->
     <th:block sec:authorize="isAuthenticated()">
       <div class="hero-badge">👋 다시 오셨네요!</div>
       <h1 th:text="${dashUser != null ? dashUser.nickname + '님,' : '안녕하세요,'}">안녕하세요,</h1>
-      <h2>오늘도 한 걸음 더 성장해볼까요?</h2>
-      <!-- 미니 대시보드 -->
-      <div style="display:flex; gap:16px; margin:20px 0; flex-wrap:wrap;">
-        <a href="/learn" style="flex:1; min-width:130px; background:rgba(255,255,255,0.9); border-radius:16px; padding:16px 20px; text-decoration:none; color:var(--text); border:2px solid var(--blue-light);">
-          <div style="font-size:1.4rem; font-weight:900; color:var(--blue);"
-               th:text="${totalLessons > 0 ? completedLessons + '/' + totalLessons : '0'}">0/0</div>
-          <div style="font-size:.78rem; color:#888; margin-top:2px;">📚 강의 완료</div>
+      <h2>한 걸음씩 꾸준히. 오늘의 학습을 이어가세요.</h2>
+      <div class="mini-dash">
+        <a href="/learn" class="dash-card">
+          <div class="dash-num" th:text="${totalLessons > 0 ? completedLessons + '/' + totalLessons : '0'}">0</div>
+          <div class="dash-label">📚 강의 완료</div>
         </a>
-        <a href="/quiz" style="flex:1; min-width:130px; background:rgba(255,255,255,0.9); border-radius:16px; padding:16px 20px; text-decoration:none; color:var(--text); border:2px solid var(--blue-light);">
-          <div style="font-size:1.4rem; font-weight:900; color:var(--blue);" th:text="${totalQuizzesTaken}">0</div>
-          <div style="font-size:.78rem; color:#888; margin-top:2px;">🎯 퀴즈 응시</div>
+        <a href="/quiz" class="dash-card">
+          <div class="dash-num" th:text="${totalQuizzesTaken}">0</div>
+          <div class="dash-label">🎯 퀴즈 응시</div>
         </a>
-        <a href="/mypage" style="flex:1; min-width:130px; background:rgba(255,255,255,0.9); border-radius:16px; padding:16px 20px; text-decoration:none; color:var(--text); border:2px solid var(--blue-light);">
-          <div style="font-size:1.4rem; font-weight:900; color:var(--blue);" th:text="${bestGrade != null ? bestGrade + '등급' : '-'}">-</div>
-          <div style="font-size:.78rem; color:#888; margin-top:2px;">🏆 최고 등급</div>
+        <a href="/mypage" class="dash-card">
+          <div class="dash-num" th:text="${bestGrade != null ? bestGrade + '등급' : '-'}">-</div>
+          <div class="dash-label">🏆 최고 등급</div>
         </a>
       </div>
-      <a href="/learn" class="btn-start" style="text-decoration:none;">학습 이어하기 ▶</a>
+      <div class="hero-actions">
+        <a href="/learn" class="btn-start">학습 이어하기 →</a>
+      </div>
     </th:block>
+
     <div class="hero-stats">
       <div class="stat">
-        <div class="stat-num">12,000+</div>
+        <div class="stat-num" th:text="${siteUserCount} + '명'">0명</div>
         <div class="stat-label">학습자</div>
       </div>
+      <div class="stat-sep"></div>
       <div class="stat">
-        <div class="stat-num">50+</div>
+        <div class="stat-num" th:text="${siteCourseCount} + '개'">0개</div>
         <div class="stat-label">강의</div>
       </div>
+      <div class="stat-sep"></div>
       <div class="stat">
-        <div class="stat-num">4.9 ⭐</div>
-        <div class="stat-label">평점</div>
+        <div class="stat-num" th:text="${siteQuizCount} + '개'">0개</div>
+        <div class="stat-label">퀴즈</div>
       </div>
     </div>
   </div>
 
-  <div class="hero-robot">
-    <div class="robot">
-      <div class="r-antenna"></div>
-      <div class="r-head">
-        <div class="r-eye-wrap">
-          <div class="r-eye blink"></div>
-          <div class="r-eye"></div>
-        </div>
-        <div class="r-mouth"></div>
-      </div>
-      <div style="display:flex;align-items:flex-start;justify-content:center;gap:4px;margin-top:2px;">
-        <div class="r-arm left"></div>
-        <div class="r-body">
-          <div class="r-screen">
-            <span id="code-text"></span><span class="typing"></span>
-          </div>
-        </div>
-        <div class="r-arm right"></div>
-      </div>
-      <div class="r-legs">
-        <div class="r-leg"></div>
-        <div class="r-leg"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="badge-float b1">🚀 무료 시작</div>
-  <div class="badge-float b2">✨ 입문자 환영!</div>
 </section>
 
-<!-- LANGUAGES -->
+<!-- ══════ LANGUAGES ══════ -->
 <section class="lang-section">
-  <h2 class="section-title">언어별 학습</h2>
-  <p class="section-sub">관심 있는 언어를 선택해서 지금 바로 시작해보세요 🎯</p>
+  <div class="section-header reveal">
+    <span class="section-eyebrow">Curriculum</span>
+    <h2 class="section-title">언어별 학습</h2>
+    <p class="section-sub">관심 있는 언어를 선택해서 지금 바로 시작해보세요</p>
+  </div>
 
-  <div class="tabs">
+  <div class="tabs reveal">
     <button class="tab active" onclick="filterCards('all', this)">전체</button>
     <button class="tab" onclick="filterCards('web', this)">웹 개발</button>
     <button class="tab" onclick="filterCards('java', this)">Java 계열</button>
@@ -435,71 +138,71 @@
   </div>
 
   <div class="cards-grid" id="lang-cards">
-    <div class="lang-card" data-cat="web" data-lang="html">
-      <div class="lang-icon">🌐</div>
+    <div class="lang-card reveal reveal-delay-1" data-cat="web" data-lang="html">
+      <span class="lang-icon">🌐</span>
       <div class="lang-name">HTML</div>
       <div class="lang-desc">웹 페이지 구조</div>
       <span class="lang-badge badge-intro">입문</span>
       <div class="lang-bar-wrap"><div class="lang-bar" th:style="${'width:' + (langProgressMap != null and langProgressMap['html'] != null ? langProgressMap['html'] : 0) + '%'}"></div></div>
     </div>
-    <div class="lang-card" data-cat="web" data-lang="css">
-      <div class="lang-icon">🎨</div>
+    <div class="lang-card reveal reveal-delay-2" data-cat="web" data-lang="css">
+      <span class="lang-icon">🎨</span>
       <div class="lang-name">CSS</div>
       <div class="lang-desc">웹 페이지 스타일링</div>
       <span class="lang-badge badge-intro">입문</span>
       <div class="lang-bar-wrap"><div class="lang-bar" th:style="${'width:' + (langProgressMap != null and langProgressMap['css'] != null ? langProgressMap['css'] : 0) + '%'}"></div></div>
     </div>
-    <div class="lang-card" data-cat="web" data-lang="javascript">
-      <div class="lang-icon">⚡</div>
+    <div class="lang-card reveal reveal-delay-3" data-cat="web" data-lang="javascript">
+      <span class="lang-icon">⚡</span>
       <div class="lang-name">JavaScript</div>
       <div class="lang-desc">웹 동적 기능</div>
       <span class="lang-badge badge-intro">입문</span>
       <div class="lang-bar-wrap"><div class="lang-bar" th:style="${'width:' + (langProgressMap != null and langProgressMap['javascript'] != null ? langProgressMap['javascript'] : 0) + '%'}"></div></div>
     </div>
-    <div class="lang-card" data-cat="web" data-lang="typescript">
-      <div class="lang-icon">🔷</div>
+    <div class="lang-card reveal reveal-delay-4" data-cat="web" data-lang="typescript">
+      <span class="lang-icon">🔷</span>
       <div class="lang-name">TypeScript</div>
       <div class="lang-desc">타입 안전 JavaScript</div>
       <span class="lang-badge badge-basic">초급</span>
       <div class="lang-bar-wrap"><div class="lang-bar" th:style="${'width:' + (langProgressMap != null and langProgressMap['typescript'] != null ? langProgressMap['typescript'] : 0) + '%'}"></div></div>
     </div>
-    <div class="lang-card" data-cat="java" data-lang="java">
-      <div class="lang-icon">☕</div>
+    <div class="lang-card reveal reveal-delay-1" data-cat="java" data-lang="java">
+      <span class="lang-icon">☕</span>
       <div class="lang-name">Java</div>
       <div class="lang-desc">객체지향 프로그래밍</div>
       <span class="lang-badge badge-intro">입문</span>
       <div class="lang-bar-wrap"><div class="lang-bar" th:style="${'width:' + (langProgressMap != null and langProgressMap['java'] != null ? langProgressMap['java'] : 0) + '%'}"></div></div>
     </div>
-    <div class="lang-card" data-cat="java" data-lang="kotlin">
-      <div class="lang-icon">🌱</div>
+    <div class="lang-card reveal reveal-delay-2" data-cat="java" data-lang="kotlin">
+      <span class="lang-icon">🌱</span>
       <div class="lang-name">Kotlin</div>
       <div class="lang-desc">현대적 JVM 언어</div>
       <span class="lang-badge badge-basic">초급</span>
       <div class="lang-bar-wrap"><div class="lang-bar" th:style="${'width:' + (langProgressMap != null and langProgressMap['kotlin'] != null ? langProgressMap['kotlin'] : 0) + '%'}"></div></div>
     </div>
-    <div class="lang-card" data-cat="c" data-lang="c">
-      <div class="lang-icon">🔧</div>
+    <div class="lang-card reveal reveal-delay-3" data-cat="c" data-lang="c">
+      <span class="lang-icon">🔧</span>
       <div class="lang-name">C언어</div>
       <div class="lang-desc">프로그래밍 기초</div>
       <span class="lang-badge badge-intro">입문</span>
       <div class="lang-bar-wrap"><div class="lang-bar" th:style="${'width:' + (langProgressMap != null and langProgressMap['c'] != null ? langProgressMap['c'] : 0) + '%'}"></div></div>
     </div>
-    <div class="lang-card" data-cat="c" data-lang="cpp">
-      <div class="lang-icon">⚙️</div>
+    <div class="lang-card reveal reveal-delay-4" data-cat="c" data-lang="cpp">
+      <span class="lang-icon">⚙️</span>
       <div class="lang-name">C++</div>
       <div class="lang-desc">고성능 프로그래밍</div>
       <span class="lang-badge badge-basic">초급</span>
       <div class="lang-bar-wrap"><div class="lang-bar" th:style="${'width:' + (langProgressMap != null and langProgressMap['cpp'] != null ? langProgressMap['cpp'] : 0) + '%'}"></div></div>
     </div>
-    <div class="lang-card" data-cat="mobile" data-lang="swift">
-      <div class="lang-icon">📱</div>
+    <div class="lang-card reveal reveal-delay-1" data-cat="mobile" data-lang="swift">
+      <span class="lang-icon">📱</span>
       <div class="lang-name">Swift</div>
       <div class="lang-desc">iOS 앱 개발</div>
       <span class="lang-badge badge-basic">초급</span>
       <div class="lang-bar-wrap"><div class="lang-bar" th:style="${'width:' + (langProgressMap != null and langProgressMap['swift'] != null ? langProgressMap['swift'] : 0) + '%'}"></div></div>
     </div>
-    <div class="lang-card" data-cat="etc" data-lang="python">
-      <div class="lang-icon">🐍</div>
+    <div class="lang-card reveal reveal-delay-2" data-cat="etc" data-lang="python">
+      <span class="lang-icon">🐍</span>
       <div class="lang-name">Python</div>
       <div class="lang-desc">AI / 데이터 분석</div>
       <span class="lang-badge badge-intro">입문</span>
@@ -508,84 +211,144 @@
   </div>
 </section>
 
-<!-- FEATURES -->
+<!-- ══════ FEATURES ══════ -->
 <section class="features-section">
-  <h2 class="section-title">🛠️ 더 많은 기능</h2>
-  <p class="section-sub">학습만이 아닌 퀴즈, 챌린지, 커뮤니티로 완성하는 코딩 여정</p>
+  <div class="section-header reveal">
+    <span class="section-eyebrow">Features</span>
+    <h2 class="section-title">더 많은 기능</h2>
+    <p class="section-sub">학습만이 아닌 퀴즈, 챌린지, 커뮤니티로 완성하는 코딩 여정</p>
+  </div>
   <div class="features-grid">
-    <div class="feature-card quiz">
+    <div class="feature-card quiz reveal reveal-delay-1">
       <div class="feature-icon">📝</div>
       <div class="feature-title">퀴즈</div>
       <div class="feature-desc">학습 후 바로 테스트! 개념을 확실하게 내 것으로 만들어보세요. 틀려도 괜찮아요 😊</div>
-      <button class="feature-btn">퀴즈 풀기</button>
+      <button class="feature-btn" onclick="location.href='/quiz'">퀴즈 풀기 →</button>
     </div>
-    <div class="feature-card challenge">
+    <div class="feature-card challenge reveal reveal-delay-2">
       <div class="feature-icon">🏆</div>
       <div class="feature-title">챌린지</div>
       <div class="feature-desc">미니 프로젝트로 실전 감각을 키워보세요. 완성하면 뱃지도 드려요! 🎖️</div>
-      <button class="feature-btn">챌린지 시작</button>
+      <button class="feature-btn" onclick="location.href='/challenge'">챌린지 시작 →</button>
     </div>
-    <div class="feature-card community">
+    <div class="feature-card community reveal reveal-delay-3">
       <div class="feature-icon">💬</div>
       <div class="feature-title">커뮤니티</div>
       <div class="feature-desc">질문하고 답변하고, 학습 경험을 나눠보세요. 함께라면 더 빠르게 성장해요 🌱</div>
-      <button class="feature-btn">참여하기</button>
+      <button class="feature-btn" onclick="location.href='/community'">참여하기 →</button>
     </div>
   </div>
 </section>
 
-<!-- CTA BANNER -->
-<div class="cta-banner">
+<!-- ══════ CTA BANNER ══════ -->
+<div class="cta-banner reveal">
   <h2>지금 바로 시작해볼까요? 🚀</h2>
   <p>무료로 가입하고 오늘부터 코딩을 배워보세요. 어렵지 않아요!</p>
-  <a href="/register" class="btn-cta-big" sec:authorize="isAnonymous()" style="text-decoration:none; display:inline-block;">🎉 무료로 시작하기</a>
-  <a href="/learn" class="btn-cta-big" sec:authorize="isAuthenticated()" style="text-decoration:none; display:inline-block;">📚 학습 이어하기</a>
+  <a href="/register" class="btn-cta-big" sec:authorize="isAnonymous()">🎉 무료로 시작하기</a>
+  <a href="/learn"    class="btn-cta-big" sec:authorize="isAuthenticated()">📚 학습 이어하기</a>
 </div>
 
-<!-- FOOTER -->
+<!-- ══════ FOOTER ══════ -->
 <th:block th:fragment="footer">
 <footer>
-  <div class="f-logo">💻 Code<span>Edu</span></div>
-  <div>© 2025 CodeEdu. 코딩은 즐거워요! 🎈</div>
-  <div>개인정보처리방침 · 이용약관 · 문의하기</div>
+  <div class="f-logo">
+    <div class="f-logo-mark">💻</div>
+    CodeEdu
+  </div>
+  <div>© <span th:text="${#temporals.year(#temporals.createNow())}">2025</span> CodeEdu. 코딩은 즐거워요!</div>
+  <div class="f-links">
+    <a href="/community">커뮤니티</a>
+    <a href="/learn">학습하기</a>
+    <a href="/quiz">퀴즈</a>
+    <a href="/terms">이용약관</a>
+    <a href="/privacy">개인정보처리방침</a>
+  </div>
 </footer>
 <script src="/js/nav.js"></script>
 </th:block>
 
 <script>
-  // 카드 클릭 → 해당 언어 강의 페이지로 바로 이동
-  document.querySelectorAll('.lang-card').forEach(card => {
-    card.addEventListener('click', () => {
+  /* ── Card click → language page ── */
+  document.querySelectorAll('.lang-card').forEach(function (card) {
+    card.addEventListener('click', function () {
       location.href = '/learn/' + card.dataset.lang;
     });
   });
 
-  // 탭 필터
+  /* ── Tab filter ── */
   function filterCards(cat, btn) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(function (t) { t.classList.remove('active'); });
     btn.classList.add('active');
-    document.querySelectorAll('.lang-card').forEach(c => {
-      c.style.display = (cat === 'all' || c.dataset.cat === cat) ? 'block' : 'none';
+    document.querySelectorAll('.lang-card').forEach(function (c) {
+      c.style.display = (cat === 'all' || c.dataset.cat === cat) ? '' : 'none';
     });
   }
 
-  // 로봇 코드 타이핑 애니메이션
-  const lines = ['print("Hello!")', 'for i in range(5):', '  print(i)', 'x = 10 + 5', 'console.log(x)'];
-  let li = 0, ci = 0;
-  const el = document.getElementById('code-text');
-  function type() {
-    if (ci < lines[li].length) {
-      el.textContent += lines[li][ci++];
-      setTimeout(type, 80);
-    } else {
-      setTimeout(() => {
-        el.textContent = '';
-        ci = 0; li = (li + 1) % lines.length;
-        type();
-      }, 1200);
+  /* ── Hero Interactive FX ── */
+  (function () {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (window.matchMedia('(hover: none)').matches) return;
+    if (window.innerWidth <= 900) return;
+
+    var hero = document.getElementById('heroSection');
+    var glow = document.getElementById('heroGlow');
+    var grad = document.getElementById('heroGrad');
+    var text = document.getElementById('heroText');
+    if (!hero || !glow || !grad || !text) return;
+
+    var h1 = text.querySelector('h1');
+    var h2 = text.querySelector('h2');
+
+    var mouse = { x: 0.5, y: 0.5 };
+    var smooth = { x: 0.5, y: 0.5 };
+    var active = false;
+
+    hero.addEventListener('mouseenter', function () {
+      active = true;
+      glow.classList.add('visible');
+      grad.classList.add('visible');
+    });
+    hero.addEventListener('mouseleave', function () {
+      active = false;
+      glow.classList.remove('visible');
+      grad.classList.remove('visible');
+      if (h1) h1.style.transform = '';
+      if (h2) h2.style.transform = '';
+    });
+    hero.addEventListener('mousemove', function (e) {
+      var rect = hero.getBoundingClientRect();
+      mouse.x = (e.clientX - rect.left) / rect.width;
+      mouse.y = (e.clientY - rect.top) / rect.height;
+    });
+
+    function lerp(a, b, t) { return a + (b - a) * t; }
+
+    function tick() {
+      smooth.x = lerp(smooth.x, mouse.x, 0.08);
+      smooth.y = lerp(smooth.y, mouse.y, 0.08);
+
+      var px = (smooth.x * 100).toFixed(1);
+      var py = (smooth.y * 100).toFixed(1);
+
+      glow.style.left = px + '%';
+      glow.style.top = py + '%';
+
+      grad.style.background =
+        'radial-gradient(ellipse 80% 60% at ' + px + '% ' + py + '%, ' +
+        'rgba(107,92,231,0.07) 0%, rgba(155,142,248,0.04) 30%, transparent 70%)';
+
+      if (active) {
+        var ox = (smooth.x - 0.5) * 8;
+        var oy = (smooth.y - 0.5) * 6;
+        if (h1) h1.style.transform = 'translate(' + ox.toFixed(1) + 'px,' + oy.toFixed(1) + 'px)';
+        if (h2) h2.style.transform = 'translate(' + (ox * 0.4).toFixed(1) + 'px,' + (oy * 0.4).toFixed(1) + 'px)';
+      }
+
+      requestAnimationFrame(tick);
     }
-  }
-  type();
+    requestAnimationFrame(tick);
+  })();
+
 </script>
 </body>
 </html>

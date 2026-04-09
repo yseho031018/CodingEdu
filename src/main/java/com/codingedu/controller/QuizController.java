@@ -51,8 +51,10 @@ public class QuizController {
     @GetMapping("/quiz/{id}")
     public String take(@PathVariable(name = "id") Long id,
                        @AuthenticationPrincipal CustomUserDetails userDetails,
+                       HttpServletRequest request,
                        Model model) {
         if (userDetails == null) return "redirect:/login";
+        request.getSession().setAttribute("quiz_start_" + id, java.time.LocalDateTime.now());
         model.addAttribute("quiz", quizService.getQuizById(id));
         return "quiz-take";
     }
@@ -77,7 +79,10 @@ public class QuizController {
         });
 
         User user = userService.findByUsername(userDetails.getUsername());
-        QuizResult result = quizService.submitQuiz(id, userAnswers, user);
+        java.time.LocalDateTime startedAt = (java.time.LocalDateTime)
+                request.getSession().getAttribute("quiz_start_" + id);
+        request.getSession().removeAttribute("quiz_start_" + id);
+        QuizResult result = quizService.submitQuiz(id, userAnswers, user, startedAt);
         redirectAttributes.addFlashAttribute("userAnswers", userAnswers);
         return "redirect:/quiz/" + id + "/result/" + result.getId();
     }

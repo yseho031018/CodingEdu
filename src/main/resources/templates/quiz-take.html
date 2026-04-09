@@ -1,137 +1,287 @@
-<!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+﻿<!DOCTYPE html>
+<html lang="ko" data-theme="light" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${quiz.title} + ' - CodeEdu'">퀴즈</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/tailwind.css">
     <style>
-        /* 전체 페이지를 뷰포트에 고정 */
         html, body { height: 100%; overflow: hidden; }
         body { display: flex; flex-direction: column; }
 
-        /* 네비 아래 공간을 전부 차지 */
         .quiz-page {
             flex: 1;
             display: flex;
             flex-direction: column;
-            background: var(--gray);
+            background: var(--bg-section);
             overflow: hidden;
-            padding: 20px 16px 16px;
+            padding: 18px 16px 14px;
         }
 
-        /* 중앙 정렬 컨테이너 */
         .quiz-take-wrap {
             width: 100%;
-            max-width: 700px;
+            max-width: 720px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
             flex: 1;
-            min-height: 0; /* 필수: flex 자식이 줄어들 수 있게 */
+            min-height: 0;
         }
 
         /* 상단 정보 바 */
         .quiz-info-bar {
-            background: var(--white); border-radius: 16px; padding: 14px 22px;
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #eee;
+            background: var(--bg-surface);
+            border-radius: 18px;
+            padding: 14px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-card);
             flex-shrink: 0;
+            transition: background 0.3s, border-color 0.3s;
         }
-        .quiz-info-title { font-size: 1.05rem; font-weight: 900; color: var(--text); }
-        .quiz-topic { font-size: .78rem; color: #888; font-weight: 700; margin-bottom: 2px; }
-        .quiz-timer { font-size: .9rem; font-weight: 900; color: var(--blue); background: var(--blue-light); padding: 6px 14px; border-radius: 50px; transition: background .3s, color .3s; }
-        .quiz-timer.warn { background: #FFF3E0; color: #E65100; }
-        .quiz-timer.danger { background: #FFEBEE; color: #C62828; animation: timerPulse .6s ease-in-out infinite; }
-        @keyframes timerPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+        .quiz-info-title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--ink-1);
+            letter-spacing: -0.02em;
+        }
+        .quiz-topic {
+            font-size: .74rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 3px;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+        .quiz-meta {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            font-size: .83rem;
+            color: var(--ink-2);
+            font-weight: 500;
+        }
+        .quiz-timer {
+            font-size: .88rem;
+            font-weight: 700;
+            color: var(--accent);
+            background: var(--accent-soft);
+            padding: 6px 14px;
+            border-radius: 50px;
+            transition: background 0.3s, color 0.3s;
+            letter-spacing: -0.01em;
+        }
+        .quiz-timer.warn   { background: var(--warning-soft); color: var(--warning); }
+        .quiz-timer.danger { background: var(--danger-soft);  color: var(--danger);  animation: timerPulse .55s ease-in-out infinite; }
+        @keyframes timerPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
 
         /* 진행률 */
         .progress-wrap { flex-shrink: 0; }
-        .progress-bar { height: 7px; background: #e0e0e0; border-radius: 10px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--blue); border-radius: 10px; transition: width .4s; }
-        .progress-label { display: flex; justify-content: space-between; font-size: .76rem; color: #888; margin-top: 4px; }
+        .progress-track {
+            height: 6px;
+            background: var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--amber));
+            border-radius: 10px;
+            transition: width 0.45s cubic-bezier(0.22,1,0.36,1);
+        }
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: .74rem;
+            color: var(--ink-3);
+            margin-top: 5px;
+            font-weight: 500;
+        }
 
-        /* form이 남은 공간을 전부 차지 */
+        /* 퀴즈 폼 */
         #quiz-form {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
             flex: 1;
-            min-height: 0; /* 필수 */
+            min-height: 0;
         }
 
-        /* 문제 카드 - 남은 공간 채우고 내부 스크롤 */
+        /* 문제 카드 */
         .q-card {
             display: none;
-            background: var(--white); border-radius: 16px; padding: 22px 26px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #eee;
+            background: var(--bg-surface);
+            border-radius: 22px;
+            padding: 26px 30px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-card);
             flex: 1;
-            min-height: 0; /* 필수 */
+            min-height: 0;
             overflow-y: auto;
+            transition: background 0.3s, border-color 0.3s;
         }
         .q-card.active { display: block; }
 
-        .q-num { font-size: .8rem; font-weight: 800; color: var(--blue); margin-bottom: 10px; }
-        .q-text { font-size: 1rem; font-weight: 800; color: var(--text); line-height: 1.55; margin-bottom: 16px; }
+        .q-num {
+            font-size: .72rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .q-text {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--ink-1);
+            line-height: 1.65;
+            margin-bottom: 20px;
+            letter-spacing: -0.01em;
+        }
 
-        .choices { display: flex; flex-direction: column; gap: 8px; }
+        /* 선택지 */
+        .choices { display: flex; flex-direction: column; gap: 9px; }
         .choice-label {
-            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
-            border-radius: 12px; border: 2px solid #eaeaea; cursor: pointer;
-            transition: all .2s; background: #fafafa;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 13px 16px;
+            border-radius: 14px;
+            border: 1.5px solid var(--border-card);
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s, transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+            background: var(--bg);
         }
-        .choice-label:hover { border-color: var(--blue); background: var(--blue-light); }
+        .choice-label:hover {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+            transform: translateX(3px);
+        }
         .choice-label input[type="radio"] { display: none; }
-        .choice-label:has(input:checked) { border-color: var(--blue); background: var(--blue-light); }
-        .choice-marker {
-            width: 30px; height: 30px; border-radius: 50%; border: 2px solid #ddd;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 900; font-size: .82rem; flex-shrink: 0; background: white; transition: all .2s;
+        .choice-label:has(input:checked) {
+            border-color: var(--accent);
+            background: var(--accent-soft);
         }
-        .choice-label:has(input:checked) .choice-marker { background: var(--blue); border-color: var(--blue); color: white; }
-        .choice-text { font-size: .95rem; color: #333; font-weight: 600; }
+        .choice-marker {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1.5px solid var(--border-card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: .8rem;
+            flex-shrink: 0;
+            background: var(--bg-surface);
+            color: var(--ink-2);
+            transition: all 0.2s;
+        }
+        .choice-label:has(input:checked) .choice-marker {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+            box-shadow: 0 2px 8px rgba(107,92,231,0.3);
+        }
+        .choice-text {
+            font-size: .93rem;
+            color: var(--ink-1);
+            font-weight: 500;
+            line-height: 1.5;
+        }
 
         /* 미선택 경고 */
         .no-answer-msg {
-            display: none; color: #C62828; font-size: .82rem; font-weight: 700;
-            margin-top: 12px; padding: 9px 14px; background: #FFEBEE;
-            border-radius: 8px; border-left: 4px solid #C62828;
+            display: none;
+            color: var(--danger);
+            font-size: .82rem;
+            font-weight: 600;
+            margin-top: 14px;
+            padding: 10px 16px;
+            background: var(--danger-soft);
+            border-radius: 10px;
+            border-left: 3px solid var(--danger);
         }
 
-        /* 네비게이션 버튼 - 항상 하단에 */
+        /* 하단 네비게이션 버튼 */
         .nav-btns {
-            display: flex; gap: 10px; flex-shrink: 0; padding-bottom: 4px;
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+            padding-bottom: 2px;
         }
         .btn-prev {
-            padding: 13px 24px; border-radius: 50px; border: 2px solid #eaeaea;
-            background: var(--white); color: var(--text-sub); font-size: .95rem; font-weight: 800;
-            cursor: pointer; transition: all .2s; white-space: nowrap;
+            padding: 13px 24px;
+            border-radius: 50px;
+            border: 1.5px solid var(--border-card);
+            background: var(--bg-surface);
+            color: var(--ink-2);
+            font-size: .92rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s, transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+            white-space: nowrap;
         }
-        .btn-prev:hover { border-color: var(--blue); color: var(--blue); }
-        .btn-prev:disabled { opacity: 0.3; cursor: not-allowed; }
+        .btn-prev:hover:not(:disabled) {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateY(-1px);
+        }
+        .btn-prev:disabled { opacity: 0.35; cursor: not-allowed; }
+
         .btn-next {
-            flex: 1; padding: 13px; border-radius: 50px; border: none;
-            background: var(--blue); color: white; font-size: .95rem; font-weight: 800;
-            cursor: pointer; transition: all .2s;
+            flex: 1;
+            padding: 13px;
+            border-radius: 50px;
+            border: none;
+            background: var(--accent);
+            color: white;
+            font-size: .92rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s;
+            box-shadow: 0 2px 12px rgba(107,92,231,0.25);
         }
-        .btn-next:hover { background: var(--blue-mid); }
+        .btn-next:hover {
+            background: var(--accent-h);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(107,92,231,0.38);
+        }
+
         .btn-submit-quiz {
-            flex: 1; padding: 13px; border-radius: 50px; border: none;
-            background: #2E7D32; color: white; font-size: .95rem; font-weight: 800;
-            cursor: pointer; transition: all .2s;
+            flex: 1;
+            padding: 13px;
+            border-radius: 50px;
+            border: none;
+            background: var(--success);
+            color: white;
+            font-size: .92rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s;
+            box-shadow: 0 2px 12px rgba(5,150,105,0.25);
         }
-        .btn-submit-quiz:hover { background: #1B5E20; }
+        .btn-submit-quiz:hover {
+            background: var(--success);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(5,150,105,0.38);
+        }
     </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav th:replace="~{index :: nav}"></nav>
 
-
 <div class="quiz-page">
-<div class="quiz-take-wrap">
+<div class="quiz-take-wrap reveal">
 
     <!-- 상단 정보 바 -->
     <div class="quiz-info-bar">
@@ -139,15 +289,19 @@
             <div class="quiz-topic" th:text="${quiz.icon + ' ' + quiz.topic}">⚡ JavaScript</div>
             <div class="quiz-info-title" th:text="${quiz.title}">퀴즈 제목</div>
         </div>
-        <div style="display:flex; gap:14px; align-items:center; font-size:.85rem; color:#666;">
+        <div class="quiz-meta">
             <span th:text="'📋 ' + ${quiz.questionCount} + '문제'">📋 5문제</span>
-            <div class="quiz-timer">⏱️ <span id="timer-display" th:attr="data-seconds=${quiz.timeLimit * 60}">00:00</span></div>
+            <div class="quiz-timer">
+                ⏱ <span id="timer-display" th:attr="data-seconds=${quiz.timeLimit * 60}">00:00</span>
+            </div>
         </div>
     </div>
 
     <!-- 진행률 -->
     <div class="progress-wrap">
-        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="progress-track">
+            <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+        </div>
         <div class="progress-label">
             <span id="progress-text">1번째 문제</span>
             <span><span id="current-num">1</span> / <span th:text="${quiz.questionCount}">5</span></span>
@@ -162,7 +316,7 @@
              class="q-card"
              th:classappend="${stat.first} ? 'active'"
              th:attr="data-index=${stat.index}">
-            <div class="q-num" th:text="'Q' + ${stat.count} + ' / ' + ${quiz.questionCount}">Q1 / 5</div>
+            <div class="q-num" th:text="'Question ' + ${stat.count} + ' of ' + ${quiz.questionCount}">Question 1 of 5</div>
             <div class="q-text" th:text="${question.questionText}">문제 내용</div>
             <div class="choices">
                 <label th:each="choice, ci : ${question.choices}" class="choice-label">
@@ -175,7 +329,7 @@
                     <span class="choice-text" th:text="${choice.choiceText}">선택지</span>
                 </label>
             </div>
-            <div class="no-answer-msg" id="no-answer-msg">⚠️ 답을 선택해주세요!</div>
+            <div class="no-answer-msg" id="no-answer-msg">답을 선택해 주세요.</div>
         </div>
 
         <!-- 네비게이션 버튼 -->
@@ -191,9 +345,9 @@
 </div>
 
 <script>
-    const cards = document.querySelectorAll('.q-card');
-    const total = cards.length;
-    let current = 0;
+    const cards  = document.querySelectorAll('.q-card');
+    const total  = cards.length;
+    let current  = 0;
 
     function showQuestion(idx) {
         cards.forEach(c => c.classList.remove('active'));
@@ -208,16 +362,16 @@
 
         const pct = ((idx + 1) / total) * 100;
         document.getElementById('progress-fill').style.width = pct + '%';
-        document.getElementById('current-num').textContent = idx + 1;
+        document.getElementById('current-num').textContent   = idx + 1;
         document.getElementById('progress-text').textContent = `${idx + 1}번째 문제`;
 
         current = idx;
     }
 
     function isCurrentAnswered() {
-        const card = cards[current];
+        const card   = cards[current];
         const radios = card.querySelectorAll('input[type="radio"]');
-        const name = radios[0]?.name;
+        const name   = radios[0]?.name;
         return name ? !!document.querySelector(`input[name="${name}"]:checked`) : false;
     }
 
@@ -234,30 +388,34 @@
     }
 
     // 타이머
-    const timerEl = document.getElementById('timer-display');
+    const timerEl   = document.getElementById('timer-display');
     const timerWrap = timerEl.closest('.quiz-timer');
-    let remaining = parseInt(timerEl.dataset.seconds, 10);
+    let remaining   = parseInt(timerEl.dataset.seconds, 10);
+
     function updateTimer() {
         const m = String(Math.floor(remaining / 60)).padStart(2, '0');
         const s = String(remaining % 60).padStart(2, '0');
         timerEl.textContent = m + ':' + s;
         timerWrap.classList.remove('warn', 'danger');
-        if (remaining <= 30) timerWrap.classList.add('danger');
+        if (remaining <= 30)      timerWrap.classList.add('danger');
         else if (remaining <= 60) timerWrap.classList.add('warn');
     }
     updateTimer();
+
     const iv = setInterval(() => {
         remaining--;
         if (remaining <= 0) {
             clearInterval(iv);
-            timerEl.textContent = '시간 초과!';
+            timerEl.textContent = '시간 초과';
             timerWrap.classList.add('danger');
-            // 미답변 항목 포함해서 자동 제출
             document.getElementById('quiz-form').submit();
             return;
         }
         updateTimer();
     }, 1000);
+
+    // 초기 진행률 표시
+    showQuestion(0);
 </script>
 </body>
 </html>

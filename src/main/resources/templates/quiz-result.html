@@ -1,16 +1,21 @@
-<!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+﻿<!DOCTYPE html>
+<html lang="ko" data-theme="light" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <title>퀴즈 결과 - CodeEdu</title>
     <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/tailwind.css">
     <style>
         .result-container { max-width: 800px; margin: 40px auto 80px; }
 
         .score-card {
-            background: var(--white); border-radius: 24px; padding: 48px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.08); border: 2px solid #eee;
+            background: var(--bg-surface); border-radius: 24px; padding: 48px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08); border: 2px solid var(--border);
             text-align: center; margin-bottom: 32px;
         }
         .grade-badge {
@@ -19,67 +24,67 @@
             font-size: 3rem; font-weight: 900; margin-bottom: 24px;
             box-shadow: 0 4px 16px rgba(0,0,0,0.15);
         }
-        .grade-A { background: linear-gradient(135deg, #4CAF50, #2E7D32); color: white; }
-        .grade-B { background: linear-gradient(135deg, #2196F3, #1565C0); color: white; }
-        .grade-C { background: linear-gradient(135deg, #FF9800, #E65100); color: white; }
-        .grade-D { background: linear-gradient(135deg, #FF5722, #BF360C); color: white; }
-        .grade-F { background: linear-gradient(135deg, #9E9E9E, #424242); color: white; }
+        .grade-A { background: linear-gradient(135deg, var(--success), var(--success)); color: white; }
+        .grade-B { background: linear-gradient(135deg, var(--accent), var(--accent)); color: white; }
+        .grade-C { background: linear-gradient(135deg, var(--amber), var(--warning)); color: white; }
+        .grade-D { background: linear-gradient(135deg, var(--warning), var(--danger)); color: white; }
+        .grade-F { background: linear-gradient(135deg, var(--ink-3), var(--ink-2)); color: white; }
 
-        .quiz-name { font-size: 1rem; color: #888; font-weight: 700; margin-bottom: 12px; }
-        .score-main { font-size: 3.5rem; font-weight: 900; color: var(--text); line-height: 1; }
-        .score-label { font-size: 1rem; color: #aaa; margin: 8px 0 20px; }
+        .quiz-name { font-size: 1rem; color: var(--ink-3); font-weight: 700; margin-bottom: 12px; }
+        .score-main { font-size: 3.5rem; font-weight: 900; color: var(--ink-1); line-height: 1; }
+        .score-label { font-size: 1rem; color: var(--ink-3); margin: 8px 0 20px; }
         .score-pct {
-            display: inline-block; font-size: 1.8rem; font-weight: 900; color: var(--blue);
-            background: var(--blue-light); padding: 8px 28px; border-radius: 50px; margin-bottom: 20px;
+            display: inline-block; font-size: 1.8rem; font-weight: 900; color: var(--accent);
+            background: var(--accent-soft); padding: 8px 28px; border-radius: 50px; margin-bottom: 20px;
         }
-        .result-msg { font-size: 1.25rem; font-weight: 800; color: var(--text); }
+        .result-msg { font-size: 1.25rem; font-weight: 800; color: var(--ink-1); }
 
         .review-section { margin-top: 16px; }
-        .review-section h2 { font-size: 1.4rem; font-weight: 900; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px dashed #eee; }
+        .review-section h2 { font-size: 1.4rem; font-weight: 900; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px dashed var(--border); }
 
         .q-card {
-            background: var(--white); border-radius: 20px; padding: 28px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.05); margin-bottom: 16px; border-left: 6px solid #ddd;
+            background: var(--bg-surface); border-radius: 20px; padding: 28px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05); margin-bottom: 16px; border-left: 6px solid var(--border-card);
         }
-        .q-card.correct    { border-left-color: #4CAF50; }
-        .q-card.wrong      { border-left-color: #E53935; }
-        .q-card.unanswered { border-left-color: #9E9E9E; }
+        .q-card.correct    { border-left-color: var(--success); }
+        .q-card.wrong      { border-left-color: var(--danger); }
+        .q-card.unanswered { border-left-color: var(--ink-3); }
 
         .q-status { font-size: .85rem; font-weight: 800; margin-bottom: 8px; }
-        .q-status.correct    { color: #4CAF50; }
-        .q-status.wrong      { color: #E53935; }
-        .q-status.unanswered { color: #9E9E9E; }
-        .q-text { font-size: 1.05rem; font-weight: 800; color: var(--text); margin-bottom: 16px; line-height: 1.5; }
+        .q-status.correct    { color: var(--success); }
+        .q-status.wrong      { color: var(--danger); }
+        .q-status.unanswered { color: var(--ink-3); }
+        .q-text { font-size: 1.05rem; font-weight: 800; color: var(--ink-1); margin-bottom: 16px; line-height: 1.5; }
 
         .choice-row {
             display: flex; align-items: center; gap: 12px; padding: 12px 16px;
             border-radius: 12px; font-size: .95rem; margin-bottom: 8px;
         }
-        .choice-row.correct        { background: #E8F5E9; border: 2px solid #4CAF50; color: #2E7D32; font-weight: 700; }
-        .choice-row.wrong-selected { background: #FFEBEE; border: 2px solid #E53935; color: #C62828; font-weight: 700; }
-        .choice-row.neutral        { background: #f5f5f5; border: 2px solid #eee; color: #555; }
+        .choice-row.correct        { background: var(--success-soft); border: 2px solid var(--success); color: var(--success); font-weight: 700; }
+        .choice-row.wrong-selected { background: var(--danger-soft); border: 2px solid var(--danger); color: var(--danger); font-weight: 700; }
+        .choice-row.neutral        { background: var(--bg-section); border: 2px solid var(--border); color: var(--ink-2); }
 
         .exp-box {
-            background: #FFF8E1; border-left: 4px solid #FFA000; border-radius: 8px;
-            padding: 14px 18px; font-size: .9rem; color: #555; line-height: 1.6; margin-top: 16px;
+            background: var(--amber-soft); border-left: 4px solid var(--amber); border-radius: 8px;
+            padding: 14px 18px; font-size: .9rem; color: var(--ink-2); line-height: 1.6; margin-top: 16px;
         }
 
         .btn-group-result { display: flex; gap: 16px; justify-content: center; margin-top: 40px; flex-wrap: wrap; }
         .btn-retry {
-            background: var(--blue); color: white; padding: 14px 36px;
+            background: var(--accent); color: white; padding: 14px 36px;
             border-radius: 50px; font-weight: 800; text-decoration: none;
-            box-shadow: 0 4px 12px rgba(21,101,192,0.3); transition: all .2s;
+            box-shadow: 0 4px 12px rgba(107,92,231,0.3); transition: all .2s;
         }
-        .btn-retry:hover { background: var(--blue-mid); transform: translateY(-2px); }
+        .btn-retry:hover { background: var(--accent-h); transform: translateY(-2px); }
         .btn-list {
-            background: var(--white); color: var(--blue); padding: 14px 36px;
+            background: var(--bg-surface); color: var(--accent); padding: 14px 36px;
             border-radius: 50px; font-weight: 800; text-decoration: none;
-            border: 2px solid var(--blue); transition: all .2s;
+            border: 2px solid var(--accent); transition: all .2s;
         }
-        .btn-list:hover { background: var(--blue-light); }
+        .btn-list:hover { background: var(--accent-soft); }
     </style>
 </head>
-<body style="background: var(--gray);">
+<body style="background: var(--bg-section);">
 
 <!-- NAV -->
 <nav th:replace="~{index :: nav}"></nav>
@@ -88,7 +93,7 @@
 <div class="result-container">
 
     <!-- 점수 카드 -->
-    <div class="score-card">
+    <div class="score-card reveal">
         <div class="grade-badge" th:classappend="'grade-' + ${quizResult.grade}"
              th:text="${quizResult.grade}">A</div>
         <div class="quiz-name" th:text="${quiz.icon + ' ' + quiz.title}">퀴즈 이름</div>
@@ -108,23 +113,23 @@
              th:with="correctCnt=${questionViews.?[status=='correct'].size()},
                       wrongCnt=${questionViews.?[status=='wrong'].size()},
                       unansCnt=${questionViews.?[status=='unanswered'].size()}">
-            <div style="background:#E8F5E9; border-radius:14px; padding:14px 24px; text-align:center; min-width:90px;">
-                <div style="font-size:1.5rem; font-weight:900; color:#2E7D32;" th:text="${correctCnt}">0</div>
-                <div style="font-size:.75rem; color:#555; margin-top:2px;">✅ 정답</div>
+            <div style="background:var(--success-soft); border-radius:14px; padding:14px 24px; text-align:center; min-width:90px;">
+                <div style="font-size:1.5rem; font-weight:900; color:var(--success);" th:text="${correctCnt}">0</div>
+                <div style="font-size:.75rem; color:var(--ink-2); margin-top:2px;">✅ 정답</div>
             </div>
-            <div style="background:#FFEBEE; border-radius:14px; padding:14px 24px; text-align:center; min-width:90px;">
-                <div style="font-size:1.5rem; font-weight:900; color:#C62828;" th:text="${wrongCnt}">0</div>
-                <div style="font-size:.75rem; color:#555; margin-top:2px;">❌ 오답</div>
+            <div style="background:var(--danger-soft); border-radius:14px; padding:14px 24px; text-align:center; min-width:90px;">
+                <div style="font-size:1.5rem; font-weight:900; color:var(--danger);" th:text="${wrongCnt}">0</div>
+                <div style="font-size:.75rem; color:var(--ink-2); margin-top:2px;">❌ 오답</div>
             </div>
-            <div style="background:#F5F5F5; border-radius:14px; padding:14px 24px; text-align:center; min-width:90px;">
-                <div style="font-size:1.5rem; font-weight:900; color:#757575;" th:text="${unansCnt}">0</div>
-                <div style="font-size:.75rem; color:#555; margin-top:2px;">⬜ 미응답</div>
+            <div style="background:var(--bg-section); border-radius:14px; padding:14px 24px; text-align:center; min-width:90px;">
+                <div style="font-size:1.5rem; font-weight:900; color:var(--ink-3);" th:text="${unansCnt}">0</div>
+                <div style="font-size:.75rem; color:var(--ink-2); margin-top:2px;">⬜ 미응답</div>
             </div>
         </div>
     </div>
 
     <!-- 문제별 해설 -->
-    <div class="review-section">
+    <div class="review-section reveal">
         <h2>📋 문제별 해설</h2>
 
         <div th:each="qv, stat : ${questionViews}"
@@ -151,7 +156,7 @@
     <div class="btn-group-result">
         <a th:href="@{/quiz/{id}(id=${quiz.id})}" class="btn-retry">🔄 다시 도전하기</a>
         <a href="/quiz" class="btn-list">퀴즈 목록으로</a>
-        <a href="/mypage" class="btn-list" style="border-color:#888; color:#555;">📊 내 이력 보기</a>
+        <a href="/mypage" class="btn-list" style="border-color:var(--ink-3); color:var(--ink-2);">📊 내 이력 보기</a>
     </div>
 </div>
 

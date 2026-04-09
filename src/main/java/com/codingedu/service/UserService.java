@@ -18,6 +18,10 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    public long countAll() {
+        return userRepository.count();
+    }
+
     public boolean isUsernameTaken(String username) {
         return userRepository.findByUsername(username).isPresent();
     }
@@ -87,6 +91,8 @@ public class UserService {
 
     @Transactional
     public void updateRole(Long userId, String role) {
+        if (!java.util.Set.of("ROLE_USER", "ROLE_ADMIN").contains(role))
+            throw new IllegalArgumentException("역할은 ROLE_USER 또는 ROLE_ADMIN이어야 합니다.");
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
         user.setRole(role);

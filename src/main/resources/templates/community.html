@@ -1,31 +1,36 @@
-<!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+﻿<!DOCTYPE html>
+<html lang="ko" data-theme="light" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <title>커뮤니티 - CodeEdu</title>
     <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/tailwind.css">
     <style>
         .community-layout { display: flex; gap: 40px; }
         .community-main { flex: 1; }
         .community-sidebar { width: 320px; flex-shrink: 0; display: flex; flex-direction: column; gap: 30px; }
 
         .community-tabs {
-            display: flex; gap: 10px; border-bottom: 2px solid #eaeaea;
+            display: flex; gap: 10px; border-bottom: 2px solid var(--border-card);
             padding-bottom: 0; margin-bottom: 30px; overflow-x: auto;
             position: relative;
         }
         .community-tab {
             padding: 10px 24px; border: none; background: transparent; font-size: 1rem;
-            font-weight: 700; color: var(--text-sub); cursor: pointer; transition: color .25s;
+            font-weight: 700; color: var(--ink-2); cursor: pointer; transition: color .25s;
             position: relative; white-space: nowrap; text-decoration: none;
             padding-bottom: 18px;
         }
-        .community-tab:hover { color: var(--blue); }
-        .community-tab.active { color: var(--blue); }
+        .community-tab:hover { color: var(--accent); }
+        .community-tab.active { color: var(--accent); }
         .tab-indicator {
             position: absolute; bottom: 0; height: 4px;
-            background: var(--blue); border-radius: 4px 4px 0 0;
+            background: var(--accent); border-radius: 4px 4px 0 0;
             transition: left .3s cubic-bezier(.4,0,.2,1), width .3s cubic-bezier(.4,0,.2,1);
             pointer-events: none;
         }
@@ -38,85 +43,85 @@
 
         .community-actions { display: flex; justify-content: flex-end; margin-bottom: 24px; }
         .btn-write {
-            display: inline-flex; align-items: center; gap: 8px; background: var(--blue);
-            color: var(--white); padding: 12px 28px; border-radius: 50px; font-weight: 800;
-            text-decoration: none; transition: transform .2s, box-shadow .2s; box-shadow: 0 4px 12px rgba(21,101,192,0.3);
+            display: inline-flex; align-items: center; gap: 8px; background: var(--accent);
+            color: var(--bg-surface); padding: 12px 28px; border-radius: 50px; font-weight: 800;
+            text-decoration: none; transition: transform .2s, box-shadow .2s; box-shadow: 0 4px 12px rgba(107,92,231,0.3);
         }
-        .btn-write:hover { transform: translateY(-3px); background: var(--blue-mid); box-shadow: 0 6px 16px rgba(21,101,192,0.4); }
+        .btn-write:hover { transform: translateY(-3px); background: var(--accent-h); box-shadow: 0 6px 16px rgba(107,92,231,0.4); }
 
         .post-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 40px; }
         .post-item {
-            display: flex; gap: 24px; background: var(--white); border-radius: 20px; padding: 24px;
+            display: flex; gap: 24px; background: var(--bg-surface); border-radius: 20px; padding: 24px;
             box-shadow: 0 4px 16px rgba(0,0,0,0.04); text-decoration: none; color: inherit;
-            transition: transform .2s, box-shadow .2s; border: 1px solid #eee;
+            transition: transform .2s, box-shadow .2s; border: 1px solid var(--border);
         }
-        .post-item:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-color: var(--blue-light); }
-        .post-item.hot { border-left: 6px solid var(--yellow-dark); background: linear-gradient(90deg, #FFFDE7, #FFFFFF); }
+        .post-item:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-color: var(--accent-soft); }
+        .post-item.hot { border-left: 6px solid var(--amber); background: linear-gradient(90deg, var(--amber-soft), #FFFFFF); }
         .post-category {
             padding: 6px 14px; border-radius: 50px; font-size: .8rem; font-weight: 800; height: fit-content; text-align: center;
         }
-        .post-category.qna { background: #E3F2FD; color: #1565C0; }
-        .post-category.tips { background: #FFF3E0; color: #E65100; }
-        .post-category.study { background: #E8F5E9; color: #2E7D32; }
-        .post-category.free { background: #F3E5F5; color: #6A1B9A; }
+        .post-category.qna { background: var(--accent-soft); color: var(--accent); }
+        .post-category.tips { background: var(--amber-soft); color: var(--warning); }
+        .post-category.study { background: var(--success-soft); color: var(--success); }
+        .post-category.free { background: var(--accent-soft); color: var(--accent); }
         
         .post-content { flex: 1; }
-        .post-content h4 { font-size: 1.25rem; font-weight: 800; color: var(--text); margin-bottom: 10px; }
-        .post-item:hover .post-content h4 { color: var(--blue); }
-        .post-content p { font-size: .9rem; color: #999; margin-bottom: 12px; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .post-meta { display: flex; gap: 16px; font-size: .85rem; color: #888; flex-wrap: wrap; }
+        .post-content h4 { font-size: 1.25rem; font-weight: 800; color: var(--ink-1); margin-bottom: 10px; }
+        .post-item:hover .post-content h4 { color: var(--accent); }
+        .post-content p { font-size: .9rem; color: var(--ink-3); margin-bottom: 12px; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .post-meta { display: flex; gap: 16px; font-size: .85rem; color: var(--ink-3); flex-wrap: wrap; }
         .post-meta span { display: flex; align-items: center; gap: 6px; }
-        .post-meta .author { font-weight: 700; color: #555; }
+        .post-meta .author { font-weight: 700; color: var(--ink-2); }
 
         .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 50px; }
         .page-btn {
-            width: 44px; height: 44px; border-radius: 50%; border: 1px solid #ddd;
-            background: var(--white); font-weight: 700; color: var(--text-sub);
+            width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--border-card);
+            background: var(--bg-surface); font-weight: 700; color: var(--ink-2);
             cursor: pointer; display: flex; align-items: center; justify-content: center;
             transition: all .2s; font-size: 1rem;
         }
-        .page-btn:hover:not(:disabled) { border-color: var(--blue); color: var(--blue); }
-        .page-btn.active { background: var(--blue); color: var(--white); border-color: var(--blue); }
+        .page-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+        .page-btn.active { background: var(--accent); color: var(--bg-surface); border-color: var(--accent); }
         .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
         .search-bar {
             display: flex; gap: 10px; margin-bottom: 24px;
         }
         .search-bar input {
-            flex: 1; padding: 12px 18px; border-radius: 50px; border: 2px solid #eaeaea;
+            flex: 1; padding: 12px 18px; border-radius: 50px; border: 2px solid var(--border-card);
             font-size: .95rem; outline: none; transition: border-color .2s;
         }
-        .search-bar input:focus { border-color: var(--blue); }
+        .search-bar input:focus { border-color: var(--accent); }
         .search-bar button {
             padding: 12px 22px; border-radius: 50px; border: none;
-            background: var(--blue); color: white; font-weight: 800; cursor: pointer;
+            background: var(--accent); color: white; font-weight: 800; cursor: pointer;
             transition: background .2s; white-space: nowrap;
         }
-        .search-bar button:hover { background: var(--blue-mid); }
+        .search-bar button:hover { background: var(--accent-h); }
         .search-result-info {
-            font-size: .9rem; color: var(--text-sub); margin-bottom: 16px;
-            padding: 10px 16px; background: var(--blue-light); border-radius: 10px;
+            font-size: .9rem; color: var(--ink-2); margin-bottom: 16px;
+            padding: 10px 16px; background: var(--accent-soft); border-radius: 10px;
         }
-        .search-result-info strong { color: var(--blue); }
+        .search-result-info strong { color: var(--accent); }
 
         .sidebar-box {
-            background: var(--white); border-radius: 20px; padding: 28px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.05); border: 1px solid #eee;
+            background: var(--bg-surface); border-radius: 20px; padding: 28px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05); border: 1px solid var(--border);
         }
-        .sidebar-box h3 { font-size: 1.15rem; font-weight: 900; margin-bottom: 20px; color: var(--text); padding-bottom: 12px; border-bottom: 2px dashed #eee; display: flex; align-items: center; gap: 8px; }
+        .sidebar-box h3 { font-size: 1.15rem; font-weight: 900; margin-bottom: 20px; color: var(--ink-1); padding-bottom: 12px; border-bottom: 2px dashed var(--border); display: flex; align-items: center; gap: 8px; }
         .tag-cloud { display: flex; flex-wrap: wrap; gap: 10px; }
         .tag {
-            background: var(--gray); color: var(--text-sub); padding: 8px 16px;
+            background: var(--bg-section); color: var(--ink-2); padding: 8px 16px;
             border-radius: 50px; font-size: .85rem; font-weight: 700; text-decoration: none;
             transition: all .2s; border: 1px solid transparent;
         }
-        .tag:hover { background: var(--blue-light); color: var(--blue); border-color: var(--blue); }
+        .tag:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
 
         .best-answerers { list-style: none; display: flex; flex-direction: column; gap: 16px; }
         .best-answerers li { display: flex; align-items: center; gap: 12px; }
         .rank { font-size: 1.5rem; }
-        .name { font-weight: 800; font-size: 1rem; color: var(--text); flex-grow: 1; }
-        .score { font-size: .85rem; color: var(--blue); font-weight: 700; background: var(--blue-light); padding: 4px 10px; border-radius: 20px; }
+        .name { font-weight: 800; font-size: 1rem; color: var(--ink-1); flex-grow: 1; }
+        .score { font-size: .85rem; color: var(--accent); font-weight: 700; background: var(--accent-soft); padding: 4px 10px; border-radius: 20px; }
 
         @media (max-width: 900px) {
             .community-layout { flex-direction: column; }
@@ -136,13 +141,13 @@
 
 
 <!-- PAGE HEADER -->
-<header class="page-header" style="background: linear-gradient(135deg, #E1BEE7 0%, #F3E5F5 100%);">
-    <h1 style="color: #6A1B9A;">💬 우리들의 커뮤니티</h1>
-    <p style="color: #555;">혼자 끙끙 앓지 마세요! 다른 사람들의 코드 리뷰, 에러 공유, 스터디 모집까지!<br>질문하고 답변하며 다함께 성장하는 개발자 공간입니다.</p>
+<header class="page-header reveal" style="background: linear-gradient(135deg, var(--accent-soft) 0%, var(--accent-soft) 100%);">
+    <h1 style="color: var(--accent);">💬 우리들의 커뮤니티</h1>
+    <p style="color: var(--ink-2);">혼자 끙끙 앓지 마세요! 다른 사람들의 코드 리뷰, 에러 공유, 스터디 모집까지!<br>질문하고 답변하며 다함께 성장하는 개발자 공간입니다.</p>
 </header>
 
-<section style="background: var(--gray);">
-    <div class="community-layout">
+<section style="background: var(--bg-section);">
+    <div class="community-layout reveal">
         <!-- 왼쪽: 게시판 메인 -->
         <div class="community-main">
             <!-- 탭 메뉴 -->
@@ -169,7 +174,7 @@
                 검색 결과 —
                 <strong th:text="${postPage.totalElements} + '건'">0건</strong>
                 <a th:href="@{/community(category=${currentCategory})}"
-                   style="margin-left:12px; color:#888; font-size:.85rem;">✕ 검색 초기화</a>
+                   style="margin-left:12px; color:var(--ink-3); font-size:.85rem;">✕ 검색 초기화</a>
             </div>
 
             <!-- 글쓰기 -->
@@ -180,7 +185,7 @@
             <!-- 게시글 리스트 -->
             <div class="post-list" id="post-list">
                 <!-- 등록된 게시글이 없는 경우 -->
-                <div th:if="${postPage.isEmpty()}" style="text-align:center; padding: 40px; background:var(--white); border-radius:20px; color:#888;">
+                <div th:if="${postPage.isEmpty()}" style="text-align:center; padding: 40px; background:var(--bg-surface); border-radius:20px; color:var(--ink-3);">
                     첫 번째 게시글의 주인공이 되어보세요! ✨
                 </div>
 
@@ -256,7 +261,12 @@
                 </ul>
             </div>
             
-            <img src="https://via.placeholder.com/320x150/FFFDE7/F9A825?text=광고+문의+받습니다+ㅎ" alt="광고배너" style="border-radius: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.05); width: 100%;">
+            <div style="background: linear-gradient(135deg, var(--accent-soft), var(--amber-soft)); border-radius: 20px; padding: 24px; text-align: center;">
+                <div style="font-size: 1.5rem; margin-bottom: 8px;">🚀</div>
+                <div style="font-weight: 800; color: var(--ink-1); margin-bottom: 6px;">코딩 챌린지 참여하기</div>
+                <div style="font-size: .82rem; color: var(--ink-2); margin-bottom: 12px;">미니 프로젝트로 실력을 키워보세요!</div>
+                <a href="/challenge" style="display:inline-block; background:var(--accent); color:#fff; padding:8px 20px; border-radius:50px; font-size:.84rem; font-weight:700; text-decoration:none;">챌린지 보기 →</a>
+            </div>
         </aside>
     </div>
 </section>

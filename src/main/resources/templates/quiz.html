@@ -1,99 +1,189 @@
-<!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+﻿<!DOCTYPE html>
+<html lang="ko" data-theme="light" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>퀴즈 - CodeEdu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/tailwind.css">
     <style>
-        .quiz-filter-tabs { display: flex; gap: 10px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
+        /* 필터 탭 */
+        .filter-tabs { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; }
         .filter-tab {
-            padding: 8px 24px; border-radius: 50px; border: 2px solid #eee;
-            background: var(--white); font-size: .95rem; font-weight: 700; cursor: pointer;
-            transition: all .2s; color: var(--text-sub); text-decoration: none; display: inline-block;
+            padding: 8px 22px; border-radius: 50px;
+            border: 1.5px solid var(--border-card);
+            background: var(--bg-card);
+            font-size: .84rem; font-weight: 500; cursor: pointer;
+            color: var(--ink-2); text-decoration: none; display: inline-block;
+            transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
         }
-        .filter-tab.active, .filter-tab:hover {
-            background: var(--blue); color: var(--white); border-color: var(--blue);
+        .filter-tab:hover { border-color: var(--accent); color: var(--accent); }
+        .filter-tab.active {
+            background: var(--accent); color: #fff;
+            border-color: var(--accent);
+            box-shadow: 0 2px 14px rgba(107,92,231,0.28);
         }
-        .quiz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
+
+        /* 연습 퀴즈 배너 */
+        .practice-banner {
+            background: linear-gradient(135deg, var(--accent-soft) 0%, var(--bg-section) 100%);
+            border-radius: 22px; padding: 28px 32px;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 40px; gap: 20px; flex-wrap: wrap;
+            border: 1.5px solid rgba(107,92,231,0.12);
+        }
+        .practice-banner-text { }
+        .practice-banner-title {
+            font-size: 1.1rem; font-weight: 800;
+            color: var(--ink-1); letter-spacing: -0.02em;
+            margin-bottom: 5px;
+        }
+        .practice-banner-sub { font-size: .88rem; color: var(--ink-2); }
+        .btn-practice {
+            background: var(--accent); color: white;
+            padding: 11px 26px; border-radius: 50px;
+            font-weight: 700; text-decoration: none; font-size: .9rem;
+            white-space: nowrap; flex-shrink: 0;
+            transition: background 0.2s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s;
+            box-shadow: 0 2px 12px rgba(107,92,231,0.25);
+        }
+        .btn-practice:hover {
+            background: var(--accent-h);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(107,92,231,0.38);
+        }
+
+        /* 퀴즈 카드 그리드 */
+        .quiz-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 22px;
+        }
         .quiz-card {
-            background: var(--white); border-radius: 24px; padding: 28px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-            transition: transform .2s, box-shadow .2s;
-            display: flex; flex-direction: column; border: 2px solid transparent;
+            background: var(--bg-card);
+            border-radius: 22px; padding: 26px;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s, border-color 0.2s;
+            display: flex; flex-direction: column;
+            border: 1.5px solid var(--border-card);
         }
-        .quiz-card:hover { transform: translateY(-8px); box-shadow: 0 12px 30px rgba(0,0,0,0.12); border-color: var(--yellow); }
-        .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .quiz-lang { font-weight: 900; font-size: 1.15rem; color: var(--blue); display: flex; align-items: center; gap: 6px; }
-        .quiz-difficulty { padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; color: white; }
-        .difficulty-easy { background: linear-gradient(135deg, #4CAF50, #2E7D32); }
-        .difficulty-medium { background: linear-gradient(135deg, #FFA000, #F57C00); }
-        .difficulty-hard { background: linear-gradient(135deg, #E53935, #C62828); }
-        .quiz-card h3 { font-size: 1.35rem; font-weight: 800; color: var(--text); margin-bottom: 12px; }
-        .quiz-card p { font-size: 0.95rem; color: var(--text-sub); line-height: 1.6; flex-grow: 1; margin-bottom: 24px; }
-        .quiz-meta { display: flex; gap: 16px; font-size: 0.85rem; color: #666; margin-bottom: 24px; flex-wrap: wrap; }
+        .quiz-card:hover {
+            transform: translateY(-7px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent);
+        }
+        .quiz-card-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 16px;
+        }
+        .quiz-lang {
+            font-weight: 700; font-size: 1rem;
+            color: var(--ink-1); display: flex; align-items: center; gap: 6px;
+            letter-spacing: -0.01em;
+        }
+        .quiz-difficulty {
+            padding: 4px 12px; border-radius: 50px;
+            font-size: .72rem; font-weight: 700; color: white;
+        }
+        .difficulty-easy   { background: var(--success); }
+        .difficulty-medium { background: var(--warning); }
+        .difficulty-hard   { background: var(--danger); }
+
+        .quiz-card h3 {
+            font-size: 1.2rem; font-weight: 700;
+            color: var(--ink-1); margin-bottom: 10px;
+            letter-spacing: -0.02em; line-height: 1.35;
+        }
+        .quiz-card p {
+            font-size: .88rem; color: var(--ink-2);
+            line-height: 1.65; flex-grow: 1; margin-bottom: 20px;
+        }
+        .quiz-meta {
+            display: flex; gap: 14px; font-size: .8rem;
+            color: var(--ink-3); margin-bottom: 20px;
+            flex-wrap: wrap; font-weight: 500;
+        }
         .quiz-meta span { display: flex; align-items: center; gap: 4px; }
+
+        /* 시작/잠금 버튼 */
         .btn-quiz {
-            display: inline-block; width: 100%; text-align: center;
-            background: var(--blue-light); color: var(--blue); padding: 14px;
-            border-radius: 12px; font-weight: 800; font-size: 1rem; text-decoration: none;
-            transition: all .2s; border: none; cursor: pointer;
+            display: block; width: 100%; text-align: center;
+            background: var(--accent-soft); color: var(--accent);
+            padding: 13px; border-radius: 14px;
+            font-weight: 700; font-size: .9rem; text-decoration: none;
+            transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+            border: none; cursor: pointer;
         }
-        .btn-quiz:hover { background: var(--blue); color: var(--white); transform: scale(1.02); }
+        .btn-quiz:hover {
+            background: var(--accent); color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(107,92,231,0.28);
+        }
         .login-notice {
-            display: inline-block; width: 100%; text-align: center;
-            background: #f5f5f5; color: #888; padding: 14px;
-            border-radius: 12px; font-weight: 700; font-size: .9rem; text-decoration: none;
-            border: 2px dashed #ddd; box-sizing: border-box;
+            display: block; width: 100%; text-align: center;
+            background: var(--bg-section); color: var(--ink-3);
+            padding: 13px; border-radius: 14px;
+            font-weight: 600; font-size: .88rem; text-decoration: none;
+            border: 1.5px dashed var(--border-card);
+            transition: all 0.2s;
         }
-        .login-notice:hover { background: var(--blue-light); color: var(--blue); border-color: var(--blue); }
+        .login-notice:hover {
+            background: var(--accent-soft); color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        /* 빈 상태 */
+        .empty-state {
+            grid-column: 1/-1; text-align: center;
+            padding: 72px 20px; color: var(--ink-3);
+            background: var(--bg-section); border-radius: 22px;
+            font-size: .95rem; font-weight: 500;
+            border: 1.5px dashed var(--border-card);
+        }
+        .empty-state .empty-icon { font-size: 3rem; display: block; margin-bottom: 16px; }
     </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav th:replace="~{index :: nav}"></nav>
 
-
-<!-- PAGE HEADER -->
-<header class="page-header">
-    <h1>📝 코딩 퀴즈</h1>
-    <p>배운 내용을 퀴즈로 확인하고 실력을 테스트해보세요!<br>틀려도 괜찮아요, 다시 도전하면 되니까요 😊</p>
+<header class="page-header reveal">
+    <h1>코딩 퀴즈</h1>
+    <p>배운 내용을 퀴즈로 확인하고 실력을 테스트해보세요</p>
 </header>
 
-<!-- QUIZ SECTION -->
-<section style="background: var(--white);">
+<section style="background: var(--bg-surface);">
+
     <!-- 연습 퀴즈 배너 -->
-    <div style="background: linear-gradient(135deg, var(--blue-light), #BBDEFB); border-radius: 20px;
-                padding: 28px 36px; display:flex; justify-content:space-between; align-items:center;
-                margin-bottom: 40px; flex-wrap: wrap; gap: 16px;">
-        <div>
-            <div style="font-size:1.2rem; font-weight:900; color:var(--blue); margin-bottom:6px;">⚡ 빠른 연습 퀴즈</div>
-            <div style="font-size:.95rem; color:var(--text-sub);">난이도·주제를 직접 골라 즉석에서 풀어보는 연습 모드</div>
+    <div class="practice-banner reveal">
+        <div class="practice-banner-text">
+            <div class="practice-banner-title">⚡ 빠른 연습 퀴즈</div>
+            <div class="practice-banner-sub">난이도·주제를 직접 골라 즉석에서 풀어보는 연습 모드</div>
         </div>
-        <a href="/quiz/practice"
-           style="background:var(--blue); color:white; padding:12px 28px; border-radius:50px;
-                  font-weight:800; text-decoration:none; font-size:.95rem; white-space:nowrap;
-                  transition: background .2s;"
-           onmouseover="this.style.background='var(--blue-mid)'"
-           onmouseout="this.style.background='var(--blue)'">연습하러 가기 →</a>
+        <a href="/quiz/practice" class="btn-practice">연습하러 가기 →</a>
     </div>
 
     <!-- 난이도 필터 탭 -->
-    <div class="quiz-filter-tabs">
-        <a th:href="@{/quiz(difficulty='all')}" class="filter-tab" th:classappend="${currentDifficulty == 'all'} ? 'active'">전체</a>
-        <a th:href="@{/quiz(difficulty='easy')}" class="filter-tab" th:classappend="${currentDifficulty == 'easy'} ? 'active'">🌱 쉬움</a>
-        <a th:href="@{/quiz(difficulty='medium')}" class="filter-tab" th:classappend="${currentDifficulty == 'medium'} ? 'active'">🔥 보통</a>
-        <a th:href="@{/quiz(difficulty='hard')}" class="filter-tab" th:classappend="${currentDifficulty == 'hard'} ? 'active'">🚀 어려움</a>
+    <div class="filter-tabs">
+        <a th:href="@{/quiz(difficulty='all')}"    class="filter-tab" th:classappend="${currentDifficulty == 'all'}    ? ' active'">전체</a>
+        <a th:href="@{/quiz(difficulty='easy')}"   class="filter-tab" th:classappend="${currentDifficulty == 'easy'}   ? ' active'">🌱 쉬움</a>
+        <a th:href="@{/quiz(difficulty='medium')}" class="filter-tab" th:classappend="${currentDifficulty == 'medium'} ? ' active'">🔥 보통</a>
+        <a th:href="@{/quiz(difficulty='hard')}"   class="filter-tab" th:classappend="${currentDifficulty == 'hard'}   ? ' active'">🚀 어려움</a>
     </div>
 
-    <div class="quiz-grid">
-        <div th:if="${quizzes.isEmpty()}" style="grid-column: 1/-1; text-align:center; padding:60px; color:#888; background:var(--gray); border-radius:20px;">
+    <!-- 퀴즈 카드 -->
+    <div class="quiz-grid reveal">
+        <div th:if="${quizzes.isEmpty()}" class="empty-state">
+            <span class="empty-icon">📭</span>
             등록된 퀴즈가 없습니다.
         </div>
 
         <div th:each="quiz : ${quizzes}" class="quiz-card">
-            <div class="quiz-header">
+            <div class="quiz-card-header">
                 <span class="quiz-lang" th:text="${quiz.icon + ' ' + quiz.topic}">⚡ JavaScript</span>
                 <span class="quiz-difficulty"
                       th:classappend="${quiz.difficulty == 'easy'} ? 'difficulty-easy' : (${quiz.difficulty == 'medium'} ? 'difficulty-medium' : 'difficulty-hard')"
@@ -103,18 +193,15 @@
             <p th:text="${quiz.description}">설명</p>
             <div class="quiz-meta">
                 <span th:text="'📋 ' + ${quiz.questionCount} + '문제'">📋 5문제</span>
-                <span th:text="'⏱️ ' + ${quiz.timeLimit} + '분'">⏱️ 15분</span>
+                <span th:text="'⏱ ' + ${quiz.timeLimit} + '분'">⏱ 15분</span>
             </div>
-            <!-- 로그인한 경우: 퀴즈 시작 링크 -->
             <a sec:authorize="isAuthenticated()"
-               th:href="@{/quiz/{id}(id=${quiz.id})}" class="btn-quiz">퀴즈 시작 ▶</a>
-            <!-- 비로그인: 로그인 안내 -->
+               th:href="@{/quiz/{id}(id=${quiz.id})}" class="btn-quiz">퀴즈 시작 →</a>
             <a sec:authorize="isAnonymous()" href="/login" class="login-notice">로그인 후 풀 수 있어요 🔒</a>
         </div>
     </div>
 </section>
 
-<!-- FOOTER -->
 <footer th:replace="~{index :: footer}"></footer>
 
 </body>

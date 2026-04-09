@@ -186,7 +186,7 @@ public class DataInitializer implements CommandLineRunner {
         admin.setEmail("admin@codingedu.com");
         admin.setRole("ROLE_ADMIN");
         userRepository.save(admin);
-        System.out.println("[DataInitializer] 관리자 계정 생성 완료 — ID: admin / PW: admin1234!");
+        System.out.println("[DataInitializer] 관리자 계정 생성 완료 (admin)");
     }
 
     // ── 강의 코스 시드 (upsert) ──────────────────────────────────────

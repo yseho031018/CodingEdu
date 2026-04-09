@@ -1,48 +1,53 @@
-<!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+﻿<!DOCTYPE html>
+<html lang="ko" data-theme="light" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <title>알림 - CodeEdu</title>
     <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/tailwind.css">
     <style>
         .notif-container {
-            max-width: 700px; margin: 40px auto 60px; background: var(--white);
+            max-width: 700px; margin: 40px auto 60px; background: var(--bg-surface);
             border-radius: 20px; padding: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-            border: 1px solid #eee;
+            border: 1px solid var(--border);
         }
         .notif-header {
             display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 28px; border-bottom: 2px dashed #eaeaea; padding-bottom: 20px;
+            margin-bottom: 28px; border-bottom: 2px dashed var(--border-card); padding-bottom: 20px;
         }
-        .notif-header h2 { font-size: 1.5rem; font-weight: 900; color: var(--text); }
+        .notif-header h2 { font-size: 1.5rem; font-weight: 900; color: var(--ink-1); }
         .notif-item {
             display: flex; align-items: flex-start; gap: 16px;
             padding: 18px; border-radius: 12px; margin-bottom: 10px;
-            border: 1px solid #f0f0f0; background: #f9f9f9; transition: background .15s;
+            border: 1px solid var(--border-card); background: var(--bg); transition: background .15s;
         }
-        .notif-item:hover { background: #f0f4ff; }
+        .notif-item:hover { background: var(--accent-soft); }
         .notif-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 2px; }
         .notif-body { flex: 1; }
-        .notif-msg { font-size: .95rem; color: #333; margin-bottom: 6px; line-height: 1.5; }
-        .notif-time { font-size: .8rem; color: #aaa; }
+        .notif-msg { font-size: .95rem; color: var(--ink-1); margin-bottom: 6px; line-height: 1.5; }
+        .notif-time { font-size: .8rem; color: var(--ink-3); }
         .notif-link { text-decoration: none; color: inherit; display: block; }
-        .notif-link:hover .notif-msg { color: var(--blue); }
-        .empty-msg { text-align: center; padding: 60px 0; color: #aaa; font-size: .95rem; }
+        .notif-link:hover .notif-msg { color: var(--accent); }
+        .empty-msg { text-align: center; padding: 60px 0; color: var(--ink-3); font-size: .95rem; }
         .btn-back {
-            background: var(--blue-light); color: var(--blue); padding: 10px 24px;
+            background: var(--accent-soft); color: var(--accent); padding: 10px 24px;
             border-radius: 50px; font-weight: 800; text-decoration: none;
             font-size: .9rem; transition: all .2s;
         }
-        .btn-back:hover { background: var(--blue); color: #fff; }
+        .btn-back:hover { background: var(--accent); color: #fff; }
     </style>
 </head>
-<body style="background: var(--gray);">
+<body style="background: var(--bg-section);">
 
 <nav th:replace="~{index :: nav}"></nav>
 
 
-<div class="notif-container">
+<div class="notif-container reveal">
     <div class="notif-header">
         <h2>🔔 알림</h2>
         <a href="/community" class="btn-back">커뮤니티로</a>

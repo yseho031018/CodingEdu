@@ -1,101 +1,169 @@
-<!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+﻿<!DOCTYPE html>
+<html lang="ko" data-theme="light" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>로그인 - CodeEdu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/tailwind.css">
     <style>
         .auth-container {
-            min-height: calc(100vh - 64px - 100px); /* 헤더, 푸터 제외 높이 */
+            min-height: calc(100vh - 68px - 88px);
             display: flex; justify-content: center; align-items: center;
-            background: var(--gray); padding: 40px;
+            background: var(--bg-section); padding: 40px 20px;
         }
         .auth-card {
-            background: var(--white); border-radius: 24px; padding: 40px;
-            width: 100%; max-width: 400px; box-shadow: 0 4px 24px rgba(0,0,0,0.06);
-            border: 1px solid #eee; text-align: center;
+            background: var(--bg-surface);
+            border-radius: 26px; padding: 44px 40px;
+            width: 100%; max-width: 400px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-card);
         }
-        .auth-card h2 { font-size: 1.8rem; font-weight: 900; color: var(--blue); margin-bottom: 8px; }
-        .auth-card p { font-size: .95rem; color: #666; margin-bottom: 30px; }
-        
-        .form-group { text-align: left; margin-bottom: 20px; }
-        .form-group label { display: block; font-size: .85rem; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; }
+        .auth-logo {
+            display: flex; align-items: center; justify-content: center;
+            gap: 10px; margin-bottom: 28px; text-decoration: none;
+        }
+        .auth-logo-mark {
+            width: 36px; height: 36px; border-radius: 11px;
+            background: var(--accent); display: flex; align-items: center;
+            justify-content: center; font-size: 1.1rem; color: #fff;
+        }
+        .auth-logo-name {
+            font-size: 1.3rem; font-weight: 800; color: var(--ink-1);
+            letter-spacing: -0.025em;
+        }
+        .auth-title {
+            font-size: 1.55rem; font-weight: 800; color: var(--ink-1);
+            margin-bottom: 6px; letter-spacing: -0.03em; text-align: center;
+        }
+        .auth-sub {
+            font-size: .88rem; color: var(--ink-2); margin-bottom: 32px;
+            text-align: center; line-height: 1.6;
+        }
+        .form-group { margin-bottom: 18px; }
+        .form-group label {
+            display: block; font-size: .82rem; font-weight: 600;
+            color: var(--ink-1); margin-bottom: 7px;
+        }
         .form-group input {
-            width: 100%; padding: 14px 16px; border-radius: 12px; border: 2px solid #eaeaea;
-            font-size: 1rem; transition: border-color .2s; outline: none;
+            width: 100%; padding: 12px 16px; border-radius: 12px;
+            border: 1.5px solid var(--border-card);
+            background: var(--bg-surface); color: var(--ink-1);
+            font-size: .93rem; font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s; outline: none;
         }
-        .form-group input:focus { border-color: var(--blue-mid); }
-        
+        .form-group input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(107,92,231,0.14);
+        }
+        .form-group input::placeholder { color: var(--ink-3); }
+        .form-group input.input-error { border-color: var(--danger); }
+        .form-group input.input-error:focus {
+            box-shadow: 0 0 0 3px rgba(220,38,38,0.12);
+        }
         .btn-submit {
-            width: 100%; background: var(--blue); color: var(--white); border: none;
-            padding: 16px; border-radius: 12px; font-size: 1.05rem; font-weight: 800;
-            cursor: pointer; transition: transform .15s, background .15s; margin-top: 10px;
+            width: 100%; background: var(--accent); color: #fff; border: none;
+            padding: 14px; border-radius: 14px; font-size: .97rem; font-weight: 700;
+            cursor: pointer; letter-spacing: -0.01em;
+            transition: background 0.2s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s;
+            box-shadow: 0 2px 14px rgba(107,92,231,0.28); margin-top: 8px;
         }
-        .btn-submit:hover { background: var(--blue-mid); transform: translateY(-2px); }
-        
-        .auth-links { margin-top: 24px; font-size: .9rem; color: #666; }
-        .auth-links a { color: var(--blue); font-weight: 700; text-decoration: none; margin-left: 6px; }
+        .btn-submit:hover {
+            background: var(--accent-h);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 22px rgba(107,92,231,0.40);
+        }
+        .auth-links { margin-top: 22px; font-size: .86rem; color: var(--ink-2); text-align: center; }
+        .auth-links a { color: var(--accent); font-weight: 600; text-decoration: none; margin-left: 4px; }
         .auth-links a:hover { text-decoration: underline; }
-
-        .error-msg { background: #FFEBEE; color: #C62828; padding: 12px; border-radius: 8px; font-size: .85rem; font-weight: 700; margin-bottom: 20px; }
-        .success-msg { background: #E8F5E9; color: #2E7D32; padding: 12px; border-radius: 8px; font-size: .85rem; font-weight: 700; margin-bottom: 20px; }
+        .error-msg {
+            background: var(--danger-soft); color: var(--danger);
+            padding: 11px 14px; border-radius: 10px;
+            font-size: .84rem; font-weight: 600; margin-bottom: 20px;
+            border-left: 3px solid var(--danger);
+        }
+        .success-msg {
+            background: var(--success-soft); color: var(--success);
+            padding: 11px 14px; border-radius: 10px;
+            font-size: .84rem; font-weight: 600; margin-bottom: 20px;
+            border-left: 3px solid var(--success);
+        }
+        .divider {
+            display: flex; align-items: center; gap: 12px;
+            margin: 20px 0; color: var(--ink-3); font-size: .8rem;
+        }
+        .divider::before, .divider::after {
+            content: ''; flex: 1; height: 1px; background: var(--border);
+        }
     </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav th:replace="~{index :: nav}"></nav>
 
-
 <div class="auth-container">
-    <div class="auth-card">
-        <h2>환영합니다! 👋</h2>
-        <p>코딩 학습을 이어가기 위해 로그인해주세요.</p>
+    <div class="auth-card reveal">
 
-        <!-- 에러 메시지 렌더링 -->
-        <div th:if="${param.error}" class="error-msg">
+        <a href="/" class="auth-logo reveal">
+            <div class="auth-logo-mark">💻</div>
+            <span class="auth-logo-name">CodeEdu</span>
+        </a>
+
+        <h2 class="auth-title">다시 오셨네요!</h2>
+        <p class="auth-sub">코딩 학습을 이어가기 위해 로그인해주세요.</p>
+
+        <div th:if="${param.error}" id="login-error" class="error-msg" role="alert">
             아이디 또는 비밀번호가 일치하지 않습니다.
         </div>
-        
-        <!-- 가입 성공 메시지 렌더링 -->
         <div th:if="${param.registered}" class="success-msg">
-            회원가입이 완료되었습니다! 로그인해주세요.
+            회원가입이 완료됐습니다! 로그인해주세요.
+        </div>
+        <div th:if="${param.passwordReset}" class="success-msg">
+            비밀번호가 성공적으로 변경됐습니다!
         </div>
 
-        <form action="/login_process" method="POST">
-            <!-- CSRF Token -->
+        <form id="loginForm" th:action="@{/login_process}" method="post">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-            
             <div class="form-group">
                 <label for="username">아이디</label>
-                <input type="text" id="username" name="username" placeholder="아이디를 입력하세요" required autofocus>
+                <input type="text" id="username" name="username" placeholder="아이디를 입력하세요" required autofocus
+                       autocomplete="username"
+                       th:classappend="${param.error} ? ' input-error'">
             </div>
-            
             <div class="form-group">
                 <label for="password">비밀번호</label>
-                <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요" required>
+                <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요" required
+                       autocomplete="current-password"
+                       th:classappend="${param.error} ? ' input-error'">
             </div>
-            
             <button type="submit" class="btn-submit">로그인</button>
         </form>
-
-        <!-- 비밀번호 재설정 성공 메시지 -->
-        <div th:if="${param.passwordReset}" class="success-msg">
-            비밀번호가 성공적으로 변경되었습니다!
-        </div>
 
         <div class="auth-links">
             아직 계정이 없으신가요? <a href="/register">무료로 회원가입</a>
         </div>
-        <div class="auth-links" style="margin-top: 10px;">
+        <div class="auth-links" style="margin-top: 8px;">
             비밀번호를 잊으셨나요? <a href="/forgot-password">비밀번호 찾기</a>
         </div>
     </div>
 </div>
 
-<!-- FOOTER -->
 <footer th:replace="~{index :: footer}"></footer>
 
+<script>
+(function () {
+  var form = document.getElementById('loginForm');
+  if (!form) return;
+  form.addEventListener('submit', function () {
+    if (!form.reportValidity()) return;
+    var btn = form.querySelector('button[type="submit"]');
+    if (btn) btn.disabled = true;
+  });
+})();
+</script>
 </body>
 </html>

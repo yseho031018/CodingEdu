@@ -1,0 +1,9 @@
+# application-local.properties 로 복사 후 사용(Git에 올리지 마세요).
+# 이 파일의 설정은 application.properties 보다 우선합니다.
+#
+# TiDB Cloud 예시(호스트·DB명·계정은 본인 값으로 교체):
+
+spring.datasource.url=jdbc:mysql://<gateway-host>.tidbcloud.com:4000/<database>?sslMode=VERIFY_IDENTITY&serverTimezone=UTC
+spring.datasource.username=<user>
+spring.datasource.password=<password>
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver

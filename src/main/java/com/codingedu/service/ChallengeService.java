@@ -91,7 +91,12 @@ public class ChallengeService {
         ChallengeParticipation p = participationRepository.findByUserAndChallenge(user, challenge)
                 .orElseThrow(() -> new IllegalArgumentException("참여 정보가 없습니다."));
         if (p.isCompleted()) return;
-        p.setGithubUrl(githubUrl != null && !githubUrl.isBlank() ? githubUrl : null);
+        if (githubUrl != null && !githubUrl.isBlank()) {
+            if (!githubUrl.matches("^https?://github\\.com/.+/.+")) {
+                throw new IllegalArgumentException("유효한 GitHub 저장소 URL을 입력해주세요. (예: https://github.com/user/repo)");
+            }
+            p.setGithubUrl(githubUrl);
+        }
         p.setCompletedAt(java.time.LocalDateTime.now());
         participationRepository.save(p);
     }
@@ -107,9 +112,7 @@ public class ChallengeService {
 
     @Transactional
     public void leave(User user, Challenge challenge) {
-        participationRepository.findByUserOrderByJoinedAtDesc(user).stream()
-                .filter(p -> p.getChallenge().getId().equals(challenge.getId()))
-                .findFirst()
+        participationRepository.findByUserAndChallenge(user, challenge)
                 .ifPresent(participationRepository::delete);
     }
 
@@ -134,6 +137,12 @@ public class ChallengeService {
                                      String status, boolean featured,
                                      LocalDate startDate, LocalDate endDate,
                                      int totalTasks) {
+        if (title == null || title.isBlank()) throw new IllegalArgumentException("챌린지 제목은 필수입니다.");
+        if (!java.util.Set.of("active", "upcoming", "ended").contains(status))
+            throw new IllegalArgumentException("상태는 active/upcoming/ended 중 하나여야 합니다.");
+        if (startDate == null) throw new IllegalArgumentException("시작일은 필수입니다.");
+        if (totalTasks < 1) throw new IllegalArgumentException("총 과제 수는 1 이상이어야 합니다.");
+
         Challenge c = new Challenge();
         c.setTitle(title);
         c.setDescription(description);
@@ -149,6 +158,8 @@ public class ChallengeService {
 
     @Transactional
     public void updateStatus(Long id, String status) {
+        if (!java.util.Set.of("active", "upcoming", "ended").contains(status))
+            throw new IllegalArgumentException("상태는 active/upcoming/ended 중 하나여야 합니다.");
         Challenge c = getChallengeById(id);
         c.setStatus(status);
         challengeRepository.save(c);

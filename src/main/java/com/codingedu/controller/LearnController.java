@@ -5,6 +5,7 @@ import com.codingedu.entity.LessonNote;
 import com.codingedu.entity.User;
 import com.codingedu.repository.LessonNoteRepository;
 import com.codingedu.security.CustomUserDetails;
+import com.codingedu.service.LessonContentService;
 import com.codingedu.service.LessonService;
 import com.codingedu.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -26,12 +27,16 @@ public class LearnController {
     );
 
     private final LessonService lessonService;
+    private final LessonContentService lessonContentService;
     private final UserService userService;
     private final LessonNoteRepository noteRepository;
 
-    public LearnController(LessonService lessonService, UserService userService,
+    public LearnController(LessonService lessonService,
+                           LessonContentService lessonContentService,
+                           UserService userService,
                            LessonNoteRepository noteRepository) {
         this.lessonService = lessonService;
+        this.lessonContentService = lessonContentService;
         this.userService = userService;
         this.noteRepository = noteRepository;
     }
@@ -72,6 +77,8 @@ public class LearnController {
                             LessonNote::getLessonIdx, LessonNote::getContent));
             model.addAttribute("noteMap", noteMap);
         }
+        model.addAttribute("coursesPayload",
+                lessonContentService.buildCoursesPayload(lessonService.getAllCourses()));
         return "learn-detail";
     }
 
@@ -115,7 +122,9 @@ public class LearnController {
         if (userDetails == null) return ResponseEntity.status(401).body(Map.of("success", false));
         if (!VALID_LANGS.contains(lang)) return ResponseEntity.badRequest().body(Map.of("success", false));
 
-        int lessonIdx = (int) body.getOrDefault("lessonIdx", -1);
+        int lessonIdx;
+        try { lessonIdx = ((Number) body.getOrDefault("lessonIdx", -1)).intValue(); }
+        catch (ClassCastException e) { return ResponseEntity.badRequest().body(Map.of("success", false)); }
         String content = (String) body.getOrDefault("content", "");
         if (lessonIdx < 0) return ResponseEntity.badRequest().body(Map.of("success", false));
 
@@ -140,6 +149,7 @@ public class LearnController {
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         if (userDetails == null) return ResponseEntity.status(401).body(Map.of("success", false));
+        if (!VALID_LANGS.contains(lang)) return ResponseEntity.badRequest().body(Map.of("success", false));
         User user = userService.findByUsername(userDetails.getUsername());
         String content = noteRepository.findByUserAndLangAndLessonIdx(user, lang, lessonIdx)
                 .map(LessonNote::getContent).orElse("");

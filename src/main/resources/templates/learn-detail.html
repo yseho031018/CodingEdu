@@ -1,12 +1,17 @@
-<!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+﻿<!DOCTYPE html>
+<html lang="ko" data-theme="light" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <meta th:name="_csrf" th:content="${_csrf.token}"/>
     <meta th:name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title th:text="${langTitle + ' - CodeEdu'}">학습하기 - CodeEdu</title>
     <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/tailwind.css">
     <style>
         /* ── 전체 레이아웃 ── */
         .learn-wrap {
@@ -18,8 +23,8 @@
         .sidebar {
             width: 260px;
             flex-shrink: 0;
-            background: #fff;
-            border-right: 1px solid #e8e8e8;
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border-card);
             display: flex;
             flex-direction: column;
             position: sticky;
@@ -36,7 +41,7 @@
         .topics-label {
             font-size: .7rem;
             font-weight: 700;
-            color: #bbb;
+            color: var(--ink-3);
             padding: 4px 16px 8px;
             letter-spacing: .05em;
             text-transform: uppercase;
@@ -45,70 +50,70 @@
             display: block;
             padding: 8px 16px;
             font-size: .855rem;
-            color: #555;
+            color: var(--ink-2);
             text-decoration: none;
             cursor: pointer;
             border-left: 3px solid transparent;
             transition: all .15s;
             line-height: 1.4;
         }
-        .topic-item:hover { background: #f9f9f9; color: #333; }
+        .topic-item:hover { background: var(--bg); color: var(--ink-1); }
         .topic-item.active {
-            background: #f0f7ff;
-            color: #1565C0;
-            border-left-color: #1565C0;
+            background: var(--accent-soft);
+            color: var(--accent);
+            border-left-color: var(--accent);
             font-weight: 700;
         }
-        .topic-item.done { color: #2E7D32; }
+        .topic-item.done { color: var(--success); }
         .topic-item.done .topic-label { text-decoration: line-through; opacity: .7; }
-        .topic-item.done.active { color: #1565C0; }
+        .topic-item.done.active { color: var(--accent); }
         .topic-item.done.active .topic-label { text-decoration: none; opacity: 1; }
         .topic-check {
             width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
             display: flex; align-items: center; justify-content: center;
             font-size: .7rem; font-weight: 900;
         }
-        .topic-check.checked { background: #4CAF50; color: #fff; }
+        .topic-check.checked { background: var(--success); color: #fff; }
         .topic-check.unchecked { display: none; }
         .topic-item.sub {
             padding-left: 28px;
             font-size: .8rem;
-            color: #888;
+            color: var(--ink-3);
         }
-        .topic-item.sub.active { color: #1565C0; }
+        .topic-item.sub.active { color: var(--accent); }
 
         /* ── 메인 콘텐츠 ── */
         .main-content {
             flex: 1;
             padding: 48px 64px;
-            background: #fff;
+            background: var(--bg-surface);
             max-width: 860px;
         }
 
         .lesson-meta {
             font-size: .85rem;
-            color: #1565C0;
+            color: var(--accent);
             margin-bottom: 6px;
         }
         .lesson-main-title {
             font-size: 2rem;
             font-weight: 900;
-            color: #1a1a2e;
+            color: var(--ink-1);
             margin-bottom: 12px;
             line-height: 1.3;
         }
         .lesson-date {
             font-size: .82rem;
-            color: #aaa;
+            color: var(--ink-3);
             margin-bottom: 32px;
             padding-bottom: 24px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border);
         }
-        .lesson-date span { color: #1565C0; margin-left: 8px; }
+        .lesson-date span { color: var(--accent); margin-left: 8px; }
 
         /* 동영상 영역 */
         .video-wrap {
-            background: #1a1a2e;
+            background: var(--ink-1);
             border-radius: 16px;
             overflow: hidden;
             margin-bottom: 36px;
@@ -120,7 +125,7 @@
         }
         .video-thumb-bg {
             position: absolute; inset: 0;
-            background: linear-gradient(135deg, #1a1a2e 0%, #2d3561 100%);
+            background: linear-gradient(135deg, var(--ink-1) 0%, var(--accent-h) 100%);
             display: flex; align-items: center; justify-content: center;
             flex-direction: column; gap: 12px;
         }
@@ -130,7 +135,7 @@
         .play-btn {
             position: absolute;
             width: 72px; height: 72px;
-            background: #ff0000; border-radius: 16px; border: none;
+            background: var(--danger); border-radius: 16px; border: none;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; z-index: 2;
             box-shadow: 0 4px 20px rgba(0,0,0,0.4);
@@ -146,21 +151,21 @@
         }
 
         /* 본문 */
-        .lesson-body { font-size: .975rem; color: #333; line-height: 1.9; }
+        .lesson-body { font-size: .975rem; color: var(--ink-1); line-height: 1.9; }
         .lesson-body h3 {
             font-size: 1.25rem;
             font-weight: 800;
-            color: #1a1a2e;
+            color: var(--ink-1);
             margin: 36px 0 12px;
             padding-bottom: 8px;
-            border-bottom: 2px solid #eee;
+            border-bottom: 2px solid var(--border);
         }
         .lesson-body p { margin-bottom: 16px; }
         .lesson-body ul { padding-left: 20px; margin-bottom: 16px; }
         .lesson-body li { margin-bottom: 8px; }
 
         .code-block {
-            background: #1A1A2E;
+            background: var(--ink-1);
             border-radius: 12px;
             padding: 20px 24px;
             font-family: 'Consolas', 'Monaco', monospace;
@@ -174,7 +179,7 @@
         .code-label {
             font-size: .78rem;
             font-weight: 700;
-            color: #999;
+            color: var(--ink-3);
             margin-bottom: 6px;
             margin-top: 20px;
         }
@@ -184,29 +189,29 @@
             justify-content: space-between;
             margin-top: 56px;
             padding-top: 28px;
-            border-top: 1px solid #eee;
+            border-top: 1px solid var(--border);
             gap: 12px;
         }
         .nav-btn {
             flex: 1;
             padding: 14px 20px;
             border-radius: 12px;
-            border: 2px solid #e8e8e8;
-            background: #fff;
+            border: 2px solid var(--border-card);
+            background: var(--bg-surface);
             cursor: pointer;
             font-size: .9rem;
             font-weight: 700;
-            color: #555;
+            color: var(--ink-2);
             transition: all .2s;
             text-align: center;
         }
-        .nav-btn:hover { border-color: #1565C0; color: #1565C0; background: #f0f7ff; }
-        .nav-btn.next { background: #1565C0; color: #fff; border-color: #1565C0; }
-        .nav-btn.next:hover { background: #1E88E5; }
-        @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(21,101,192,.5)} 50%{box-shadow:0 0 0 8px rgba(21,101,192,0)} }
+        .nav-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+        .nav-btn.next { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .nav-btn.next:hover { background: var(--accent-h); }
+        @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(107,92,231,.4)} 50%{box-shadow:0 0 0 8px rgba(107,92,231,0)} }
         .nav-btn.pulse { animation: pulse 1.2s infinite; }
         .nav-btn:disabled { opacity: .35; cursor: not-allowed; }
-        .nav-btn:disabled:hover { border-color: #e8e8e8; color: #555; background: #fff; }
+        .nav-btn:disabled:hover { border-color: var(--border-card); color: var(--ink-2); background: var(--bg-surface); }
 
         /* ── 모바일 ── */
         .sidebar-toggle {
@@ -218,12 +223,12 @@
             width: 52px;
             height: 52px;
             border-radius: 50%;
-            background: #1565C0;
+            background: var(--accent);
             color: #fff;
             border: none;
             font-size: 1.4rem;
             cursor: pointer;
-            box-shadow: 0 4px 16px rgba(21,101,192,.4);
+            box-shadow: 0 4px 16px rgba(107,92,231,.4);
         }
         @media (max-width: 900px) {
             .sidebar {
@@ -259,15 +264,15 @@
         </div>
 
         <!-- 노트 영역 (로그인 시) -->
-        <div th:if="${isLoggedIn}" id="note-panel" style="border-top:1px solid #eee; padding:12px 16px; flex-shrink:0;">
-            <div style="font-size:.75rem; font-weight:700; color:#bbb; margin-bottom:6px; letter-spacing:.05em; text-transform:uppercase;">📝 강의 노트</div>
+        <div th:if="${isLoggedIn}" id="note-panel" style="border-top:1px solid var(--border); padding:12px 16px; flex-shrink:0;">
+            <div style="font-size:.75rem; font-weight:700; color:var(--ink-3); margin-bottom:6px; letter-spacing:.05em; text-transform:uppercase;">📝 강의 노트</div>
             <textarea id="note-area"
                       placeholder="이 강의에 대한 메모를 남겨보세요..."
-                      style="width:100%; height:110px; border:1.5px solid #e0e4ef; border-radius:8px; padding:8px 10px; font-size:.82rem; resize:vertical; font-family:inherit; line-height:1.5; color:#333;"></textarea>
+                      style="width:100%; height:110px; border:1.5px solid var(--border-card); border-radius:8px; padding:8px 10px; font-size:.82rem; resize:vertical; font-family:inherit; line-height:1.5; color:var(--ink-1);"></textarea>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
-                <span id="note-status" style="font-size:.72rem; color:#aaa;"></span>
+                <span id="note-status" style="font-size:.72rem; color:var(--ink-3);"></span>
                 <button id="note-save-btn" onclick="saveNote()"
-                        style="padding:5px 14px; background:#1565C0; color:#fff; border:none; border-radius:8px; font-size:.78rem; font-weight:700; cursor:pointer;">저장</button>
+                        style="padding:5px 14px; background:var(--accent); color:#fff; border:none; border-radius:8px; font-size:.78rem; font-weight:700; cursor:pointer;">저장</button>
             </div>
         </div>
     </aside>
@@ -281,348 +286,7 @@
 <button class="sidebar-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
 
 <script th:inline="javascript">
-const COURSES = {
-    html: {
-        title: "WEB1 - HTML & Internet",
-        icon: "🌐",
-        date: "2025-01-15",
-        videoId: "pQN-pnXPaVg",
-        lessons: [
-            { id: 0, label: "프로젝트의 동기", sub: false,
-              title: "이 강의를 만든 이유",
-              desc: "코딩을 배우고 싶지만 어디서 시작해야 할지 모르는 분들을 위해 이 강의를 제작했습니다. HTML은 웹의 뼈대를 담당하는 언어로, 가장 쉽게 결과를 눈으로 확인할 수 있어 처음 코딩을 배우기에 최적입니다.",
-              points: ["별도 설치 없이 브라우저만 있으면 시작 가능", "작성 즉시 결과 확인 가능", "전 세계 모든 웹사이트의 기반 기술"],
-              code: null },
-            { id: 1, label: "코딩과 HTML", sub: false,
-              title: "코딩이란 무엇인가?",
-              desc: "코딩(Coding)이란 컴퓨터에게 명령을 내리는 행위입니다. HTML은 HyperText Markup Language의 약자로, 웹 페이지의 구조와 내용을 정의하는 언어입니다.",
-              points: ["HTML은 프로그래밍 언어가 아닌 마크업 언어", "태그(Tag)를 이용해 문서 구조를 표현", "브라우저가 HTML을 읽어 화면에 렌더링"],
-              code: '<!-- 이것이 HTML의 기본 구조입니다 -->\n<!DOCTYPE html>\n<html>\n  <head>\n    <title>나의 첫 웹페이지</title>\n  </head>\n  <body>\n    <h1>Hello, World!</h1>\n    <p>HTML로 만든 첫 번째 페이지입니다.</p>\n  </body>\n</html>' },
-            { id: 2, label: "HTML 코딩 실습 환경 준비", sub: false,
-              title: "개발 환경 설정하기",
-              desc: "HTML 코딩을 시작하기 위한 환경을 구성합니다. 텍스트 에디터와 브라우저만 있으면 바로 시작할 수 있습니다.",
-              points: ["VS Code 설치 및 기본 설정", "Live Server 확장 설치로 실시간 미리보기", "Chrome 개발자 도구(F12) 활용법"],
-              code: null },
-            { id: 3, label: "기본 문법 - 태그", sub: false,
-              title: "HTML 태그의 기본 문법",
-              desc: "HTML은 태그(Tag)라는 단위로 구성됩니다. 대부분의 태그는 열리는 태그와 닫히는 태그가 쌍을 이룹니다.",
-              points: ["태그는 꺽쇠 괄호 < > 안에 작성", "대부분 시작 태그와 종료 태그로 구성", "태그 안에 속성(attribute)을 추가 가능"],
-              code: '<!-- 기본 태그 사용법 -->\n<h1>제목 1</h1>\n<h2>제목 2</h2>\n<p>단락(paragraph) 태그</p>\n\n<!-- 속성 사용 예시 -->\n<a href="https://www.google.com">구글로 이동</a>\n<img src="photo.jpg" alt="사진 설명">' },
-            { id: 4, label: "혁명적인 변화", sub: false,
-              title: "웹이 가져온 정보 혁명",
-              desc: "인터넷과 HTML의 등장은 인류가 정보를 공유하는 방식을 근본적으로 바꿨습니다. 누구나 정보를 생산하고 소비할 수 있는 시대가 열렸습니다.",
-              points: ["하이퍼텍스트: 문서 간 링크로 정보 연결", "누구나 웹페이지를 만들 수 있는 민주화", "WWW(World Wide Web)의 탄생과 발전"],
-              code: null },
-            { id: 5, label: "HTML이 중요한 이유", sub: false,
-              title: "왜 HTML을 배워야 할까?",
-              desc: "HTML은 모든 웹 기술의 기초입니다. HTML을 이해하지 않고는 CSS나 JavaScript를 제대로 활용하기 어렵습니다.",
-              points: ["모든 웹 프레임워크의 출력 결과는 HTML", "SEO(검색엔진 최적화)의 핵심", "이메일 템플릿, 앱 UI(WebView) 등에도 활용"],
-              code: null },
-            { id: 6, label: "부모 자식과 목록", sub: false,
-              title: "중첩 태그와 목록 만들기",
-              desc: "HTML 태그는 서로 중첩(Nesting)될 수 있습니다. ul, ol, li 태그로 목록을 만들 수 있습니다.",
-              points: ["부모(Parent)와 자식(Child) 관계 이해", "ul: 순서 없는 목록 / ol: 순서 있는 목록", "li 태그로 각 항목 정의"],
-              code: '<!-- 순서 없는 목록 -->\n<ul>\n  <li>HTML - 구조</li>\n  <li>CSS  - 스타일</li>\n  <li>JS   - 동작</li>\n</ul>\n\n<!-- 순서 있는 목록 -->\n<ol>\n  <li>HTML 배우기</li>\n  <li>CSS 배우기</li>\n  <li>JavaScript 배우기</li>\n</ol>' },
-            { id: 7, label: "HTML 태그의 제왕", sub: false,
-              title: "가장 중요한 HTML 태그들",
-              desc: "수백 개의 HTML 태그 중 실무에서 가장 많이 사용되는 핵심 태그들을 마스터합니다.",
-              points: ["구조: div, span, section, article", "텍스트: h1~h6, p, strong, em", "미디어: img, video, audio"],
-              code: '<!-- 핵심 태그 모음 -->\n<div class="container">\n  <header>\n    <h1>사이트 제목</h1>\n  </header>\n  <main>\n    <section>\n      <h2>섹션 제목</h2>\n      <p>본문 내용입니다. <strong>굵게</strong>, <em>기울임</em></p>\n    </section>\n  </main>\n  <footer>하단 정보</footer>\n</div>' },
-            { id: 8, label: "웹사이트 완성", sub: false,
-              title: "미니 웹사이트 만들기",
-              desc: "지금까지 배운 태그를 모두 활용해 나만의 간단한 웹사이트를 완성합니다.",
-              points: ["nav, header, main, footer 구조 잡기", "이미지와 링크 추가", "실제 브라우저에서 확인"],
-              code: '<!DOCTYPE html>\n<html lang="ko">\n<head>\n  <meta charset="UTF-8">\n  <title>나의 포트폴리오</title>\n</head>\n<body>\n  <nav>\n    <a href="#about">소개</a>\n    <a href="#work">작업물</a>\n  </nav>\n  <header>\n    <h1>안녕하세요, 저는 코딩을 배우는 중입니다! 👋</h1>\n  </header>\n  <main id="about">\n    <h2>자기소개</h2>\n    <p>HTML을 배우고 있는 초보 개발자입니다.</p>\n  </main>\n  <footer>\n    <p>© 2025 My Portfolio</p>\n  </footer>\n</body>\n</html>' }
-        ]
-    },
-    css: {
-        title: "WEB2 - CSS",
-        icon: "🎨",
-        videoId: "1Rs2ND1ryYc",
-        date: "2025-02-01",
-        lessons: [
-            { id: 0, label: "CSS란 무엇인가?", sub: false,
-              title: "CSS 소개 및 역할",
-              desc: "CSS(Cascading Style Sheets)는 HTML 문서에 시각적 스타일을 입히는 언어입니다. 색상, 크기, 위치, 애니메이션까지 화면의 모든 것을 CSS로 제어합니다.",
-              points: ["HTML이 구조라면 CSS는 디자인", "선택자(Selector)로 스타일 대상 지정", "속성(Property)과 값(Value)으로 스타일 정의"],
-              code: '/* CSS 기본 문법 */\n선택자 {\n  속성: 값;\n}\n\n/* 예시 */\nh1 {\n  color: #1565C0;\n  font-size: 2rem;\n  font-weight: 900;\n}' },
-            { id: 1, label: "선택자(Selector)", sub: false,
-              title: "다양한 CSS 선택자",
-              desc: "CSS 선택자는 스타일을 적용할 HTML 요소를 지정하는 방법입니다. 태그, 클래스, ID, 속성 등 다양한 선택자를 활용합니다.",
-              points: ["태그 선택자: 모든 해당 태그에 적용", "클래스 선택자(.): 재사용 가능", "ID 선택자(#): 페이지에서 고유한 요소"],
-              code: '/* 태그 선택자 */\np { color: #333; }\n\n/* 클래스 선택자 */\n.card { background: white; border-radius: 12px; }\n\n/* ID 선택자 */\n#header { height: 64px; }\n\n/* 자식 선택자 */\n.nav > a { font-weight: 600; }\n\n/* 가상 클래스 */\nbutton:hover { background: #1E88E5; }' },
-            { id: 2, label: "박스 모델", sub: false,
-              title: "CSS 박스 모델 이해하기",
-              desc: "모든 HTML 요소는 박스(Box)로 이루어져 있습니다. content - padding - border - margin 4단계 구조를 이해해야 레이아웃을 자유롭게 조작할 수 있습니다.",
-              points: ["content: 실제 내용이 들어가는 영역", "padding: 내용과 테두리 사이 안쪽 여백", "margin: 요소 바깥쪽 여백"],
-              code: '.box {\n  /* 콘텐츠 크기 */\n  width: 200px;\n  height: 100px;\n\n  /* 안쪽 여백 */\n  padding: 16px 24px;\n\n  /* 테두리 */\n  border: 2px solid #1565C0;\n  border-radius: 12px;\n\n  /* 바깥 여백 */\n  margin: 20px auto;\n\n  /* 박스 크기 계산 방식 */\n  box-sizing: border-box;\n}' },
-            { id: 3, label: "Flexbox 레이아웃", sub: false,
-              title: "Flexbox로 레이아웃 잡기",
-              desc: "Flexbox는 요소를 수평·수직으로 배치하는 현대적인 레이아웃 방식입니다. 복잡한 레이아웃을 몇 줄의 코드로 구현할 수 있습니다.",
-              points: ["display: flex 로 활성화", "justify-content: 주축(가로) 정렬", "align-items: 교차축(세로) 정렬"],
-              code: '.container {\n  display: flex;\n  justify-content: space-between; /* 가로 정렬 */\n  align-items: center;           /* 세로 정렬 */\n  gap: 16px;                     /* 간격 */\n  flex-wrap: wrap;               /* 줄바꿈 허용 */\n}\n\n.item {\n  flex: 1;      /* 남은 공간 균등 분배 */\n  min-width: 200px;\n}' },
-            { id: 4, label: "Grid 레이아웃", sub: false,
-              title: "CSS Grid로 복잡한 레이아웃",
-              desc: "Grid는 행(Row)과 열(Column)을 모두 제어할 수 있는 2차원 레이아웃 시스템입니다. 카드 그리드, 대시보드 레이아웃에 적합합니다.",
-              points: ["display: grid 로 활성화", "grid-template-columns로 열 정의", "gap으로 행/열 간격 설정"],
-              code: '.cards-grid {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));\n  gap: 24px;\n}\n\n/* 특정 영역 병합 */\n.featured {\n  grid-column: span 2;\n  grid-row: span 2;\n}' },
-            { id: 5, label: "반응형 디자인", sub: false,
-              title: "미디어 쿼리로 반응형 만들기",
-              desc: "미디어 쿼리(Media Query)를 사용해 화면 크기에 따라 다른 스타일을 적용합니다. 모바일 우선(Mobile-First) 방식이 표준입니다.",
-              points: ["브레이크포인트: 모바일(480), 태블릿(768), 데스크탑(1024)", "모바일 우선: 기본 스타일 → 큰 화면 추가", "viewport 메타 태그 필수"],
-              code: '/* 모바일 기본 */\n.grid { grid-template-columns: 1fr; }\n\n/* 태블릿 */\n@media (min-width: 768px) {\n  .grid { grid-template-columns: 1fr 1fr; }\n}\n\n/* 데스크탑 */\n@media (min-width: 1024px) {\n  .grid { grid-template-columns: repeat(3, 1fr); }\n}' }
-        ]
-    },
-    javascript: {
-        title: "WEB3 - JavaScript",
-        icon: "⚡",
-        videoId: "W6NZfCO5SIk",
-        date: "2025-02-20",
-        lessons: [
-            { id: 0, label: "JavaScript 소개", sub: false,
-              title: "JavaScript란 무엇인가?",
-              desc: "JavaScript는 웹 페이지에 동적인 기능을 추가하는 프로그래밍 언어입니다. 버튼 클릭, 데이터 통신, 애니메이션 등 웹의 모든 상호작용을 담당합니다.",
-              points: ["브라우저 내장 언어 - 별도 설치 불필요", "HTML/CSS와 함께 웹의 3대 기술", "Node.js로 서버 개발도 가능"],
-              code: '// 첫 번째 JavaScript 코드\nconsole.log("Hello, JavaScript!");\n\n// 브라우저 알림\nalert("안녕하세요!");\n\n// HTML 요소 변경\ndocument.title = "새로운 제목";' },
-            { id: 1, label: "변수와 자료형", sub: false,
-              title: "변수 선언과 데이터 타입",
-              desc: "JavaScript에서 데이터를 저장하려면 변수를 사용합니다. let(변경 가능), const(변경 불가)를 상황에 맞게 사용합니다.",
-              points: ["const: 재할당 불가, 기본적으로 const 사용", "let: 재할당 필요할 때 사용", "var: 구버전, 현재는 사용 지양"],
-              code: '// 변수 선언\nconst name = "코딩에듀";    // 문자열\nlet score = 100;             // 숫자\nconst isPass = true;         // 불리언\nconst grades = [90, 85, 92]; // 배열\nconst user = {               // 객체\n  id: 1,\n  nickname: "김코딩"\n};\n\n// 템플릿 리터럴\nconsole.log(`${name}: ${score}점`);' },
-            { id: 2, label: "조건문과 반복문", sub: false,
-              title: "프로그램 흐름 제어",
-              desc: "if/else로 조건에 따라 다른 동작을 하고, for/while로 같은 작업을 반복합니다.",
-              points: ["if/else if/else: 조건 분기", "for...of: 배열 순회에 적합", "while: 조건이 참인 동안 반복"],
-              code: '// 조건문\nconst score = 87;\nif (score >= 90) {\n  console.log("A");\n} else if (score >= 80) {\n  console.log("B");  // 출력\n} else {\n  console.log("C");\n}\n\n// 배열 순회\nconst langs = ["HTML", "CSS", "JS"];\nfor (const lang of langs) {\n  console.log(`${lang} 학습 중`);\n}' },
-            { id: 3, label: "함수", sub: false,
-              title: "함수 선언과 화살표 함수",
-              desc: "함수는 특정 작업을 수행하는 코드 블록입니다. 재사용성을 높이고 코드를 구조화합니다.",
-              points: ["function 키워드로 선언", "화살표 함수(=>): 간결한 문법", "매개변수와 반환값(return)"],
-              code: '// 일반 함수\nfunction add(a, b) {\n  return a + b;\n}\n\n// 화살표 함수\nconst multiply = (a, b) => a * b;\n\n// 기본값 매개변수\nconst greet = (name = "사용자") => {\n  return `안녕하세요, ${name}님!`;\n};\n\nconsole.log(add(3, 5));       // 8\nconsole.log(multiply(4, 6)); // 24\nconsole.log(greet());         // 안녕하세요, 사용자님!' },
-            { id: 4, label: "DOM 조작", sub: false,
-              title: "DOM으로 HTML 동적 제어",
-              desc: "DOM(Document Object Model)은 HTML 문서를 JavaScript로 제어하기 위한 API입니다. 요소를 선택하고 내용·스타일을 변경할 수 있습니다.",
-              points: ["querySelector: CSS 선택자로 요소 탐색", "textContent/innerHTML: 내용 변경", "addEventListener: 이벤트 감지"],
-              code: '// 요소 선택\nconst btn = document.querySelector("#submit-btn");\nconst output = document.querySelector(".result");\n\n// 클릭 이벤트\nbtn.addEventListener("click", () => {\n  const input = document.querySelector("#nameInput").value;\n  output.textContent = `안녕하세요, ${input}님!`;\n  output.style.color = "#1565C0";\n  output.style.fontWeight = "bold";\n});' },
-            { id: 5, label: "비동기와 fetch", sub: false,
-              title: "API 통신과 비동기 처리",
-              desc: "fetch API와 async/await로 서버에서 데이터를 가져와 화면에 표시합니다. 비동기(Async) 개념을 이해하면 실전 개발이 가능합니다.",
-              points: ["동기: 순서대로, 비동기: 기다리지 않고 진행", "Promise와 async/await", "fetch로 REST API 호출"],
-              code: '// 게시글 목록 불러오기\nasync function loadPosts() {\n  try {\n    const response = await fetch("/api/posts");\n    if (!response.ok) throw new Error("요청 실패");\n\n    const posts = await response.json();\n    const list = document.querySelector("#post-list");\n\n    posts.forEach(post => {\n      const li = document.createElement("li");\n      li.textContent = post.title;\n      list.appendChild(li);\n    });\n  } catch (error) {\n    console.error("오류:", error.message);\n  }\n}\nloadPosts();' }
-        ]
-    },
-    typescript: {
-        title: "TypeScript - 타입 안전 개발",
-        icon: "🔷",
-        videoId: "BwuLxPH8IDs",
-        date: "2025-03-05",
-        lessons: [
-            { id: 0, label: "TypeScript 소개", sub: false,
-              title: "왜 TypeScript가 필요한가?",
-              desc: "TypeScript는 JavaScript에 정적 타입을 추가한 언어입니다. 컴파일 단계에서 오류를 발견해 런타임 버그를 크게 줄일 수 있습니다.",
-              points: ["JavaScript의 슈퍼셋 - JS 코드 그대로 동작", "컴파일 시 타입 오류 감지", "IDE 자동완성·리팩토링 지원 강화"],
-              code: '// JavaScript - 런타임에서야 오류 발견\nfunction add(a, b) { return a + b; }\nadd("3", 5); // "35" - 의도치 않은 결과!\n\n// TypeScript - 컴파일 시 오류 감지\nfunction add(a: number, b: number): number {\n  return a + b;\n}\nadd("3", 5); // ❌ 컴파일 오류: string은 number에 할당 불가' },
-            { id: 1, label: "기본 타입", sub: false,
-              title: "TypeScript 기본 타입 시스템",
-              desc: "TypeScript가 제공하는 다양한 기본 타입과 타입 추론(Type Inference) 기능을 학습합니다.",
-              points: ["원시 타입: string, number, boolean", "특수 타입: any, unknown, never, void", "타입 추론: 선언 시 자동으로 타입 결정"],
-              code: '// 기본 타입\nlet name: string = "TypeScript";\nlet version: number = 5.0;\nlet isStable: boolean = true;\n\n// 배열\nlet scores: number[] = [90, 85, 92];\nlet tags: Array<string> = ["web", "ts"];\n\n// 튜플\nlet point: [number, number] = [10, 20];\n\n// 유니온 타입\nlet id: string | number = "abc";\nid = 123; // OK\n\n// 타입 추론\nlet message = "Hello"; // string으로 자동 추론' },
-            { id: 2, label: "인터페이스와 타입", sub: false,
-              title: "interface와 type alias",
-              desc: "interface와 type으로 복잡한 객체의 구조를 정의합니다. 코드의 가독성과 안전성을 크게 높입니다.",
-              points: ["interface: 객체 구조 정의, 선언 병합 가능", "type: 유니온·교차 타입 등 더 유연", "?: 선택적 프로퍼티, readonly 읽기 전용"],
-              code: 'interface User {\n  readonly id: number;    // 읽기 전용\n  name: string;\n  email: string;\n  age?: number;           // 선택 필드\n  role: "admin" | "user"; // 리터럴 타입\n}\n\n// 타입 별칭\ntype Point = { x: number; y: number };\ntype ID = string | number;\n\n// 인터페이스 확장\ninterface AdminUser extends User {\n  permissions: string[];\n}\n\nconst admin: AdminUser = {\n  id: 1, name: "관리자", email: "admin@example.com",\n  role: "admin", permissions: ["write", "delete"]\n};' },
-            { id: 3, label: "제네릭", sub: false,
-              title: "제네릭으로 재사용 가능한 코드",
-              desc: "제네릭(Generic)은 타입을 매개변수처럼 사용하는 기능입니다. 다양한 타입에 동작하면서도 타입 안전성을 유지합니다.",
-              points: ["<T>: 타입 매개변수 선언", "함수, 클래스, 인터페이스에 모두 적용", "제약조건(extends)으로 타입 범위 제한"],
-              code: '// 제네릭 함수\nfunction getFirst<T>(arr: T[]): T {\n  return arr[0];\n}\nconst num = getFirst([1, 2, 3]);    // number\nconst str = getFirst(["a", "b"]);   // string\n\n// 제네릭 인터페이스\ninterface ApiResponse<T> {\n  data: T;\n  status: number;\n  message: string;\n}\n\ntype UserResponse = ApiResponse<User>;\ntype PostListResponse = ApiResponse<Post[]>;' }
-        ]
-    },
-    java: {
-        title: "Java - 객체지향 프로그래밍",
-        icon: "☕",
-        videoId: "eIrMbAQSU34",
-        date: "2025-01-20",
-        lessons: [
-            { id: 0, label: "Java 소개 및 환경 설정", sub: false,
-              title: "Java란? JVM과 개발환경",
-              desc: "Java는 'Write Once, Run Anywhere' 철학의 언어입니다. JVM(Java Virtual Machine) 위에서 동작해 운영체제에 관계없이 실행됩니다.",
-              points: ["JVM: 바이트코드를 각 OS에서 실행", "JDK 설치: Java Development Kit", "IntelliJ IDEA 또는 Eclipse 권장"],
-              code: 'public class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println("Hello, Java!");\n\n        // 변수 선언\n        String name = "코딩에듀";\n        int year = 2025;\n        double version = 21.0;\n\n        System.out.printf("프로젝트: %s (Java %.1f)%n", name, version);\n    }\n}' },
-            { id: 1, label: "변수와 자료형", sub: false,
-              title: "Java의 기본 자료형",
-              desc: "Java는 정적 타입 언어로 모든 변수에 타입을 명시해야 합니다. 기본형(Primitive)과 참조형(Reference)으로 구분됩니다.",
-              points: ["정수: byte, short, int, long", "실수: float, double", "문자: char, 논리: boolean"],
-              code: '// 기본형 (Primitive)\nint age = 25;\nlong bigNum = 9_000_000_000L;\ndouble pi = 3.14159;\nchar grade = \'A\';\nboolean isPass = true;\n\n// 참조형 (Reference)\nString name = "홍길동";\nint[] scores = {90, 85, 92};\n\n// 형변환\ndouble result = (double) age / 7;  // 명시적 형변환\nSystem.out.printf("%.2f%n", result);' },
-            { id: 2, label: "클래스와 객체", sub: false,
-              title: "객체지향 프로그래밍 기초",
-              desc: "Java는 클래스(설계도)로 객체(실체)를 만드는 객체지향 언어입니다. 캡슐화를 통해 데이터를 보호합니다.",
-              points: ["클래스: 속성(필드) + 동작(메서드)", "생성자(Constructor): 객체 초기화", "접근 제어자: private, public, protected"],
-              code: 'public class Student {\n    // 필드 (캡슐화: private)\n    private String name;\n    private int score;\n\n    // 생성자\n    public Student(String name, int score) {\n        this.name = name;\n        this.score = score;\n    }\n\n    // 메서드\n    public String getGrade() {\n        return score >= 90 ? "A" : score >= 80 ? "B" : "C";\n    }\n\n    // getter\n    public String getName() { return name; }\n}' },
-            { id: 3, label: "상속과 다형성", sub: false,
-              title: "상속(Inheritance)과 다형성(Polymorphism)",
-              desc: "extends 키워드로 클래스를 상속하고, @Override로 부모 메서드를 재정의합니다. 다형성은 같은 타입으로 다양한 객체를 다루게 해줍니다.",
-              points: ["extends로 상속, super로 부모 접근", "@Override: 메서드 재정의", "인터페이스(interface): 다중 구현"],
-              code: 'public abstract class Shape {\n    public abstract double area();\n\n    public void print() {\n        System.out.printf("넓이: %.2f%n", area());\n    }\n}\n\npublic class Circle extends Shape {\n    private double radius;\n    public Circle(double r) { this.radius = r; }\n\n    @Override\n    public double area() {\n        return Math.PI * radius * radius;\n    }\n}\n\n// 다형성 활용\nShape s = new Circle(5.0);\ns.print(); // 넓이: 78.54' },
-            { id: 4, label: "컬렉션과 제네릭", sub: false,
-              title: "Java 컬렉션 프레임워크",
-              desc: "ArrayList, HashMap 등 컬렉션을 활용해 데이터를 효율적으로 관리합니다. 제네릭으로 타입 안전성을 확보합니다.",
-              points: ["List: 순서 있는 목록 (ArrayList)", "Map: 키-값 쌍 저장 (HashMap)", "Stream API: 컬렉션 함수형 처리"],
-              code: 'import java.util.*;\nimport java.util.stream.*;\n\nList<String> langs = new ArrayList<>(Arrays.asList(\n    "Java", "Kotlin", "Python"\n));\nlangs.add("TypeScript");\n\n// Stream으로 필터 + 정렬\nList<String> result = langs.stream()\n    .filter(l -> l.length() > 4)\n    .sorted()\n    .collect(Collectors.toList());\n\nSystem.out.println(result); // [Kotlin, Python, TypeScript]' }
-        ]
-    },
-    kotlin: {
-        title: "Kotlin - 현대적 JVM 언어",
-        icon: "🌱",
-        videoId: "F9UC9DY-vIU",
-        date: "2025-03-10",
-        lessons: [
-            { id: 0, label: "Kotlin 소개", sub: false,
-              title: "왜 Kotlin인가?",
-              desc: "Kotlin은 JetBrains가 만든 현대적 JVM 언어입니다. 2019년 Google이 Android 공식 언어로 채택했으며, Java보다 간결하고 안전합니다.",
-              points: ["Java 100% 상호운용 가능", "Null 안전성으로 NullPointerException 방지", "함수형 + 객체지향 멀티패러다임"],
-              code: '// Java와 비교\n// Java\nString name = "Kotlin";\nSystem.out.println("Hello, " + name + "!");\n\n// Kotlin - 훨씬 간결!\nval name = "Kotlin"  // 타입 추론\nprintln("Hello, $name!")' },
-            { id: 1, label: "val / var / 타입", sub: false,
-              title: "변수 선언과 Null 안전성",
-              desc: "Kotlin의 val(불변)/var(가변) 선언과 Null 안전성 시스템을 학습합니다. ?와 !!를 적절히 사용해 안전한 코드를 작성합니다.",
-              points: ["val: 재할당 불가 (Java final)", "var: 재할당 가능", "?: nullable 타입, ?: 엘비스 연산자"],
-              code: 'val language = "Kotlin"  // String (불변)\nvar count = 0             // Int (가변)\ncount++\n\n// Null 안전성\nval email: String? = null  // nullable\nval len = email?.length    // null이면 null 반환\nval display = email ?: "이메일 없음"  // 엘비스 연산자\n\n// let: null이 아닐 때만 실행\nemail?.let { println("이메일: $it") }' },
-            { id: 2, label: "데이터 클래스", sub: false,
-              title: "data class와 copy",
-              desc: "data class는 equals, hashCode, toString, copy를 자동으로 생성합니다. DTO나 모델 클래스로 자주 활용됩니다.",
-              points: ["equals/hashCode 자동 구현", "copy()로 일부 필드만 변경한 복사본 생성", "구조 분해(Destructuring) 지원"],
-              code: 'data class User(\n    val id: Long,\n    val name: String,\n    val email: String,\n    val role: String = "user"\n)\n\nfun main() {\n    val user = User(1, "김코틀린", "kim@example.com")\n    println(user)  // User(id=1, name=김코틀린, ...)\n\n    // 일부만 변경\n    val admin = user.copy(role = "admin")\n\n    // 구조 분해\n    val (id, name) = user\n    println("$id: $name")\n}' },
-            { id: 3, label: "확장 함수와 고차함수", sub: false,
-              title: "Kotlin의 강력한 함수 기능",
-              desc: "확장 함수로 기존 클래스에 새 메서드를 추가하고, 고차함수와 람다로 간결하게 컬렉션을 처리합니다.",
-              points: ["확장 함수: 기존 클래스 수정 없이 메서드 추가", "람다: { 매개변수 -> 본문 }", "it: 단일 매개변수 기본 이름"],
-              code: '// 확장 함수\nfun String.isEmail() = contains("@") && contains(".")\nfun Int.squared() = this * this\n\nprintln("test@email.com".isEmail())  // true\nprintln(5.squared())                 // 25\n\n// 고차함수로 컬렉션 처리\nval numbers = listOf(1, 2, 3, 4, 5, 6, 7, 8)\nval result = numbers\n    .filter { it % 2 == 0 }   // [2,4,6,8]\n    .map { it * it }           // [4,16,36,64]\n    .reduce { acc, n -> acc + n } // 120\nprintln(result)' }
-        ]
-    },
-    c: {
-        title: "C언어 - 프로그래밍 기초",
-        icon: "🔧",
-        videoId: "KJgsSFOSQv0",
-        date: "2025-01-10",
-        lessons: [
-            { id: 0, label: "C언어 소개", sub: false,
-              title: "C언어를 배워야 하는 이유",
-              desc: "C언어는 1972년 Dennis Ritchie가 개발한 언어로, 운영체제·펌웨어 등 시스템 프로그래밍의 근간입니다. 메모리 구조를 이해하면 모든 언어가 쉬워집니다.",
-              points: ["운영체제(Linux, Windows)의 핵심이 C로 작성", "메모리 직접 제어로 최고 성능 달성", "C++, Java, Python 모두 C의 영향을 받음"],
-              code: '#include <stdio.h>\n\nint main() {\n    printf("Hello, C World!\\n");\n\n    // 변수 선언\n    int age = 25;\n    float gpa = 3.7f;\n    char grade = \'A\';\n\n    printf("나이: %d, 학점: %.1f, 등급: %c\\n",\n           age, gpa, grade);\n\n    return 0;  // 정상 종료\n}' },
-            { id: 1, label: "변수와 자료형", sub: false,
-              title: "C언어 기본 자료형과 메모리",
-              desc: "C언어의 자료형은 메모리 크기와 직결됩니다. sizeof 연산자로 각 타입이 차지하는 바이트 수를 확인할 수 있습니다.",
-              points: ["int: 4바이트 정수", "double: 8바이트 실수", "char: 1바이트 문자"],
-              code: '#include <stdio.h>\n\nint main() {\n    int   a = 2147483647;   // 최대 4바이트 정수\n    long  b = 9223372036LL; // 8바이트\n    float c = 3.14f;        // 4바이트\n    double d = 3.14159265;  // 8바이트\n    char  e = \'K\';\n\n    // sizeof로 크기 확인\n    printf("int:    %lu bytes\\n", sizeof(int));\n    printf("double: %lu bytes\\n", sizeof(double));\n    printf("char:   %lu bytes\\n", sizeof(char));\n    return 0;\n}' },
-            { id: 2, label: "조건문과 반복문", sub: false,
-              title: "흐름 제어 구문",
-              desc: "if-else, switch로 조건 분기를 처리하고, for, while, do-while로 반복 작업을 수행합니다.",
-              points: ["switch: 정수/문자 비교에 효율적", "break: 반복문/switch 탈출", "continue: 다음 반복으로 건너뜀"],
-              code: '#include <stdio.h>\n\nint main() {\n    // 구구단 출력\n    for (int i = 2; i <= 9; i++) {\n        printf("\\n=== %d단 ===\\n", i);\n        for (int j = 1; j <= 9; j++) {\n            printf("%d x %d = %2d\\n", i, j, i*j);\n        }\n    }\n\n    // while로 합계 계산\n    int sum = 0, n = 1;\n    while (n <= 100) { sum += n++; }\n    printf("1~100 합: %d\\n", sum);\n    return 0;\n}' },
-            { id: 3, label: "함수와 배열", sub: false,
-              title: "함수 정의와 배열 활용",
-              desc: "C에서 함수는 선언 → 정의 → 호출 순서로 사용합니다. 배열은 같은 타입의 데이터를 연속 메모리에 저장합니다.",
-              points: ["함수 프로토타입(선언) 필요", "배열 이름은 첫 번째 요소의 주소", "문자열은 char 배열 + null 종료 문자"],
-              code: '#include <stdio.h>\n\n// 함수 선언\nint max(int a, int b);\ndouble average(int arr[], int size);\n\nint main() {\n    int scores[] = {85, 92, 78, 96, 88};\n    int n = sizeof(scores) / sizeof(scores[0]);\n\n    printf("최댓값: %d\\n", max(92, 85));\n    printf("평균: %.1f\\n", average(scores, n));\n    return 0;\n}\n\nint max(int a, int b) { return a > b ? a : b; }\n\ndouble average(int arr[], int size) {\n    int sum = 0;\n    for (int i = 0; i < size; i++) sum += arr[i];\n    return (double)sum / size;\n}' },
-            { id: 4, label: "포인터와 메모리", sub: false,
-              title: "포인터 완전 정복",
-              desc: "포인터는 C언어의 핵심입니다. 변수의 메모리 주소를 저장하고 간접 접근을 가능하게 합니다.",
-              points: ["&: 주소 연산자, *: 역참조 연산자", "포인터로 함수에서 여러 값 반환", "동적 메모리 할당: malloc/free"],
-              code: '#include <stdio.h>\n#include <stdlib.h>\n\nvoid swap(int *a, int *b) {\n    int temp = *a;\n    *a = *b;\n    *b = temp;\n}\n\nint main() {\n    int x = 10, y = 20;\n    printf("전: x=%d, y=%d\\n", x, y);\n    swap(&x, &y);\n    printf("후: x=%d, y=%d\\n", x, y);\n\n    // 동적 메모리 할당\n    int *arr = (int*)malloc(5 * sizeof(int));\n    for (int i = 0; i < 5; i++) arr[i] = i * i;\n    free(arr);  // 반드시 해제!\n    return 0;\n}' }
-        ]
-    },
-    cpp: {
-        title: "C++ - 고성능 프로그래밍",
-        icon: "⚙️",
-        videoId: "vLnPwxZdW4Y",
-        date: "2025-02-10",
-        lessons: [
-            { id: 0, label: "C++와 C의 차이", sub: false,
-              title: "C++를 배우는 이유",
-              desc: "C++는 C의 성능을 유지하면서 객체지향과 제네릭 프로그래밍을 추가한 언어입니다. 게임 엔진(Unreal), 운영체제, 고성능 서버에 널리 사용됩니다.",
-              points: ["C와 100% 호환", "OOP + 제네릭 + 함수형 멀티패러다임", "STL로 강력한 표준 라이브러리 제공"],
-              code: '#include <iostream>\n#include <string>\nusing namespace std;\n\n// 함수 오버로딩 (C에는 없는 기능)\nvoid print(int n)    { cout << "정수: " << n << endl; }\nvoid print(double d) { cout << "실수: " << d << endl; }\nvoid print(string s) { cout << "문자열: " << s << endl; }\n\nint main() {\n    print(42);\n    print(3.14);\n    print("Hello C++");\n    return 0;\n}' },
-            { id: 1, label: "클래스와 OOP", sub: false,
-              title: "클래스, 생성자, 소멸자",
-              desc: "C++에서 클래스로 데이터와 동작을 캡슐화하고, 생성자/소멸자로 객체 수명을 관리합니다.",
-              points: ["생성자(Constructor): 객체 생성 시 자동 호출", "소멸자(Destructor): 객체 소멸 시 자동 호출", "초기화 리스트로 효율적 초기화"],
-              code: 'class Vector2D {\nprivate:\n    double x, y;\npublic:\n    // 생성자 (초기화 리스트)\n    Vector2D(double x, double y) : x(x), y(y) {}\n\n    // 연산자 오버로딩\n    Vector2D operator+(const Vector2D& other) const {\n        return {x + other.x, y + other.y};\n    }\n\n    double length() const {\n        return sqrt(x*x + y*y);\n    }\n\n    void print() const {\n        cout << "(" << x << ", " << y << ")" << endl;\n    }\n};' },
-            { id: 2, label: "STL과 컨테이너", sub: false,
-              title: "표준 템플릿 라이브러리",
-              desc: "STL은 C++의 강력한 표준 라이브러리입니다. vector, map, set, algorithm 등으로 효율적인 코드를 작성합니다.",
-              points: ["vector: 동적 배열", "map: 키-값 쌍 (정렬된 트리)", "algorithm: sort, find, count 등"],
-              code: '#include <vector>\n#include <map>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    // vector\n    vector<int> v = {5, 3, 8, 1, 9, 2};\n    sort(v.begin(), v.end());\n    for (int x : v) cout << x << " ";  // 1 2 3 5 8 9\n\n    // map\n    map<string, int> scores;\n    scores["Alice"] = 95;\n    scores["Bob"]   = 87;\n    for (auto& [name, score] : scores) {\n        cout << name << ": " << score << endl;\n    }\n    return 0;\n}' },
-            { id: 3, label: "모던 C++", sub: false,
-              title: "C++11 이후 주요 기능",
-              desc: "C++11/14/17/20에서 추가된 auto, 람다, 스마트 포인터, 범위 기반 for문 등 현대 C++ 문법을 학습합니다.",
-              points: ["auto: 타입 자동 추론", "unique_ptr/shared_ptr: 스마트 포인터", "lambda: 익명 함수"],
-              code: '#include <memory>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    // auto 타입 추론\n    auto name = string("C++17");\n    auto pi = 3.14159;\n\n    // 람다 표현식\n    auto square = [](int x) { return x * x; };\n    cout << square(5) << endl;  // 25\n\n    // 스마트 포인터 (메모리 자동 관리)\n    auto ptr = make_unique<int>(42);\n    cout << *ptr << endl;  // 42\n    // delete 불필요 - 범위 벗어나면 자동 해제\n    return 0;\n}' }
-        ]
-    },
-    swift: {
-        title: "Swift - iOS 앱 개발",
-        icon: "📱",
-        videoId: "comQ1-x2a1Q",
-        date: "2025-02-25",
-        lessons: [
-            { id: 0, label: "Swift 소개", sub: false,
-              title: "Swift와 Apple 생태계",
-              desc: "Swift는 2014년 Apple이 발표한 현대적 언어입니다. 안전성과 성능을 모두 갖추고 있으며, iPhone/iPad/Mac 앱 개발의 표준입니다.",
-              points: ["Objective-C를 대체하는 Apple 공식 언어", "안전한 타입 시스템과 옵셔널", "오픈소스 - Linux에서도 사용 가능"],
-              code: 'import Foundation\n\n// Swift 기본 출력\nlet greeting = "Hello, Swift!"\nprint(greeting)\n\n// 문자열 보간\nlet name = "코딩에듀"\nlet year = 2025\nprint("\\(name)에서 \\(year)년에 Swift를 시작했습니다.")' },
-            { id: 1, label: "변수와 옵셔널", sub: false,
-              title: "let/var와 Optional 타입",
-              desc: "Swift에서 let은 상수, var는 변수입니다. 옵셔널(Optional)로 nil(값 없음)을 안전하게 다룹니다.",
-              points: ["let: 변경 불가 상수 (권장)", "var: 변경 가능 변수", "?: Optional, ?? nil 병합 연산자"],
-              code: 'let appName: String = "CodeEdu"\nvar version: Int = 1\nversion = 2\n\n// 옵셔널\nvar nickname: String? = nil\nnickname = "김스위프트"\n\n// 옵셔널 바인딩\nif let name = nickname {\n    print("닉네임: \\(name)")\n}\n\n// nil 병합\nlet display = nickname ?? "이름 없음"\nprint(display)' },
-            { id: 2, label: "구조체와 클래스", sub: false,
-              title: "struct vs class",
-              desc: "Swift에서 struct는 값 타입, class는 참조 타입입니다. Swift는 struct를 우선적으로 사용하도록 권장합니다.",
-              points: ["struct: 값 복사, 스택 메모리", "class: 참조 공유, 힙 메모리", "protocol: 인터페이스 역할"],
-              code: '// 구조체 (값 타입)\nstruct Point {\n    var x: Double\n    var y: Double\n\n    func distance(to other: Point) -> Double {\n        let dx = x - other.x\n        let dy = y - other.y\n        return (dx*dx + dy*dy).squareRoot()\n    }\n}\n\n// 프로토콜\nprotocol Drawable {\n    func draw()\n}\n\nstruct Circle: Drawable {\n    var radius: Double\n    func draw() {\n        print("원 반지름: \\(radius)")\n    }\n}' },
-            { id: 3, label: "SwiftUI 기초", sub: false,
-              title: "SwiftUI로 첫 앱 만들기",
-              desc: "SwiftUI는 선언형 UI 프레임워크입니다. @State로 상태를 관리하고 View를 조합해 인터페이스를 구성합니다.",
-              points: ["선언형 UI: 상태를 기반으로 화면 자동 갱신", "@State: 뷰 내부 상태 관리", "VStack/HStack/ZStack: 레이아웃"],
-              code: 'import SwiftUI\n\nstruct ContentView: View {\n    @State private var count = 0\n    @State private var name = ""\n\n    var body: some View {\n        VStack(spacing: 24) {\n            Text("카운터: \\(count)")\n                .font(.largeTitle)\n                .fontWeight(.bold)\n\n            HStack {\n                Button("➖") { count -= 1 }\n                    .buttonStyle(.bordered)\n                Button("➕") { count += 1 }\n                    .buttonStyle(.borderedProminent)\n            }\n\n            TextField("이름 입력", text: $name)\n                .textFieldStyle(.roundedBorder)\n\n            if !name.isEmpty {\n                Text("안녕하세요, \\(name)님!")\n            }\n        }\n        .padding()\n    }\n}' }
-        ]
-    },
-    python: {
-        title: "Python - AI &amp; 데이터 분석",
-        icon: "🐍",
-        videoId: "_uQrJ0TkZlc",
-        date: "2025-01-05",
-        lessons: [
-            { id: 0, label: "Python 소개", sub: false,
-              title: "Python이 인기 있는 이유",
-              desc: "Python은 문법이 간결하고 읽기 쉬운 언어입니다. AI/머신러닝, 데이터 분석, 웹 백엔드, 자동화까지 폭넓게 사용됩니다.",
-              points: ["들여쓰기로 블록 구분 - 세미콜론 없음", "인터프리터 언어 - 즉시 실행 가능", "방대한 라이브러리 생태계 (pip)"],
-              code: '# 파이썬의 간결함\nprint("Hello, Python!")\n\n# 변수 (타입 선언 불필요)\nname = "코딩에듀"\nversion = 3.12\nis_free = True\n\n# f-string\nprint(f"{name} Python {version}")' },
-            { id: 1, label: "자료형과 컬렉션", sub: false,
-              title: "리스트, 딕셔너리, 튜플, 셋",
-              desc: "Python의 강력한 내장 자료구조를 활용합니다. 리스트 컴프리헨션으로 간결하게 데이터를 변환할 수 있습니다.",
-              points: ["list: 순서 있는 변경 가능 목록", "dict: 키-값 쌍 저장", "list comprehension: 한 줄 데이터 변환"],
-              code: '# 리스트\nscores = [85, 92, 78, 96, 88]\nscores.append(100)\nprint(max(scores), min(scores))\n\n# 딕셔너리\nstudent = {"name": "김파이썬", "grade": 3, "gpa": 3.8}\nprint(student["name"])\n\n# 리스트 컴프리헨션\nhigh = [s for s in scores if s >= 90]\nsquared = [x**2 for x in range(1, 6)]\nprint(high)    # [92, 96, 100]\nprint(squared) # [1, 4, 9, 16, 25]' },
-            { id: 2, label: "함수와 모듈", sub: false,
-              title: "def와 import로 코드 구조화",
-              desc: "함수로 코드를 재사용하고, 모듈과 패키지로 기능을 분리합니다. 데코레이터로 함수에 기능을 추가할 수 있습니다.",
-              points: ["def로 함수 정의, return으로 반환", "기본 인수, 가변 인수(*args, **kwargs)", "import로 표준/외부 라이브러리 활용"],
-              code: 'import random\nfrom datetime import datetime\n\ndef greet(name, greeting="안녕하세요"):\n    now = datetime.now().strftime("%H:%M")\n    return f"[{now}] {greeting}, {name}님!"\n\ndef sum_all(*numbers):\n    return sum(numbers)\n\nprint(greet("홍길동"))\nprint(sum_all(1, 2, 3, 4, 5))  # 15' },
-            { id: 3, label: "클래스와 OOP", sub: false,
-              title: "Python 객체지향 프로그래밍",
-              desc: "Python에서 class로 객체를 설계하고 상속으로 코드를 재사용합니다. 매직 메서드로 연산자를 오버로딩할 수 있습니다.",
-              points: ["__init__: 생성자", "self: 인스턴스 참조", "__str__, __repr__: 문자열 표현"],
-              code: 'class Animal:\n    def __init__(self, name, sound):\n        self.name = name\n        self.sound = sound\n\n    def speak(self):\n        return f"{self.name}: {self.sound}!"\n\nclass Dog(Animal):\n    def __init__(self, name):\n        super().__init__(name, "멍멍")\n\n    def fetch(self):\n        return f"{self.name}이(가) 공을 가져옵니다!"\n\ndog = Dog("바둑이")\nprint(dog.speak())\nprint(dog.fetch())' },
-            { id: 4, label: "Pandas 데이터 분석", sub: false,
-              title: "Pandas로 데이터 다루기",
-              desc: "Pandas는 Python 데이터 분석의 핵심 라이브러리입니다. DataFrame으로 표 형태의 데이터를 효율적으로 처리합니다.",
-              points: ["DataFrame: 행과 열로 구성된 2차원 데이터", "groupby: 그룹별 집계", "matplotlib으로 시각화"],
-              code: 'import pandas as pd\n\ndata = {\n    "이름": ["김철수", "이영희", "박민준", "최지아"],\n    "점수": [85, 92, 78, 96],\n    "학년": [2, 3, 1, 3]\n}\ndf = pd.DataFrame(data)\n\nprint(df.describe())\nprint(df[df["점수"] >= 90])\nprint(df.groupby("학년")["점수"].mean())' }
-        ]
-    }
-};
+const COURSES = /*[[${coursesPayload}]]*/ {};
 
 // 서버에서 주입된 값
 const initialLang      = /*[[${lang}]]*/ 'html';
@@ -793,7 +457,7 @@ function showCompleteToast(hasNext, lessonIdx) {
     toast.id = 'complete-toast';
     toast.style.cssText = `
         position:fixed; bottom:32px; left:50%; transform:translateX(-50%);
-        background:#1a1a2e; color:#fff; border-radius:16px;
+        background:var(--ink-1); color:#fff; border-radius:16px;
         padding:16px 28px; font-weight:700; font-size:.95rem;
         box-shadow:0 8px 24px rgba(0,0,0,0.3); z-index:9999;
         display:flex; align-items:center; gap:14px;
@@ -804,7 +468,7 @@ function showCompleteToast(hasNext, lessonIdx) {
         toast.innerHTML = `
             <span>✅ 강의 완료!</span>
             <button onclick="selectLesson(${lessonIdx + 1}); this.closest('#complete-toast').remove();"
-                style="background:var(--blue); color:#fff; border:none; border-radius:10px;
+                style="background:var(--accent); color:#fff; border:none; border-radius:10px;
                        padding:8px 18px; font-weight:800; cursor:pointer; white-space:nowrap;">
                 다음 강의 →
             </button>
@@ -815,7 +479,7 @@ function showCompleteToast(hasNext, lessonIdx) {
     } else {
         toast.innerHTML = `
             <span>🎉 이 언어의 모든 강의를 완료했어요!</span>
-            <a href="/learn" style="background:var(--blue); color:#fff; border-radius:10px;
+            <a href="/learn" style="background:var(--accent); color:#fff; border-radius:10px;
                        padding:8px 18px; font-weight:800; text-decoration:none; white-space:nowrap;">
                 학습 목록으로
             </a>
@@ -856,13 +520,13 @@ async function saveNote() {
             noteMap[lessonIdx] = content;
             if (noteStatus) {
                 noteStatus.textContent = '✓ 저장됨';
-                noteStatus.style.color = '#2E7D32';
+                noteStatus.style.color = 'var(--success)';
             }
         } else {
-            if (noteStatus) { noteStatus.textContent = '저장 실패'; noteStatus.style.color = '#C62828'; }
+            if (noteStatus) { noteStatus.textContent = '저장 실패'; noteStatus.style.color = 'var(--danger)'; }
         }
     } catch (e) {
-        if (noteStatus) { noteStatus.textContent = '저장 실패'; noteStatus.style.color = '#C62828'; }
+        if (noteStatus) { noteStatus.textContent = '저장 실패'; noteStatus.style.color = 'var(--danger)'; }
     } finally {
         if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = '저장'; }
         setTimeout(() => { if (noteStatus) noteStatus.textContent = ''; }, 3000);

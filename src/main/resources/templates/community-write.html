@@ -1,53 +1,58 @@
-<!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+﻿<!DOCTYPE html>
+<html lang="ko" data-theme="light" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <title>커뮤니티 글쓰기 - CodeEdu</title>
     <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/tailwind.css">
     <style>
         .write-container {
-            max-width: 800px; margin: 60px auto; background: var(--white);
+            max-width: 800px; margin: 60px auto; background: var(--bg-surface);
             border-radius: 20px; padding: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-            border: 1px solid #eee;
+            border: 1px solid var(--border);
         }
-        .write-header { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px dashed #eaeaea; }
-        .write-header h2 { font-size: 1.6rem; font-weight: 900; color: var(--text); }
-        .write-header p { font-size: .95rem; color: var(--text-sub); margin-top: 6px; }
+        .write-header { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px dashed var(--border-card); }
+        .write-header h2 { font-size: 1.6rem; font-weight: 900; color: var(--ink-1); }
+        .write-header p { font-size: .95rem; color: var(--ink-2); margin-top: 6px; }
         
         .form-group { margin-bottom: 24px; }
-        .form-group label { display: block; font-size: .9rem; font-weight: 800; color: var(--text-sub); margin-bottom: 10px; }
+        .form-group label { display: block; font-size: .9rem; font-weight: 800; color: var(--ink-2); margin-bottom: 10px; }
         .form-control {
-            width: 100%; padding: 14px 16px; border-radius: 12px; border: 2px solid #eaeaea;
+            width: 100%; padding: 14px 16px; border-radius: 12px; border: 2px solid var(--border-card);
             font-size: 1rem; transition: border-color .2s; outline: none; font-family: inherit;
         }
-        .form-control:focus { border-color: var(--blue-mid); }
+        .form-control:focus { border-color: var(--accent-h); }
         select.form-control { appearance: none; background: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>') no-repeat right 12px center; background-size: 20px; }
         textarea.form-control { min-height: 300px; resize: vertical; line-height: 1.6; }
         
         .btn-group { display: flex; gap: 12px; justify-content: flex-end; margin-top: 40px; }
         .btn-cancel {
-            background: var(--white); color: var(--text-sub); border: 2px solid #ddd;
+            background: var(--bg-surface); color: var(--ink-2); border: 2px solid var(--border-card);
             padding: 14px 28px; border-radius: 50px; font-size: 1rem; font-weight: 700;
             cursor: pointer; text-decoration: none; transition: all .2s;
         }
-        .btn-cancel:hover { background: #f5f5f5; border-color: #ccc; }
+        .btn-cancel:hover { background: var(--bg-section); border-color: var(--border-card); }
         .btn-submit {
-            background: var(--blue); color: var(--white); border: none;
+            background: var(--accent); color: var(--bg-surface); border: none;
             padding: 14px 32px; border-radius: 50px; font-size: 1rem; font-weight: 800;
             cursor: pointer; transition: transform .15s, background .15s;
-            box-shadow: 0 4px 12px rgba(21,101,192,0.3);
+            box-shadow: 0 4px 12px rgba(107,92,231,0.3);
         }
-        .btn-submit:hover { background: var(--blue-mid); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(21,101,192,0.4); }
+        .btn-submit:hover { background: var(--accent-h); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(107,92,231,0.4); }
     </style>
 </head>
-<body style="background: var(--gray);">
+<body style="background: var(--bg-section);">
 
 <!-- NAV -->
 <nav th:replace="~{index :: nav}"></nav>
 
 
-<div class="write-container">
+<div class="write-container reveal">
     <div class="write-header">
         <h2>✏️ 새 글 작성하기</h2>
         <p>에러 질문, 유용한 팁, 스터디 모집 등 자유롭게 글을 남겨주세요!</p>

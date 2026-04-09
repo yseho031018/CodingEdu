@@ -40,6 +40,10 @@ public class HomeController {
 
     @GetMapping("/")
     public String index(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+        model.addAttribute("siteUserCount", userService.countAll());
+        model.addAttribute("siteCourseCount", lessonService.getAllCourses().size());
+        model.addAttribute("siteQuizCount", quizService.countAll());
+
         if (userDetails != null) {
             User user = userService.findByUsername(userDetails.getUsername());
             var allCourses = lessonService.getAllCourses();

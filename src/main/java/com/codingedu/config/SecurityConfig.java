@@ -8,7 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -18,7 +18,9 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         // AJAX 요청을 위해 CSRF 토큰을 쿠키로 제공
         CookieCsrfTokenRepository csrfRepo = CookieCsrfTokenRepository.withHttpOnlyFalse();
-        XorCsrfTokenRequestAttributeHandler requestHandler = new XorCsrfTokenRequestAttributeHandler();
+        // Xor 핸들러는 일부 환경에서 Thymeleaf ${_csrf} 렌더와 맞지 않아 표준 핸들러 사용
+        CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+        requestHandler.setCsrfRequestAttributeName("_csrf");
 
         http
             .csrf(csrf -> csrf
@@ -27,7 +29,7 @@ public class SecurityConfig {
             )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/", "/learn", "/learn/**", "/quiz", "/challenge", "/challenge/**", "/community", "/community/**", "/user/**", "/login", "/register", "/forgot-password", "/forgot-password/**", "/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/", "/learn", "/learn/**", "/quiz", "/quiz/**", "/challenge", "/challenge/**", "/community", "/community/**", "/user/**", "/login", "/login/**", "/register", "/register/**", "/login_process", "/forgot-password", "/forgot-password/**", "/terms", "/privacy", "/css/**", "/js/**", "/images/**").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

@@ -9,7 +9,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -29,6 +31,14 @@ class SecurityConfigIntegrationTest {
     @Test
     void loginPageRendersForAnonymous() throws Exception {
         mockMvc.perform(get("/login")).andExpect(status().isOk());
+    }
+
+    @Test
+    void registerPageRendersForAnonymous() throws Exception {
+        mockMvc.perform(get("/register"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("register"))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("1분만에 가입하기")));
     }
 
     @Test

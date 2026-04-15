@@ -60,7 +60,12 @@
     <div th:each="n : ${notifications}">
         <a th:href="${n.postId != null ? '/community/' + n.postId : '#'}" class="notif-link">
             <div class="notif-item">
-                <div class="notif-icon">💬</div>
+                <div class="notif-icon"
+                     th:text="${n.type == 'COMMENT' ? '💬' :
+                                n.type == 'LIKE' ? '❤️' :
+                                n.type == 'CHALLENGE' ? '🏆' :
+                                n.type == 'QUIZ' ? '📝' :
+                                n.type == 'SYSTEM' ? '📢' : '🔔'}">🔔</div>
                 <div class="notif-body">
                     <div class="notif-msg" th:text="${n.message}">알림 내용</div>
                     <div class="notif-time" th:text="${#temporals.format(n.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</div>

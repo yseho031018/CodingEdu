@@ -2,8 +2,13 @@ package com.codingedu.controller;
 
 import com.codingedu.entity.User;
 import com.codingedu.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -11,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +43,8 @@ public class AuthController {
 
     // 회원가입 폼 제출시 DB 저장 처리
     @PostMapping("/register")
-    public String registerProcess(@Valid User user, BindingResult bindingResult, Model model) {
+    public String registerProcess(@Valid User user, BindingResult bindingResult, Model model,
+                                  HttpServletRequest request) {
         Map<String, String> fieldErrors = new HashMap<>();
 
         // Bean Validation 에러를 필드별로 수집
@@ -60,7 +67,20 @@ public class AuthController {
         }
 
         userService.register(user);
-        return "redirect:/login?registered=true";
+
+        // 가입 완료 후 자동 로그인 처리
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                user.getUsername(), null,
+                List.of(new SimpleGrantedAuthority(user.getRole()))
+        );
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        HttpSession session = request.getSession(true);
+        session.setAttribute(
+                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                SecurityContextHolder.getContext()
+        );
+
+        return "redirect:/";
     }
 
     // 비밀번호 찾기 - 1단계: 본인 확인 폼

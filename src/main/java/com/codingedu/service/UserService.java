@@ -106,4 +106,14 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }
+
+    @Transactional
+    public boolean deleteAccount(String username, String password) {
+        User user = findByUsername(username);
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            return false;
+        }
+        userRepository.delete(user);
+        return true;
+    }
 }

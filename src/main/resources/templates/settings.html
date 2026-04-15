@@ -237,9 +237,38 @@
             <p style="color: var(--ink-2); margin-bottom: 16px; font-size: .95rem;">
                 아래 작업은 되돌릴 수 없습니다. 신중하게 진행하세요.
             </p>
-            <button type="button" class="btn-secondary" onclick="alert('계정 삭제 기능은 추후 업데이트될 예정입니다.')">
+            <button type="button" class="btn-secondary" onclick="document.getElementById('deleteModal').style.display='flex'">
                 🗑️ 계정 삭제
             </button>
+        </div>
+
+        <!-- 계정 삭제 확인 모달 -->
+        <div id="deleteModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:9999; align-items:center; justify-content:center;">
+            <div style="background:var(--bg-surface); border-radius:20px; padding:40px; max-width:420px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,.3);">
+                <h3 style="font-size:1.3rem; font-weight:900; color:var(--danger); margin-bottom:12px;">계정을 정말 삭제하시겠습니까?</h3>
+                <p style="color:var(--ink-2); font-size:.95rem; margin-bottom:24px; line-height:1.6;">
+                    계정을 삭제하면 모든 학습 기록, 퀴즈 결과, 게시글이 영구적으로 삭제되며 <strong>복구할 수 없습니다.</strong>
+                </p>
+                <form th:action="@{/settings/delete-account}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <div style="margin-bottom:20px;">
+                        <label style="font-size:.9rem; font-weight:700; color:var(--ink-1); display:block; margin-bottom:8px;">확인을 위해 현재 비밀번호를 입력하세요</label>
+                        <input type="password" name="confirmPassword" required
+                               style="width:100%; padding:12px 16px; border-radius:10px; border:2px solid var(--border); background:var(--bg-section); font-size:.95rem; color:var(--ink-1); box-sizing:border-box;"
+                               placeholder="비밀번호 입력" />
+                    </div>
+                    <div style="display:flex; gap:12px;">
+                        <button type="button" onclick="document.getElementById('deleteModal').style.display='none'"
+                                style="flex:1; padding:12px; border-radius:10px; border:2px solid var(--border); background:var(--bg-section); font-weight:700; font-size:.95rem; cursor:pointer; color:var(--ink-1);">
+                            취소
+                        </button>
+                        <button type="submit"
+                                style="flex:1; padding:12px; border-radius:10px; border:none; background:var(--danger); color:#fff; font-weight:800; font-size:.95rem; cursor:pointer;">
+                            삭제 확인
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
 
         <!-- 하단 버튼 -->

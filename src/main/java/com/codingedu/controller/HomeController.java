@@ -11,6 +11,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -180,6 +183,29 @@ public class HomeController {
         var user = userService.findByUsername(username);
         model.addAttribute("user", user);
         return "settings";
+    }
+
+    @PostMapping("/settings/delete-account")
+    public String deleteAccount(@RequestParam String confirmPassword,
+                                HttpServletRequest request,
+                                HttpServletResponse response,
+                                Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            return "redirect:/login";
+        }
+
+        String username = auth.getName();
+        boolean deleted = userService.deleteAccount(username, confirmPassword);
+        if (!deleted) {
+            model.addAttribute("errorMessage", "비밀번호가 일치하지 않습니다.");
+            var user = userService.findByUsername(username);
+            model.addAttribute("user", user);
+            return "settings";
+        }
+
+        new SecurityContextLogoutHandler().logout(request, response, auth);
+        return "redirect:/?accountDeleted=true";
     }
 
     /**

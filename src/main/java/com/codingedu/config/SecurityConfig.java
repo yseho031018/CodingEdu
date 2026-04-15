@@ -1,5 +1,9 @@
 package com.codingedu.config;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -7,8 +11,13 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
@@ -16,9 +25,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        // AJAX 요청을 위해 CSRF 토큰을 쿠키로 제공
         CookieCsrfTokenRepository csrfRepo = CookieCsrfTokenRepository.withHttpOnlyFalse();
-        // Xor 핸들러는 일부 환경에서 Thymeleaf ${_csrf} 렌더와 맞지 않아 표준 핸들러 사용
         CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
         requestHandler.setCsrfRequestAttributeName("_csrf");
 
@@ -27,9 +34,23 @@ public class SecurityConfig {
                 .csrfTokenRepository(csrfRepo)
                 .csrfTokenRequestHandler(requestHandler)
             )
+            // 모든 요청마다 CSRF 쿠키를 강제 발급 — Spring Security 6의 지연 로드 문제 해결
+            .addFilterAfter(new OncePerRequestFilter() {
+                @Override
+                protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
+                        throws ServletException, IOException {
+                    CsrfToken token = (CsrfToken) req.getAttribute(CsrfToken.class.getName());
+                    if (token != null) token.getToken(); // 토큰을 강제로 로드해 쿠키에 기록
+                    chain.doFilter(req, res);
+                }
+            }, BasicAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/", "/learn", "/learn/**", "/quiz", "/quiz/**", "/challenge", "/challenge/**", "/community", "/community/**", "/user/**", "/login", "/login/**", "/register", "/register/**", "/login_process", "/forgot-password", "/forgot-password/**", "/terms", "/privacy", "/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/", "/learn", "/learn/**", "/quiz", "/quiz/**", "/challenge", "/challenge/**",
+                        "/community", "/community/**", "/user/**", "/login", "/login/**",
+                        "/register", "/register/**", "/login_process",
+                        "/forgot-password", "/forgot-password/**",
+                        "/terms", "/privacy", "/css/**", "/js/**", "/images/**").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -46,12 +67,12 @@ public class SecurityConfig {
                 .deleteCookies("JSESSIONID")
                 .permitAll()
             );
-        
+
         return http.build();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // 비밀번호 1234 -> 암호화(해시) 방식으로 안전하게 저장
+        return new BCryptPasswordEncoder();
     }
 }

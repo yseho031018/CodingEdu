@@ -38,10 +38,7 @@ public class Post {
 
     @PrePersist
     public void prePersist() {
-        this.createdAt = LocalDateTime.now();
-        this.views = 0;
-        this.commentCount = 0;
-        this.likeCount = 0;
+        if (this.createdAt == null) this.createdAt = LocalDateTime.now();
     }
 
     // Getters and Setters

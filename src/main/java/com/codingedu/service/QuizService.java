@@ -25,11 +25,21 @@ public class QuizService {
         this.detailRepository = detailRepository;
     }
 
-    public List<Quiz> getQuizzesByDifficulty(String difficulty) {
-        if ("all".equals(difficulty)) {
-            return quizRepository.findAllByOrderByCreatedAtAsc();
-        }
-        return quizRepository.findByDifficultyOrderByCreatedAtAsc(difficulty);
+    public record TopicInfo(String topic, String icon) {}
+
+    public List<Quiz> getQuizzes(String difficulty, String topic) {
+        boolean allDiff  = "all".equals(difficulty);
+        boolean allTopic = "all".equals(topic);
+        if (allDiff && allTopic)  return quizRepository.findAllByOrderByCreatedAtAsc();
+        if (allDiff)              return quizRepository.findByTopicOrderByCreatedAtAsc(topic);
+        if (allTopic)             return quizRepository.findByDifficultyOrderByCreatedAtAsc(difficulty);
+        return quizRepository.findByDifficultyAndTopicOrderByCreatedAtAsc(difficulty, topic);
+    }
+
+    public List<TopicInfo> getDistinctTopics() {
+        return quizRepository.findDistinctTopicsWithIcons().stream()
+                .map(row -> new TopicInfo((String) row[0], (String) row[1]))
+                .collect(java.util.stream.Collectors.toList());
     }
 
     public Quiz getQuizById(Long id) {
@@ -96,11 +106,6 @@ public class QuizService {
         return quizResultRepository.save(result);
     }
 
-    @Transactional
-    public QuizResult submitQuiz(Long quizId, Map<Long, Long> userAnswers, User user) {
-        return submitQuiz(quizId, userAnswers, user, null);
-    }
-
     private QuizResult saveTimedOutResult(Quiz quiz, User user) {
         QuizResult result = new QuizResult();
         result.setUser(user);
@@ -120,10 +125,6 @@ public class QuizService {
 
     public List<QuizResultDetail> getResultDetails(QuizResult result) {
         return detailRepository.findByResultOrderByQuestionOrderNumAsc(result);
-    }
-
-    public boolean hasData() {
-        return quizRepository.count() > 0;
     }
 
     public long countAll() {
@@ -180,5 +181,22 @@ public class QuizService {
     @Transactional
     public void deleteQuiz(Long id) {
         quizRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteQuestion(Long quizId, Long questionId) {
+        Quiz quiz = getQuizById(quizId);
+        Question question = quiz.getQuestions().stream()
+                .filter(q -> q.getId().equals(questionId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 문항입니다."));
+        detailRepository.deleteByQuestion(question);
+        quiz.getQuestions().remove(question);
+        quizRepository.save(quiz);
+    }
+
+    public List<Quiz> getQuizzesByDifficulty(String difficulty) {
+        return "all".equals(difficulty) ? quizRepository.findAllByOrderByCreatedAtAsc()
+                : quizRepository.findByDifficultyOrderByCreatedAtAsc(difficulty);
     }
 }

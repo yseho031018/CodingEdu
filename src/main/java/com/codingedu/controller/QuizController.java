@@ -35,9 +35,12 @@ public class QuizController {
     // 1. DB 기반 퀴즈 목록 (메인 퀴즈 페이지)
     @GetMapping("/quiz")
     public String list(@RequestParam(name = "difficulty", defaultValue = "all") String difficulty,
+                       @RequestParam(name = "topic", defaultValue = "all") String topic,
                        Model model) {
-        model.addAttribute("quizzes", quizService.getQuizzesByDifficulty(difficulty));
+        model.addAttribute("quizzes", quizService.getQuizzes(difficulty, topic));
         model.addAttribute("currentDifficulty", difficulty);
+        model.addAttribute("currentTopic", topic);
+        model.addAttribute("topics", quizService.getDistinctTopics());
         return "quiz";
     }
 

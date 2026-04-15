@@ -19,7 +19,7 @@
 <nav th:fragment="nav">
   <a href="/" class="logo">
     <div class="logo-mark">💻</div>
-    <span class="logo-name">Code<em>Edu</em></span>
+    <span class="logo-name">Code<em><i>E</i>du</em></span>
   </a>
 
   <div class="nav-links">
@@ -102,17 +102,17 @@
 
     <div class="hero-stats">
       <div class="stat">
-        <div class="stat-num" th:text="${siteUserCount} + '명'">0명</div>
+        <div class="stat-num"><span class="count-up" th:data-target="${siteUserCount}">0</span>명</div>
         <div class="stat-label">학습자</div>
       </div>
       <div class="stat-sep"></div>
       <div class="stat">
-        <div class="stat-num" th:text="${siteCourseCount} + '개'">0개</div>
+        <div class="stat-num"><span class="count-up" th:data-target="${siteCourseCount}">0</span>개</div>
         <div class="stat-label">강의</div>
       </div>
       <div class="stat-sep"></div>
       <div class="stat">
-        <div class="stat-num" th:text="${siteQuizCount} + '개'">0개</div>
+        <div class="stat-num"><span class="count-up" th:data-target="${siteQuizCount}">0</span>개</div>
         <div class="stat-label">퀴즈</div>
       </div>
     </div>
@@ -253,9 +253,9 @@
 <footer>
   <div class="f-logo">
     <div class="f-logo-mark">💻</div>
-    CodeEdu
+    <span class="f-logo-name">Code<em><i>E</i>du</em></span>
   </div>
-  <div>© <span th:text="${#temporals.year(#temporals.createNow())}">2025</span> CodeEdu. 코딩은 즐거워요!</div>
+  <div>© <span th:text="${#temporals.year(#temporals.createNow())}">2025</span> Code<em style="color:var(--accent);font-style:normal;"><i>E</i></em>du. 코딩은 즐거워요!</div>
   <div class="f-links">
     <a href="/community">커뮤니티</a>
     <a href="/learn">학습하기</a>
@@ -348,6 +348,55 @@
     }
     requestAnimationFrame(tick);
   })();
+
+  /* ── Number Count Up FX ── */
+  document.addEventListener("DOMContentLoaded", function() {
+    const counters = document.querySelectorAll(".count-up");
+    if (!counters.length) return;
+
+    function animateCounter(counter) {
+      const target = +counter.getAttribute('data-target');
+      if (isNaN(target) || target <= 0) return;
+
+      if (counter._rafId) cancelAnimationFrame(counter._rafId);
+
+      const duration = 1800;
+      const startTime = performance.now();
+
+      const update = (now) => {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+        counter.textContent = Math.round(eased * target);
+
+        if (progress < 1) {
+          counter._rafId = requestAnimationFrame(update);
+        } else {
+          counter.textContent = target;
+          counter._rafId = null;
+        }
+      };
+
+      counter._rafId = requestAnimationFrame(update);
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          animateCounter(entry.target);
+        } else {
+          // 뷰포트 밖으로 나가면 0으로 리셋 → 다시 들어올 때 재실행
+          const counter = entry.target;
+          if (counter._rafId) {
+            cancelAnimationFrame(counter._rafId);
+            counter._rafId = null;
+          }
+          counter.textContent = '0';
+        }
+      });
+    }, { threshold: 0.4 });
+
+    counters.forEach(c => observer.observe(c));
+  });
 
 </script>
 </body>

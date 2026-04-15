@@ -167,7 +167,9 @@ nav > .nav-right { justify-self: end; }
   background: var(--accent); display: flex; align-items: center;
   justify-content: center; color: #fff; font-size: .9rem; flex-shrink: 0;
 }
-.logo span  { color: var(--accent); }
+.logo-name { color: var(--accent); }
+.logo-name em { color: var(--accent); font-style: normal; }
+.logo-name em i { font-style: italic; margin-right: 1px; }
 .logo-icon  { font-size: 1.1rem; }
 
 .nav-links {
@@ -315,7 +317,9 @@ footer {
   background: var(--accent); flex-shrink: 0; font-size: .7rem;
   display: flex; align-items: center; justify-content: center; color: #fff;
 }
-.f-logo span { color: var(--amber); }
+.f-logo-name { color: var(--accent); }
+.f-logo-name em { color: var(--accent); font-style: normal; }
+.f-logo-name em i { font-style: italic; margin-right: 1px; }
 .f-links { display: flex; gap: 18px; }
 footer a { color: var(--ink-3); text-decoration: none; transition: color 0.2s; }
 footer a:hover { color: var(--ink-2); }

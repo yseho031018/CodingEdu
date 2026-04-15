@@ -33,9 +33,11 @@
             justify-content: center; font-size: 1.1rem; color: #fff;
         }
         .auth-logo-name {
-            font-size: 1.3rem; font-weight: 800; color: var(--ink-1);
+            font-size: 1.3rem; font-weight: 800; color: var(--accent);
             letter-spacing: -0.025em;
         }
+        .auth-logo-name em { color: var(--accent); font-style: normal; }
+        .auth-logo-name em i { font-style: italic; margin-right: 1px; }
         .auth-title {
             font-size: 1.55rem; font-weight: 800; color: var(--ink-1);
             margin-bottom: 6px; letter-spacing: -0.03em; text-align: center;
@@ -95,13 +97,13 @@
 
         <a href="/" class="auth-logo reveal">
             <div class="auth-logo-mark">💻</div>
-            <span class="auth-logo-name">CodeEdu</span>
+            <span class="auth-logo-name">Code<em><i>E</i>du</em></span>
         </a>
 
         <h2 class="auth-title">1분만에 가입하기</h2>
         <p class="auth-sub">가입하고 나만의 코딩 포트폴리오를 만들어보세요.</p>
 
-        <form id="registerForm" action="/register" method="POST">
+        <form id="registerForm" th:action="@{/register}" method="POST">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
             <div class="form-group">
@@ -109,8 +111,7 @@
                 <input type="text" id="username" name="username" placeholder="영문, 숫자 조합 4자 이상"
                        th:value="${user?.username}"
                        th:classappend="${fieldErrors?.containsKey('username')} ? ' input-error'"
-                       th:attr="aria-invalid=${fieldErrors?.containsKey('username')} ? 'true' : 'false'"
-                       th:attrappend="${fieldErrors?.containsKey('username')} ? 'aria-describedby=err-username' : ''"
+                       th:attr="aria-invalid=${fieldErrors?.containsKey('username')} ? 'true' : 'false', aria-describedby=${fieldErrors?.containsKey('username')} ? 'err-username' : null"
                        autofocus>
                 <span th:if="${fieldErrors?.containsKey('username')}" id="err-username" class="field-error" role="alert"
                       th:text="${fieldErrors['username']}"></span>
@@ -120,8 +121,7 @@
                 <label for="password">비밀번호</label>
                 <input type="password" id="password" name="password" placeholder="8자 이상 입력"
                        th:classappend="${fieldErrors?.containsKey('password')} ? ' input-error'"
-                       th:attr="aria-invalid=${fieldErrors?.containsKey('password')} ? 'true' : 'false'"
-                       th:attrappend="${fieldErrors?.containsKey('password')} ? 'aria-describedby=err-password' : ''">
+                       th:attr="aria-invalid=${fieldErrors?.containsKey('password')} ? 'true' : 'false', aria-describedby=${fieldErrors?.containsKey('password')} ? 'err-password' : null">
                 <span th:if="${fieldErrors?.containsKey('password')}" id="err-password" class="field-error" role="alert"
                       th:text="${fieldErrors['password']}"></span>
             </div>
@@ -131,8 +131,7 @@
                 <input type="text" id="nickname" name="nickname" placeholder="커뮤니티에서 사용할 별명"
                        th:value="${user?.nickname}"
                        th:classappend="${fieldErrors?.containsKey('nickname')} ? ' input-error'"
-                       th:attr="aria-invalid=${fieldErrors?.containsKey('nickname')} ? 'true' : 'false'"
-                       th:attrappend="${fieldErrors?.containsKey('nickname')} ? 'aria-describedby=err-nickname' : ''">
+                       th:attr="aria-invalid=${fieldErrors?.containsKey('nickname')} ? 'true' : 'false', aria-describedby=${fieldErrors?.containsKey('nickname')} ? 'err-nickname' : null">
                 <span th:if="${fieldErrors?.containsKey('nickname')}" id="err-nickname" class="field-error" role="alert"
                       th:text="${fieldErrors['nickname']}"></span>
             </div>
@@ -142,8 +141,7 @@
                 <input type="email" id="email" name="email" placeholder="알림을 받을 이메일 주소"
                        th:value="${user?.email}"
                        th:classappend="${fieldErrors?.containsKey('email')} ? ' input-error'"
-                       th:attr="aria-invalid=${fieldErrors?.containsKey('email')} ? 'true' : 'false'"
-                       th:attrappend="${fieldErrors?.containsKey('email')} ? 'aria-describedby=err-email' : ''">
+                       th:attr="aria-invalid=${fieldErrors?.containsKey('email')} ? 'true' : 'false', aria-describedby=${fieldErrors?.containsKey('email')} ? 'err-email' : null">
                 <span th:if="${fieldErrors?.containsKey('email')}" id="err-email" class="field-error" role="alert"
                       th:text="${fieldErrors['email']}"></span>
             </div>

@@ -100,6 +100,15 @@ public class AdminController {
         return "redirect:/admin?tab=quizzes";
     }
 
+    @PostMapping("/quizzes/{quizId}/questions/{questionId}/delete")
+    public String deleteQuestion(@PathVariable Long quizId,
+                                 @PathVariable Long questionId,
+                                 RedirectAttributes ra) {
+        quizService.deleteQuestion(quizId, questionId);
+        ra.addFlashAttribute("msg", "문항이 삭제되었습니다.");
+        return "redirect:/admin?tab=quizzes&quizId=" + quizId;
+    }
+
     // ── 챌린지 관리 ─────────────────────────────────────────────
 
     @PostMapping("/challenges/add")

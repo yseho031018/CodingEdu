@@ -49,8 +49,9 @@ public class MyPageController {
         int totalLessonsCompleted = lessonService.getTotalCompletedCount(user);
         int totalLessons = allCourses.stream().mapToInt(LessonCourse::getLessonCount).sum();
 
-        // 퀴즈 이력 (전체 — 히스토리 표시)
+        // 퀴즈 이력 (최근 10개)
         List<QuizResult> quizResults = quizService.getUserResults(user);
+        List<QuizResult> recentQuizResults = quizResults.size() > 10 ? quizResults.subList(0, 10) : quizResults;
 
         // 최고 퀴즈 등급 계산
         String bestGrade = quizResults.stream()
@@ -66,7 +67,7 @@ public class MyPageController {
         model.addAttribute("completedCountMap", completedCountMap);
         model.addAttribute("totalLessonsCompleted", totalLessonsCompleted);
         model.addAttribute("totalLessons", totalLessons);
-        model.addAttribute("recentQuizResults", quizResults);
+        model.addAttribute("recentQuizResults", recentQuizResults);
         model.addAttribute("totalQuizzesTaken", quizResults.size());
         model.addAttribute("bestGrade", bestGrade);
         model.addAttribute("recentPosts", postService.getRecentPostsByUser(user));

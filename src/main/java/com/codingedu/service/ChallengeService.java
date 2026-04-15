@@ -120,10 +120,6 @@ public class ChallengeService {
         return participationRepository.findByUserOrderByJoinedAtDesc(user);
     }
 
-    public boolean hasData() {
-        return challengeRepository.count() > 0;
-    }
-
     public List<Challenge> getAllChallenges() {
         return challengeRepository.findAll(org.springframework.data.domain.Sort.by("id").ascending());
     }

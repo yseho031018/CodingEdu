@@ -11,21 +11,113 @@
     <link rel="stylesheet" href="/css/common.css">
     <link rel="stylesheet" href="/css/tailwind.css">
     <style>
-        /* 필터 탭 */
-        .filter-tabs { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; }
-        .filter-tab {
-            padding: 8px 22px; border-radius: 50px;
-            border: 1.5px solid var(--border-card);
-            background: var(--bg-card);
-            font-size: .84rem; font-weight: 500; cursor: pointer;
-            color: var(--ink-2); text-decoration: none; display: inline-block;
-            transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+        /* ══ 공통 칩 스타일 ════════════════════════════════════════ */
+        .qf-chip {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 6px 15px; border-radius: 999px; white-space: nowrap;
+            font-size: .83rem; font-weight: 500; text-decoration: none;
+            color: var(--ink-2); background: var(--bg-section);
+            border: 1.5px solid transparent; line-height: 1.4;
+            transition: color .15s, background .15s, border-color .15s,
+                        box-shadow .15s, transform .15s;
         }
-        .filter-tab:hover { border-color: var(--accent); color: var(--accent); }
-        .filter-tab.active {
+        .qf-chip:hover {
+            color: var(--accent); background: var(--accent-soft);
+            border-color: rgba(107,92,231,.25); transform: translateY(-1px);
+        }
+        .qf-chip.active {
+            background: var(--accent); color: #fff; font-weight: 600;
+            box-shadow: 0 3px 12px rgba(107,92,231,.3);
+        }
+
+        /* ══ 버전 1: 카드형 칩 필터 ════════════════════════════════ */
+        .qf1 {
+            margin-bottom: 36px;
+            background: var(--bg-card);
+            border: 1.5px solid var(--border-card);
+            border-radius: 20px; overflow: hidden;
+        }
+        .qf1-row { display: flex; align-items: flex-start; gap: 16px; padding: 14px 22px; }
+        .qf1-row + .qf1-row { border-top: 1px solid var(--border-card); }
+        .qf1-label {
+            font-size: .69rem; font-weight: 700; color: var(--ink-3);
+            letter-spacing: .08em; text-transform: uppercase;
+            white-space: nowrap; padding-top: 7px;
+            min-width: 44px; text-align: right; flex-shrink: 0;
+        }
+        .qf1-chips { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+        .qf1-lang-wrap { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+        .qf1-lang-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+        .qf1-lang-chips.collapsed { max-height: 34px; overflow: hidden; }
+        .qf1-more {
+            align-self: flex-start; display: inline-flex; align-items: center; gap: 5px;
+            padding: 4px 12px; border-radius: 999px;
+            border: 1.5px solid var(--border-card);
+            background: transparent; font-size: .77rem; font-weight: 600;
+            color: var(--ink-3); cursor: pointer; line-height: 1.4;
+            transition: border-color .15s, color .15s, background .15s;
+        }
+        .qf1-more:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+
+        /* ══ 버전 2: 드롭다운 필터바 ═══════════════════════════════ */
+        .qf2 { position: relative; margin-bottom: 36px; }
+        .qf2-bar {
+            display: flex; align-items: center; gap: 2px; flex-wrap: wrap;
+            background: var(--bg-card); border: 1.5px solid var(--border-card);
+            border-radius: 16px; padding: 8px 12px; box-shadow: var(--shadow-sm);
+        }
+        .qf2-bar-icon { font-size: .88rem; padding: 0 6px; color: var(--ink-3); flex-shrink: 0; }
+        .qf2-sep { width: 1px; height: 20px; background: var(--border-card); margin: 0 4px; flex-shrink: 0; }
+        .qf2-trigger {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 7px 13px; border-radius: 10px;
+            border: none; background: transparent; cursor: pointer;
+            font-size: .84rem; font-weight: 500; color: var(--ink-2);
+            transition: background .15s, color .15s;
+        }
+        .qf2-trigger:hover, .qf2-trigger.open { background: var(--accent-soft); color: var(--accent); }
+        .qf2-trigger.has-filter { color: var(--accent); font-weight: 700; }
+        .qf2-badge {
             background: var(--accent); color: #fff;
-            border-color: var(--accent);
-            box-shadow: 0 2px 14px rgba(107,92,231,0.28);
+            font-size: .69rem; font-weight: 700;
+            padding: 2px 8px; border-radius: 999px; white-space: nowrap;
+        }
+        .qf2-arrow { width: 12px; height: 12px; flex-shrink: 0; display: block; transition: transform .2s; }
+        .qf2-trigger.open .qf2-arrow { transform: rotate(180deg); }
+        .qf2-spacer { flex: 1; min-width: 4px; }
+        .qf2-reset {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: .78rem; font-weight: 600; color: var(--ink-3);
+            text-decoration: none; padding: 6px 12px; border-radius: 10px;
+            border: 1.5px solid var(--border-card); white-space: nowrap;
+            transition: color .15s, border-color .15s, background .15s;
+        }
+        .qf2-reset:hover { color: var(--danger); border-color: var(--danger); background: rgba(239,68,68,.06); }
+        .qf2-panel {
+            display: none; position: absolute; top: calc(100% + 8px); left: 0; right: 0;
+            background: var(--bg-card); border: 1.5px solid var(--border-card);
+            border-radius: 18px; padding: 20px 22px;
+            box-shadow: 0 16px 56px rgba(0,0,0,.13); z-index: 200;
+        }
+        .qf2-panel.open { display: block; animation: qfIn .16s ease; }
+        @keyframes qfIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+        .qf2-panel-title {
+            font-size: .7rem; font-weight: 700; color: var(--ink-3);
+            text-transform: uppercase; letter-spacing: .08em; margin-bottom: 12px;
+        }
+        .qf2-panel-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+
+        /* 모바일 */
+        @media (max-width: 600px) {
+            .qf1-row { flex-direction: column; gap: 8px; }
+            .qf1-label { text-align: left; padding-top: 0; }
+            .qf2-sep { display: none; }
+            .qf2-trigger { flex: 1; justify-content: center; }
+            .qf2-panel {
+                position: fixed; bottom: 0; left: 0; right: 0; top: auto;
+                border-radius: 20px 20px 0 0; border-bottom: none;
+                max-height: 65vh; overflow-y: auto;
+            }
         }
 
         /* 연습 퀴즈 배너 */
@@ -167,12 +259,78 @@
         <a href="/quiz/practice" class="btn-practice">연습하러 가기 →</a>
     </div>
 
-    <!-- 난이도 필터 탭 -->
-    <div class="filter-tabs">
-        <a th:href="@{/quiz(difficulty='all')}"    class="filter-tab" th:classappend="${currentDifficulty == 'all'}    ? ' active'">전체</a>
-        <a th:href="@{/quiz(difficulty='easy')}"   class="filter-tab" th:classappend="${currentDifficulty == 'easy'}   ? ' active'">🌱 쉬움</a>
-        <a th:href="@{/quiz(difficulty='medium')}" class="filter-tab" th:classappend="${currentDifficulty == 'medium'} ? ' active'">🔥 보통</a>
-        <a th:href="@{/quiz(difficulty='hard')}"   class="filter-tab" th:classappend="${currentDifficulty == 'hard'}   ? ' active'">🚀 어려움</a>
+    <!-- ★ 버전 1: 카드형 칩 필터 ━ 기본 사용 중 (th:if="false"로 비활성화) ★ -->
+    <div th:if="true" class="qf1">
+        <div class="qf1-row">
+            <span class="qf1-label">난이도</span>
+            <div class="qf1-chips">
+                <a th:href="@{/quiz(difficulty='all',   topic=${currentTopic})}" class="qf-chip" th:classappend="${currentDifficulty=='all'}    ? ' active'">전체</a>
+                <a th:href="@{/quiz(difficulty='easy',  topic=${currentTopic})}" class="qf-chip" th:classappend="${currentDifficulty=='easy'}   ? ' active'">🌱 쉬움</a>
+                <a th:href="@{/quiz(difficulty='medium',topic=${currentTopic})}" class="qf-chip" th:classappend="${currentDifficulty=='medium'} ? ' active'">🔥 보통</a>
+                <a th:href="@{/quiz(difficulty='hard',  topic=${currentTopic})}" class="qf-chip" th:classappend="${currentDifficulty=='hard'}   ? ' active'">🚀 어려움</a>
+            </div>
+        </div>
+        <div class="qf1-row">
+            <span class="qf1-label">언어</span>
+            <div class="qf1-lang-wrap">
+                <div class="qf1-lang-chips" id="qf1-lang">
+                    <a th:href="@{/quiz(difficulty=${currentDifficulty},topic='all')}" class="qf-chip" th:classappend="${currentTopic=='all'} ? ' active'">전체</a>
+                    <a th:each="t : ${topics}"
+                       th:href="@{/quiz(difficulty=${currentDifficulty},topic=${t.topic})}"
+                       class="qf-chip"
+                       th:classappend="${currentTopic==t.topic} ? ' active'"
+                       th:text="${t.icon + ' ' + t.topic}">⚡ JavaScript</a>
+                </div>
+                <button class="qf1-more" id="qf1-more" hidden onclick="qf1Toggle(this)">더보기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ★ 버전 2: 드롭다운 필터바 ━ th:if="true"로 변경하면 활성화 ★ -->
+    <div th:if="false" class="qf2" id="qf2">
+        <div class="qf2-bar">
+            <span class="qf2-bar-icon">⚙️</span>
+            <div class="qf2-sep"></div>
+            <button class="qf2-trigger"
+                    th:classappend="${currentDifficulty != 'all'} ? ' has-filter'"
+                    data-panel="qf2-diff" onclick="qf2Open(this)">
+                <span>난이도</span>
+                <span class="qf2-badge" th:if="${currentDifficulty != 'all'}"
+                      th:text="${currentDifficulty=='easy'} ? '🌱 쉬움' : (${currentDifficulty=='medium'} ? '🔥 보통' : '🚀 어려움')"></span>
+                <svg class="qf2-arrow" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"/></svg>
+            </button>
+            <div class="qf2-sep"></div>
+            <button class="qf2-trigger"
+                    th:classappend="${currentTopic != 'all'} ? ' has-filter'"
+                    data-panel="qf2-lang" onclick="qf2Open(this)">
+                <span>언어</span>
+                <span class="qf2-badge" th:if="${currentTopic != 'all'}" th:text="${currentTopic}"></span>
+                <svg class="qf2-arrow" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"/></svg>
+            </button>
+            <div class="qf2-spacer"></div>
+            <a th:if="${currentDifficulty != 'all' || currentTopic != 'all'}"
+               th:href="@{/quiz}" class="qf2-reset">✕ 초기화</a>
+        </div>
+        <div class="qf2-panel" id="qf2-diff">
+            <div class="qf2-panel-title">난이도 선택</div>
+            <div class="qf2-panel-chips">
+                <a th:href="@{/quiz(difficulty='all',   topic=${currentTopic})}" class="qf-chip" th:classappend="${currentDifficulty=='all'}    ? ' active'">전체</a>
+                <a th:href="@{/quiz(difficulty='easy',  topic=${currentTopic})}" class="qf-chip" th:classappend="${currentDifficulty=='easy'}   ? ' active'">🌱 쉬움</a>
+                <a th:href="@{/quiz(difficulty='medium',topic=${currentTopic})}" class="qf-chip" th:classappend="${currentDifficulty=='medium'} ? ' active'">🔥 보통</a>
+                <a th:href="@{/quiz(difficulty='hard',  topic=${currentTopic})}" class="qf-chip" th:classappend="${currentDifficulty=='hard'}   ? ' active'">🚀 어려움</a>
+            </div>
+        </div>
+        <div class="qf2-panel" id="qf2-lang">
+            <div class="qf2-panel-title">언어 / 주제 선택</div>
+            <div class="qf2-panel-chips">
+                <a th:href="@{/quiz(difficulty=${currentDifficulty},topic='all')}" class="qf-chip" th:classappend="${currentTopic=='all'} ? ' active'">전체</a>
+                <a th:each="t : ${topics}"
+                   th:href="@{/quiz(difficulty=${currentDifficulty},topic=${t.topic})}"
+                   class="qf-chip"
+                   th:classappend="${currentTopic==t.topic} ? ' active'"
+                   th:text="${t.icon + ' ' + t.topic}">⚡ JavaScript</a>
+            </div>
+        </div>
     </div>
 
     <!-- 퀴즈 카드 -->
@@ -204,5 +362,76 @@
 
 <footer th:replace="~{index :: footer}"></footer>
 
+<script>
+/* ── 버전 1: 언어 칩 접기/펼치기 ─────────────────────────────── */
+(function () {
+    var lang = document.getElementById('qf1-lang');
+    var btn  = document.getElementById('qf1-more');
+    if (!lang || !btn) return;
+
+    lang.classList.add('collapsed');
+
+    requestAnimationFrame(function () {
+        /* 한 줄 이내면 버튼 숨김 */
+        if (lang.scrollHeight <= lang.clientHeight + 2) {
+            lang.classList.remove('collapsed');
+            return;
+        }
+        /* 숨겨진 칩 개수 */
+        var topY   = lang.getBoundingClientRect().top;
+        var chips  = lang.querySelectorAll('a');
+        var hidden = 0;
+        chips.forEach(function (c) {
+            if (c.getBoundingClientRect().top > topY + 34) hidden++;
+        });
+        btn.removeAttribute('hidden');
+        btn.textContent = '+' + hidden + ' 더보기';
+
+        /* 선택된 칩이 접힌 영역에 있으면 자동 펼치기 */
+        var active = lang.querySelector('a.active');
+        if (active && active.getBoundingClientRect().top > topY + 34) {
+            lang.classList.remove('collapsed');
+            btn.textContent = '접기 ↑';
+        }
+    });
+}());
+
+function qf1Toggle(btn) {
+    var lang      = document.getElementById('qf1-lang');
+    var collapsed = lang.classList.toggle('collapsed');
+    if (collapsed) {
+        requestAnimationFrame(function () {
+            var topY   = lang.getBoundingClientRect().top;
+            var hidden = 0;
+            lang.querySelectorAll('a').forEach(function (c) {
+                if (c.getBoundingClientRect().top > topY + 34) hidden++;
+            });
+            btn.textContent = '+' + hidden + ' 더보기';
+        });
+    } else {
+        btn.textContent = '접기 ↑';
+    }
+}
+
+/* ── 버전 2: 드롭다운 패널 ───────────────────────────────────── */
+function qf2Open(trigger) {
+    var panelId = trigger.getAttribute('data-panel');
+    var panel   = document.getElementById(panelId);
+    if (!panel) return;
+    var isOpen  = panel.classList.contains('open');
+
+    document.querySelectorAll('.qf2-panel').forEach(function (p) { p.classList.remove('open'); });
+    document.querySelectorAll('.qf2-trigger').forEach(function (t) { t.classList.remove('open'); });
+
+    if (!isOpen) { panel.classList.add('open'); trigger.classList.add('open'); }
+}
+
+document.addEventListener('click', function (e) {
+    if (!e.target.closest('#qf2')) {
+        document.querySelectorAll('.qf2-panel').forEach(function (p) { p.classList.remove('open'); });
+        document.querySelectorAll('.qf2-trigger').forEach(function (t) { t.classList.remove('open'); });
+    }
+});
+</script>
 </body>
 </html>

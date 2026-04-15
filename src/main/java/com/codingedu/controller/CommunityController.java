@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -42,6 +43,9 @@ public class CommunityController {
         model.addAttribute("currentCategory", category);
         model.addAttribute("currentPage", page);
         model.addAttribute("keyword", keyword);
+        model.addAttribute("topAnswerers", commentService.getTopAnswerersThisWeek(3));
+        List<Long> postIds = postPage.getContent().stream().map(Post::getId).toList();
+        model.addAttribute("commentCounts", commentService.countCommentsByPostIds(postIds));
         return "community";
     }
 
@@ -74,8 +78,10 @@ public class CommunityController {
                          @AuthenticationPrincipal CustomUserDetails userDetails,
                          Model model) {
         Post post = postService.getPostAndIncreaseViews(id);
+        long commentCount = commentService.countCommentsByPostId(id);
         model.addAttribute("post", post);
         model.addAttribute("comments", commentService.getCommentsByPostId(id));
+        model.addAttribute("commentCount", commentCount);
         if (userDetails != null) {
             User user = userService.findByUsername(userDetails.getUsername());
             model.addAttribute("currentUsername", userDetails.getUsername());

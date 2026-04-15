@@ -7,7 +7,12 @@ import com.codingedu.repository.CommentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -25,6 +30,35 @@ public class CommentService {
 
     public List<Comment> getCommentsByPostId(Long postId) {
         return commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
+    }
+
+    public long countCommentsByPostId(Long postId) {
+        return commentRepository.countByPostId(postId);
+    }
+
+    public Map<Long, Long> countCommentsByPostIds(Collection<Long> postIds) {
+        if (postIds == null || postIds.isEmpty()) {
+            return Map.of();
+        }
+
+        Map<Long, Long> counts = postIds.stream()
+                .distinct()
+                .collect(Collectors.toMap(Function.identity(), id -> 0L));
+
+        commentRepository.countGroupedByPostIds(postIds).forEach(row ->
+                counts.put((Long) row[0], (Long) row[1]));
+
+        return counts;
+    }
+
+    public record TopAnswerer(String nickname, long commentCount) {}
+
+    public List<TopAnswerer> getTopAnswerersThisWeek(int limit) {
+        LocalDateTime weekStart = LocalDateTime.now().minusDays(7);
+        return commentRepository.findTopAnswerersThisWeek(weekStart).stream()
+                .limit(limit)
+                .map(row -> new TopAnswerer((String) row[0], (Long) row[1]))
+                .toList();
     }
 
     @Transactional

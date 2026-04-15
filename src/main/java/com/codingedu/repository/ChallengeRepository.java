@@ -9,5 +9,4 @@ import java.util.List;
 @Repository
 public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
     List<Challenge> findByStatusOrderByFeaturedDescCreatedAtAsc(String status);
-    boolean existsByTitle(String title);
 }

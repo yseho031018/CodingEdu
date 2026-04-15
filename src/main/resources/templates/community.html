@@ -15,11 +15,19 @@
         .community-main { flex: 1; }
         .community-sidebar { width: 320px; flex-shrink: 0; display: flex; flex-direction: column; gap: 30px; }
 
+        .community-header-row {
+            position: relative; margin-bottom: 30px;
+        }
+        .community-header-row .btn-write {
+            position: absolute; right: 0; bottom: 6px;
+        }
         .community-tabs {
             display: flex; gap: 10px; border-bottom: 2px solid var(--border-card);
-            padding-bottom: 0; margin-bottom: 30px; overflow-x: auto;
-            position: relative;
+            padding-bottom: 0; margin-bottom: 0; overflow-x: auto;
+            position: relative; padding-right: 190px;
+            scrollbar-width: none; -ms-overflow-style: none;
         }
+        .community-tabs::-webkit-scrollbar { display: none; }
         .community-tab {
             padding: 10px 24px; border: none; background: transparent; font-size: 1rem;
             font-weight: 700; color: var(--ink-2); cursor: pointer; transition: color .25s;
@@ -116,6 +124,7 @@
             transition: all .2s; border: 1px solid transparent;
         }
         .tag:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+        .tag.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
         .best-answerers { list-style: none; display: flex; flex-direction: column; gap: 16px; }
         .best-answerers li { display: flex; align-items: center; gap: 12px; }
@@ -150,14 +159,17 @@
     <div class="community-layout reveal">
         <!-- 왼쪽: 게시판 메인 -->
         <div class="community-main">
-            <!-- 탭 메뉴 -->
-            <div class="community-tabs" id="communityTabs">
-                <a th:href="@{/community(category='all')}" class="community-tab" th:classappend="${currentCategory == 'all'} ? 'active'">전체보기</a>
-                <a th:href="@{/community(category='qna')}" class="community-tab" th:classappend="${currentCategory == 'qna'} ? 'active'">💡 에러/질문(Q&A)</a>
-                <a th:href="@{/community(category='tips')}" class="community-tab" th:classappend="${currentCategory == 'tips'} ? 'active'">🔥 꿀팁/노하우</a>
-                <a th:href="@{/community(category='study')}" class="community-tab" th:classappend="${currentCategory == 'study'} ? 'active'">📚 스터디 모집</a>
-                <a th:href="@{/community(category='free')}" class="community-tab" th:classappend="${currentCategory == 'free'} ? 'active'">☕ 자유게시판</a>
-                <div class="tab-indicator" id="tabIndicator"></div>
+            <!-- 탭 + 글쓰기 버튼 -->
+            <div class="community-header-row">
+                <div class="community-tabs" id="communityTabs">
+                    <a th:href="@{/community(category='all')}" class="community-tab" th:classappend="${currentCategory == 'all'} ? 'active'">전체보기</a>
+                    <a th:href="@{/community(category='qna')}" class="community-tab" th:classappend="${currentCategory == 'qna'} ? 'active'">💡 에러/질문(Q&A)</a>
+                    <a th:href="@{/community(category='tips')}" class="community-tab" th:classappend="${currentCategory == 'tips'} ? 'active'">🔥 꿀팁/노하우</a>
+                    <a th:href="@{/community(category='study')}" class="community-tab" th:classappend="${currentCategory == 'study'} ? 'active'">📚 스터디 모집</a>
+                    <a th:href="@{/community(category='free')}" class="community-tab" th:classappend="${currentCategory == 'free'} ? 'active'">☕ 자유게시판</a>
+                    <div class="tab-indicator" id="tabIndicator"></div>
+                </div>
+                <a th:href="@{/community/write}" class="btn-write" style="flex-shrink:0; margin-bottom:2px;">✏️ 새 글 작성하기</a>
             </div>
 
             <!-- 검색바 -->
@@ -175,11 +187,6 @@
                 <strong th:text="${postPage.totalElements} + '건'">0건</strong>
                 <a th:href="@{/community(category=${currentCategory})}"
                    style="margin-left:12px; color:var(--ink-3); font-size:.85rem;">✕ 검색 초기화</a>
-            </div>
-
-            <!-- 글쓰기 -->
-            <div class="community-actions">
-                <a th:href="@{/community/write}" class="btn-write">✏️ 새 글 작성하기</a>
             </div>
 
             <!-- 게시글 리스트 -->
@@ -201,7 +208,7 @@
                             <span class="author" th:text="${post.author.nickname}">작성자</span>
                             <span class="date" th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">작성일짜</span>
                             <span class="views" th:text="'👁️ ' + ${post.views}">조회수</span>
-                            <span th:text="'💬 ' + ${post.commentCount}">댓글수</span>
+                            <span th:text="'💬 ' + ${commentCounts[post.id] != null ? commentCounts[post.id] : 0}">댓글수</span>
                         </div>
                     </div>
                 </a>
@@ -229,36 +236,30 @@
             <div class="sidebar-box">
                 <h3>🏷️ 요즘 많이 찾는 태그</h3>
                 <div class="tag-cloud">
-                    <a href="#" class="tag">#Java_기초</a>
-                    <a href="#" class="tag">#Spring</a>
-                    <a href="#" class="tag">#오류해결</a>
-                    <a href="#" class="tag">#면접꿀팁</a>
-                    <a href="#" class="tag">#GitHub</a>
-                    <a href="#" class="tag">#Python</a>
-                    <a href="#" class="tag">#이력서피드백</a>
-                    <a href="#" class="tag">#토이프로젝트</a>
+                    <a th:href="@{/community(keyword='Java_기초', category='all')}" th:classappend="${keyword == 'Java_기초'} ? 'active'" class="tag">#Java_기초</a>
+                    <a th:href="@{/community(keyword='Spring', category='all')}" th:classappend="${keyword == 'Spring'} ? 'active'" class="tag">#Spring</a>
+                    <a th:href="@{/community(keyword='오류해결', category='all')}" th:classappend="${keyword == '오류해결'} ? 'active'" class="tag">#오류해결</a>
+                    <a th:href="@{/community(keyword='면접꿀팁', category='all')}" th:classappend="${keyword == '면접꿀팁'} ? 'active'" class="tag">#면접꿀팁</a>
+                    <a th:href="@{/community(keyword='GitHub', category='all')}" th:classappend="${keyword == 'GitHub'} ? 'active'" class="tag">#GitHub</a>
+                    <a th:href="@{/community(keyword='Python', category='all')}" th:classappend="${keyword == 'Python'} ? 'active'" class="tag">#Python</a>
+                    <a th:href="@{/community(keyword='이력서피드백', category='all')}" th:classappend="${keyword == '이력서피드백'} ? 'active'" class="tag">#이력서피드백</a>
+                    <a th:href="@{/community(keyword='토이프로젝트', category='all')}" th:classappend="${keyword == '토이프로젝트'} ? 'active'" class="tag">#토이프로젝트</a>
                 </div>
             </div>
 
             <div class="sidebar-box">
                 <h3>⭐ 이 주의 천사 답변러</h3>
-                <ul class="best-answerers">
-                    <li>
-                        <span class="rank">🥇</span>
-                        <span class="name">에러해결사</span>
-                        <span class="score">채택 32건</span>
-                    </li>
-                    <li>
-                        <span class="rank">🥈</span>
-                        <span class="name">백엔드장인</span>
-                        <span class="score">채택 28건</span>
-                    </li>
-                    <li>
-                        <span class="rank">🥉</span>
-                        <span class="name">프론트깎는노인</span>
-                        <span class="score">채택 21건</span>
+                <ul class="best-answerers" th:if="${topAnswerers != null and !topAnswerers.isEmpty()}">
+                    <li th:each="a, s : ${topAnswerers}">
+                        <span class="rank" th:text="${s.index == 0 ? '🥇' : s.index == 1 ? '🥈' : '🥉'}">🥇</span>
+                        <span class="name" th:text="${a.nickname}">닉네임</span>
+                        <span class="score" th:text="${a.commentCount} + '개 댓글'">0개 댓글</span>
                     </li>
                 </ul>
+                <p th:if="${topAnswerers == null or topAnswerers.isEmpty()}"
+                   style="color:var(--ink-3); font-size:.9rem; text-align:center; padding:12px 0;">
+                    이번 주 활동 데이터가 없습니다.
+                </p>
             </div>
             
             <div style="background: linear-gradient(135deg, var(--accent-soft), var(--amber-soft)); border-radius: 20px; padding: 24px; text-align: center;">
@@ -320,6 +321,32 @@
 
                 setTimeout(() => { window.location.href = href; }, 180);
             });
+        });
+    })();
+
+    // 검색 키워드 하이라이팅
+    (function() {
+        const keyword = /*[[${keyword}]]*/ '';
+        if (!keyword || keyword.trim() === '') return;
+
+        function highlight(el, kw) {
+            if (!el) return;
+            const escaped = kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp('(' + escaped + ')', 'gi');
+            el.childNodes.forEach(node => {
+                if (node.nodeType === 3) { // TEXT_NODE
+                    const text = node.textContent;
+                    if (regex.test(text)) {
+                        const span = document.createElement('span');
+                        span.innerHTML = text.replace(regex, '<mark style="background:var(--amber-soft);color:var(--amber);border-radius:3px;padding:0 2px;font-weight:700;">$1</mark>');
+                        node.replaceWith(span);
+                    }
+                }
+            });
+        }
+
+        document.querySelectorAll('.post-content h4, .post-content p').forEach(el => {
+            highlight(el, keyword.trim());
         });
     })();
 </script>

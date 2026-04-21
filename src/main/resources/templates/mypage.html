@@ -203,6 +203,7 @@
         }
 
         /* 반응형 */
+        /* 모바일 대응 코드 */
         @media (max-width: 768px) {
             .mypage-layout { grid-template-columns: 1fr; padding: 24px 4%; gap: 20px; }
             .profile-card { position: static; padding: 24px 20px; }
@@ -306,8 +307,7 @@
 
         <!-- 퀴즈 이력 -->
         <div class="section-block">
-            <div class="block-title"
-                 th:with="gradeText=${bestGrade != '-' ? ' · 최고 ' + bestGrade + '등급' : ''}">
+            <div class="block-title">
                 🎯 퀴즈 이력
                 <span th:if="${bestGrade != '-'}"
                       style="font-size:.8rem; font-weight:600; color:var(--ink-3);"

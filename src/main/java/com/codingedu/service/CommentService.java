@@ -19,12 +19,10 @@ import java.util.stream.Collectors;
 public class CommentService {
 
     private final CommentRepository commentRepository;
-    private final PostService postService;
     private final NotificationService notificationService;
 
-    public CommentService(CommentRepository commentRepository, PostService postService, NotificationService notificationService) {
+    public CommentService(CommentRepository commentRepository, NotificationService notificationService) {
         this.commentRepository = commentRepository;
-        this.postService = postService;
         this.notificationService = notificationService;
     }
 
@@ -68,7 +66,6 @@ public class CommentService {
         comment.setPost(post);
         comment.setAuthor(author);
         commentRepository.save(comment);
-        postService.incrementCommentCount(post);
         notificationService.createCommentNotification(post, author);
 
         return comment;
@@ -81,8 +78,6 @@ public class CommentService {
         if (!comment.getAuthor().getUsername().equals(username)) {
             throw new IllegalArgumentException("삭제 권한이 없습니다.");
         }
-        Post post = comment.getPost();
         commentRepository.delete(comment);
-        postService.decrementCommentCount(post);
     }
 }

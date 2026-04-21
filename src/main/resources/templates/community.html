@@ -132,9 +132,11 @@
         .name { font-weight: 800; font-size: 1rem; color: var(--ink-1); flex-grow: 1; }
         .score { font-size: .85rem; color: var(--accent); font-weight: 700; background: var(--accent-soft); padding: 4px 10px; border-radius: 20px; }
 
+        /* 모바일 대응 코드 */
         @media (max-width: 900px) {
             .community-layout { flex-direction: column; }
             .community-sidebar { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+            /* 모바일 대응 코드 */
             @media (max-width: 600px) {
                 .community-sidebar { grid-template-columns: 1fr; }
                 .post-item { flex-direction: column; gap: 12px; }
@@ -333,14 +335,22 @@
             if (!el) return;
             const escaped = kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const regex = new RegExp('(' + escaped + ')', 'gi');
-            el.childNodes.forEach(node => {
+            Array.from(el.childNodes).forEach(node => {
                 if (node.nodeType === 3) { // TEXT_NODE
-                    const text = node.textContent;
-                    if (regex.test(text)) {
-                        const span = document.createElement('span');
-                        span.innerHTML = text.replace(regex, '<mark style="background:var(--amber-soft);color:var(--amber);border-radius:3px;padding:0 2px;font-weight:700;">$1</mark>');
-                        node.replaceWith(span);
-                    }
+                    const parts = node.textContent.split(regex);
+                    if (parts.length === 1) return;
+                    const frag = document.createDocumentFragment();
+                    parts.forEach((part, i) => {
+                        if (i % 2 === 1) {
+                            const mark = document.createElement('mark');
+                            mark.style.cssText = 'background:var(--amber-soft);color:var(--amber);border-radius:3px;padding:0 2px;font-weight:700;';
+                            mark.textContent = part;
+                            frag.appendChild(mark);
+                        } else {
+                            frag.appendChild(document.createTextNode(part));
+                        }
+                    });
+                    node.replaceWith(frag);
                 }
             });
         }

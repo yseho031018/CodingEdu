@@ -385,25 +385,25 @@ public class DataInitializer implements CommandLineRunner {
             "Spring Boot로 간단한 CRUD를 만들고 있는데 서비스 레이어에서 NullPointerException이 계속 발생합니다.\n\n" +
             "```java\n@Service\npublic class UserService {\n    @Autowired\n    private UserRepository userRepository;\n\n    public User findUser(Long id) {\n        return userRepository.findById(id).get(); // 여기서 터짐\n    }\n}\n```\n\n" +
             "findById()에서 값이 없으면 NoSuchElementException이 발생한다는 건 알겠는데, 왜 NPE가 같이 뜨는지 모르겠습니다. 혹시 아시는 분 계신가요?",
-            52, 8, 3, now.minusDays(5));
+            52, 3, now.minusDays(5));
 
         post(u1, "qna", "Spring Security 로그인 후 리다이렉트가 이상하게 동작해요",
             "로그인 성공 후 원래 접근하려던 페이지로 가야 하는데 무조건 홈으로만 가는 문제가 있습니다.\n\n" +
             "SecurityConfig에서 defaultSuccessUrl을 설정해봤는데도 똑같이 홈으로 이동하네요.\n\n" +
             "혹시 SavedRequestAwareAuthenticationSuccessHandler를 써야 하나요? 사용법을 아시는 분 계시면 도움 부탁드립니다 🙏",
-            38, 5, 7, now.minusDays(3));
+            38, 7, now.minusDays(3));
 
         post(u4, "qna", "JPA에서 LazyInitializationException 해결 방법이 뭔가요?",
             "연관 엔티티를 LAZY로 설정했더니 트랜잭션 밖에서 접근할 때 LazyInitializationException이 발생합니다.\n\n" +
             "```\norg.hibernate.LazyInitializationException: could not initialize proxy - no Session\n```\n\n" +
             "EAGER로 바꾸면 되긴 하는데, 성능 문제가 생길 것 같아서요. fetch join이나 @Transactional을 써야 하나요? N+1 문제도 같이 해결하고 싶어요.",
-            91, 12, 15, now.minusDays(1));
+            91, 15, now.minusDays(1));
 
         post(admin, "qna", "React에서 useState 업데이트가 즉시 반영 안 되는 이유가 뭔가요?",
             "버튼 클릭 시 setState를 호출한 직후에 콘솔로 값을 찍어보면 여전히 이전 값이 나옵니다.\n\n" +
             "```javascript\nconst [count, setCount] = useState(0);\n\nconst handleClick = () => {\n    setCount(count + 1);\n    console.log(count); // 업데이트 전 값이 찍힘\n};\n```\n\n" +
             "비동기로 동작하는 건 알겠는데, 업데이트된 값을 즉시 사용하려면 어떻게 해야 하나요?",
-            67, 9, 11, now.minusHours(8));
+            67, 11, now.minusHours(8));
 
         // tips 카테고리
         post(u2, "tips", "IntelliJ 생산성 단축키 모음 - 알면 개발 속도 2배!",
@@ -412,7 +412,7 @@ public class DataInitializer implements CommandLineRunner {
             "**리팩토링**\n- `Shift+F6`: 이름 변경\n- `Ctrl+Alt+M`: 메서드 추출\n- `Ctrl+Alt+V`: 변수 추출\n\n" +
             "**탐색**\n- `Ctrl+Shift+F`: 전체 파일 검색\n- `Ctrl+E`: 최근 파일\n- `Ctrl+G`: 라인 이동\n\n" +
             "특히 Alt+Enter는 무조건 외우세요. 에러 해결의 신입니다 😄",
-            203, 18, 45, now.minusDays(7));
+            203, 45, now.minusDays(7));
 
         post(u1, "tips", "Git 실수 복구 명령어 총정리 - 겁 없이 커밋하세요",
             "개발하다 보면 Git에서 실수를 많이 하죠. 자주 쓰는 복구 명령어 정리했습니다.\n\n" +
@@ -421,7 +421,7 @@ public class DataInitializer implements CommandLineRunner {
             "**푸시한 커밋 되돌리기**\n```bash\n# 되돌리는 새 커밋 생성 (협업 시 안전)\ngit revert HEAD\n```\n\n" +
             "**stash 활용**\n```bash\n# 현재 작업 임시 저장\ngit stash\n\n# 저장한 작업 불러오기\ngit stash pop\n```\n\n" +
             "force push는 웬만하면 쓰지 마세요. 팀원들이 싫어합니다 😅",
-            178, 22, 38, now.minusDays(4));
+            178, 38, now.minusDays(4));
 
         post(u3, "tips", "CSS Flexbox 완전 정복 - 레이아웃 잡기 이제 쉽습니다",
             "Flexbox는 처음엔 헷갈리지만 제대로 이해하면 레이아웃이 정말 쉬워져요!\n\n" +
@@ -429,7 +429,7 @@ public class DataInitializer implements CommandLineRunner {
             "**자주 쓰는 패턴**\n```css\n/* 완전 중앙 정렬 */\n.center {\n    display: flex;\n    justify-content: center; /* 가로축 */\n    align-items: center;    /* 세로축 */\n}\n\n/* 양 끝 정렬 */\n.space-between {\n    display: flex;\n    justify-content: space-between;\n}\n```\n\n" +
             "**flex-grow vs flex-shrink**\n- `flex-grow`: 남은 공간을 얼마나 차지할지\n- `flex-shrink`: 공간 부족 시 얼마나 줄어들지\n- `flex: 1`이면 `flex-grow: 1; flex-shrink: 1; flex-basis: 0`\n\n" +
             "Grid와 함께 쓰면 대부분의 레이아웃을 처리할 수 있어요! 🎨",
-            156, 14, 29, now.minusDays(2));
+            156, 29, now.minusDays(2));
 
         post(u2, "tips", "Spring Boot 성능 최적화 - 실무에서 바로 써먹는 팁",
             "Spring Boot 프로젝트에서 성능을 개선한 경험을 공유합니다.\n\n" +
@@ -437,7 +437,7 @@ public class DataInitializer implements CommandLineRunner {
             "**2. 캐싱 적용**\n```java\n@Cacheable(\"users\")\npublic User findById(Long id) { ... }\n```\n\n" +
             "**3. 페이지네이션**\nfindAll() 대신 Page 객체를 써서 대용량 데이터를 처리하세요.\n\n" +
             "이 세 가지만 챙겨도 응답 속도가 눈에 띄게 빨라집니다!",
-            142, 16, 31, now.minusHours(3));
+            142, 31, now.minusHours(3));
 
         // study 카테고리
         post(u5, "study", "Spring Boot + React 풀스택 스터디 모집 (주 2회, 온라인)",
@@ -446,21 +446,21 @@ public class DataInitializer implements CommandLineRunner {
             "**모집 대상**\n- Java/Spring 기초 지식 있으신 분\n- 주 2회 (화, 목 저녁 8시) 참여 가능하신 분\n- 적극적으로 코드 리뷰 하고 싶으신 분\n\n" +
             "**모집 인원**: 4~5명\n**기간**: 3개월\n**방식**: Discord + 화상회의\n\n" +
             "관심 있으신 분은 댓글 남겨주세요! 함께 성장해요 💪",
-            89, 24, 19, now.minusDays(6));
+            89, 19, now.minusDays(6));
 
         post(admin, "study", "알고리즘 스터디 모집 - 코딩테스트 같이 준비해요",
             "취업/이직을 위해 코딩테스트를 준비하는 스터디입니다!\n\n" +
             "**커리큘럼**\n1주차: 시간복잡도, 정렬\n2주차: 탐색(BFS/DFS)\n3주차: 동적 프로그래밍\n4주차: 그리디, 백트래킹\n...\n\n" +
             "**플랫폼**: 백준 + 프로그래머스\n**언어**: Java / Python 모두 가능\n**주 1회** (토요일 오후 2시)\n**기간**: 12주\n\n" +
             "매주 3문제씩 풀고 풀이를 공유하는 방식입니다. 혼자 풀면 막막한데 같이 하면 확실히 달라요! 현재 2명 확정이고 3명 더 모집합니다.",
-            73, 19, 14, now.minusDays(2));
+            73, 14, now.minusDays(2));
 
         post(u3, "study", "CSS/디자인 감각 키우기 스터디 - 프론트개발자 필수!",
             "백엔드 개발자도 기본 UI는 만들 줄 알아야 한다고 생각해서 스터디를 만들었어요!\n\n" +
             "**다룰 내용**\n- Figma로 와이어프레임 만들기\n- CSS 그리드 & 플렉스박스 마스터\n- 반응형 웹 디자인\n- Tailwind CSS 실전 활용\n- 애니메이션 & 트랜지션\n\n" +
             "매주 하나의 UI 컴포넌트를 직접 만들어보는 방식입니다. 노션에 결과물 아카이빙해서 포폴에도 써먹을 수 있어요!\n\n" +
             "주 1회 비동기 스터디라 시간 부담 적습니다. 관심 있으신 분 DM 주세요 😊",
-            61, 11, 8, now.minusDays(1));
+            61, 8, now.minusDays(1));
 
         // free 카테고리
         post(u4, "free", "개발 공부 6개월째... 슬럼프 극복한 방법 공유",
@@ -468,7 +468,7 @@ public class DataInitializer implements CommandLineRunner {
             "처음 3개월은 정말 재밌었는데 4개월차부터 슬럼프가 왔어요. '내가 과연 개발자가 될 수 있을까?' 라는 생각이 매일 들었고, 코드 한 줄 짜기도 싫어지더라고요.\n\n" +
             "그때 제가 한 것들:\n1. **작은 프로젝트 완성하기** - 투두리스트, 날씨앱 등 작아도 '완성'의 경험이 중요했어요\n2. **커뮤니티 참여** - 혼자 공부하면 지치는데 여기처럼 커뮤니티에서 글 보는 것만으로도 힘이 됐습니다\n3. **기대치 낮추기** - 처음부터 완벽한 코드 쓰려다 지친 것 같아요. 일단 돌아가면 장땡!\n\n" +
             "지금은 다시 재밌어졌어요. 슬럼프 오신 분들 화이팅입니다! 💪",
-            134, 31, 42, now.minusDays(8));
+            134, 42, now.minusDays(8));
 
         post(u5, "free", "개발자 면접 후기 - 신입 기술면접에서 자주 나오는 질문",
             "최근 스타트업 3군데 면접을 보고 왔습니다. 공부하시는 분들께 도움 되시길!\n\n" +
@@ -476,14 +476,14 @@ public class DataInitializer implements CommandLineRunner {
             "**CS 기초**\n- 프로세스 vs 스레드\n- HTTP vs HTTPS\n- TCP 3-way handshake\n- 데이터베이스 정규화\n\n" +
             "면접관분들이 답을 외웠냐보다 '왜 그런지 이해하고 있냐'를 더 중요하게 보시더라고요. 두루뭉술하게 알기보다 하나를 제대로 설명할 수 있는 게 나은 것 같았습니다!\n\n" +
             "다들 좋은 결과 있으시길 바라요 🙏",
-            287, 44, 76, now.minusDays(3));
+            287, 76, now.minusDays(3));
 
         post(u3, "free", "비전공자가 1년 만에 첫 취업한 회고",
             "안녕하세요! 문과 출신으로 독학해서 작년에 첫 개발자 취업에 성공했습니다. 공부하시는 분들께 도움이 될까 해서 회고를 써봤어요.\n\n" +
             "**타임라인**\n- 1~3개월: Java 기초, 자료구조\n- 4~6개월: Spring Boot 공부, 미니 프로젝트\n- 7~9개월: 포트폴리오 프로젝트 (팀 프로젝트 1개, 개인 프로젝트 1개)\n- 10~12개월: 취업 준비, 코테, 면접\n\n" +
             "**가장 중요했던 것**\n결국 '내가 직접 만든 것'이 있어야 한다는 거예요. 강의 100개 듣는 것보다 프로젝트 1개 제대로 완성하는 게 훨씬 값집니다.\n\n" +
             "궁금하신 거 댓글로 달아주시면 아는 범위에서 답해드릴게요!",
-            412, 58, 93, now.minusDays(10));
+            412, 93, now.minusDays(10));
 
         post(u2, "free", "추천 개발 유튜브 채널 & 블로그 모음",
             "공부하면서 도움 많이 받은 자료들을 공유합니다!\n\n" +
@@ -492,7 +492,7 @@ public class DataInitializer implements CommandLineRunner {
             "**블로그**\n- 우아한형제들 기술블로그\n- 카카오 기술블로그\n- 네이버 D2\n\n" +
             "영어 자료가 한국어보다 훨씬 많고 최신이에요. 영어 공부도 함께 하시면 정말 좋습니다!\n\n" +
             "다른 좋은 자료 아시는 분들은 댓글로 공유해주세요 🙌",
-            198, 27, 55, now.minusDays(5));
+            198, 55, now.minusDays(5));
     }
 
     private User seedDummyUser(String nickname, String username, String email) {
@@ -508,7 +508,7 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void post(User author, String category, String title, String content,
-                      int views, int commentCount, int likeCount,
+                      int views, int likeCount,
                       java.time.LocalDateTime createdAt) {
         if (postRepository.existsByTitle(title)) return;
         Post p = new Post();
@@ -517,7 +517,6 @@ public class DataInitializer implements CommandLineRunner {
         p.setTitle(title);
         p.setContent(content);
         p.setViews(views);
-        p.setCommentCount(commentCount);
         p.setLikeCount(likeCount);
         p.setCreatedAt(createdAt);
         postRepository.save(p);

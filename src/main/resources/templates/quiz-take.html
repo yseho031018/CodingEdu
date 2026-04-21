@@ -281,7 +281,7 @@
 <nav th:replace="~{index :: nav}"></nav>
 
 <div class="quiz-page">
-<div class="quiz-take-wrap reveal">
+<div class="quiz-take-wrap">
 
     <!-- 상단 정보 바 -->
     <div class="quiz-info-bar">
@@ -329,7 +329,7 @@
                     <span class="choice-text" th:text="${choice.choiceText}">선택지</span>
                 </label>
             </div>
-            <div class="no-answer-msg" id="no-answer-msg">답을 선택해 주세요.</div>
+            <div class="no-answer-msg">답을 선택해 주세요.</div>
         </div>
 
         <!-- 네비게이션 버튼 -->
@@ -353,7 +353,7 @@
         cards.forEach(c => c.classList.remove('active'));
         cards[idx].classList.add('active');
 
-        document.getElementById('no-answer-msg').style.display = 'none';
+        cards[idx].querySelector('.no-answer-msg').style.display = 'none';
         document.getElementById('btn-prev').disabled = (idx === 0);
 
         const isLast = (idx === total - 1);
@@ -377,7 +377,7 @@
 
     function nextQuestion() {
         if (!isCurrentAnswered()) {
-            document.getElementById('no-answer-msg').style.display = 'block';
+            cards[current].querySelector('.no-answer-msg').style.display = 'block';
             return;
         }
         if (current < total - 1) showQuestion(current + 1);

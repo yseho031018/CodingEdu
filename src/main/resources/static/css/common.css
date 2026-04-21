@@ -426,6 +426,7 @@ section { padding: 80px 8%; }
 /* ══════════════════════════════════════════════
    반응형
 ══════════════════════════════════════════════ */
+/* 모바일 대응 코드 */
 @media (max-width: 900px) {
   nav { padding: 0 5%; }
   .nav-links { display: none; }
@@ -436,6 +437,7 @@ section { padding: 80px 8%; }
   footer { padding: 28px 5%; flex-direction: column; text-align: center; }
   .f-links { justify-content: center; }
 }
+/* 모바일 대응 코드 */
 @media (max-width: 600px) {
   section { padding: 48px 4%; }
 }

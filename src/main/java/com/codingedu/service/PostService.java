@@ -108,12 +108,6 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    @Transactional
-    public void incrementCommentCount(Post post) {
-        post.setCommentCount(post.getCommentCount() + 1);
-        postRepository.save(post);
-    }
-
     public java.util.List<Post> getRecentPostsByUser(User user) {
         return postRepository.findTop5ByAuthorOrderByCreatedAtDesc(user);
     }
@@ -122,9 +116,4 @@ public class PostService {
         return postRepository.countByAuthor(user);
     }
 
-    @Transactional
-    public void decrementCommentCount(Post post) {
-        post.setCommentCount(Math.max(0, post.getCommentCount() - 1));
-        postRepository.save(post);
-    }
 }

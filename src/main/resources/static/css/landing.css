@@ -581,6 +581,7 @@ footer a:hover { color: var(--text-2); }
 /* ══════════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════════ */
+/* 모바일 대응 코드 */
 @media (max-width: 900px) {
   .hero {
     min-height: calc(100vh - 68px);
@@ -592,6 +593,7 @@ footer a:hover { color: var(--text-2); }
   .nav-right-auth { gap: 12px; }
   section { padding: 64px 6%; }
 }
+/* 모바일 대응 코드 */
 @media (max-width: 600px) {
   nav { padding: 0 5%; }
   .hero { padding: clamp(10px, 2.5vh, 24px) 5%; }
@@ -636,6 +638,7 @@ footer a:hover { color: var(--text-2); }
 
 .hero h1, .hero h2 { will-change: transform; transition: transform 0.15s ease-out; }
 
+/* 모바일 대응 코드 */
 @media (max-width: 900px), (hover: none) {
   .hero-glow-follow, .hero-grad-layer { display: none !important; }
 }

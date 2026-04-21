@@ -24,9 +24,6 @@ public class Post {
     private int views;
 
     @Column(nullable = false)
-    private int commentCount;
-
-    @Column(nullable = false)
     private int likeCount;
 
     @Column(name = "created_at")
@@ -81,14 +78,6 @@ public class Post {
 
     public void setViews(int views) {
         this.views = views;
-    }
-
-    public int getCommentCount() {
-        return commentCount;
-    }
-
-    public void setCommentCount(int commentCount) {
-        this.commentCount = commentCount;
     }
 
     public LocalDateTime getCreatedAt() {

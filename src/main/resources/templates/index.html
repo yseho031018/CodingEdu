@@ -39,7 +39,7 @@
 
     <div sec:authorize="isAuthenticated()" class="nav-right-auth">
       <a href="/mypage" class="nav-user">
-        👤 <span sec:authentication="principal.nickname">사용자</span>님
+        👤 <span class="nav-user-name" sec:authentication="principal.nickname">사용자</span><span class="nav-user-suffix">님</span>
       </a>
       <a href="/notifications" class="nav-notify" style="position:relative; text-decoration:none; font-size:1.2rem;" title="알림">
         🔔
@@ -47,9 +47,11 @@
               th:text="${unreadNotificationCount}"
               style="position:absolute; top:-6px; right:-8px; background:var(--danger); color:#fff; font-size:.6rem; font-weight:800; border-radius:50%; min-width:16px; height:16px; display:flex; align-items:center; justify-content:center; padding:0 2px; line-height:1;">1</span>
       </a>
-      <a href="/settings" class="btn-login ghost">⚙️ 설정</a>
+      <a href="/settings" class="nav-icon-btn nav-mobile-only" title="설정" aria-label="설정">⚙️</a>
+      <a href="/settings" class="btn-login ghost nav-mobile-hide">⚙️ 설정</a>
       <form th:action="@{/logout}" method="post" style="margin:0;">
-        <button type="submit" class="btn-login ghost">로그아웃</button>
+        <button type="submit" class="nav-icon-btn nav-icon-btn-logout nav-mobile-only" title="로그아웃" aria-label="로그아웃">🚪</button>
+        <button type="submit" class="btn-login ghost nav-mobile-hide">로그아웃</button>
       </form>
     </div>
   </div>

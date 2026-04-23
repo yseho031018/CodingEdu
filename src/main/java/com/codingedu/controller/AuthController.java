@@ -1,12 +1,12 @@
 package com.codingedu.controller;
 
 import com.codingedu.entity.User;
+import com.codingedu.security.CustomUserDetails;
 import com.codingedu.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -69,9 +68,9 @@ public class AuthController {
         userService.register(user);
 
         // 가입 완료 후 자동 로그인 처리
+        CustomUserDetails userDetails = new CustomUserDetails(user);
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                user.getUsername(), null,
-                List.of(new SimpleGrantedAuthority(user.getRole()))
+                userDetails, null, userDetails.getAuthorities()
         );
         SecurityContextHolder.getContext().setAuthentication(auth);
         HttpSession session = request.getSession(true);

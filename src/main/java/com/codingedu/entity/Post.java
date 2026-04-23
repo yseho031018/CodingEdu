@@ -26,6 +26,9 @@ public class Post {
     @Column(nullable = false)
     private int likeCount;
 
+    @Column(name = "comment_count", nullable = false)
+    private int commentCount;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -98,4 +101,7 @@ public class Post {
 
     public int getLikeCount() { return likeCount; }
     public void setLikeCount(int likeCount) { this.likeCount = likeCount; }
+
+    public int getCommentCount() { return commentCount; }
+    public void setCommentCount(int commentCount) { this.commentCount = commentCount; }
 }

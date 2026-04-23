@@ -181,6 +181,35 @@ nav > .nav-right { justify-self: end; }
   color: #fff;
   box-shadow: 0 2px 8px rgba(217, 119, 6, 0.45);
 }
+.nav-icon-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text-2);
+  text-decoration: none;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.nav-icon-btn:hover {
+  background: var(--bg-section);
+  color: var(--text-1);
+}
+.nav-icon-btn-logout {
+  color: var(--danger);
+  border-color: rgba(220, 38, 38, 0.18);
+  background: var(--danger-soft);
+}
+.nav-icon-btn-logout:hover {
+  color: #fff;
+  background: var(--danger);
+}
 
 /* Theme toggle pill */
 .theme-toggle {
@@ -595,7 +624,63 @@ footer a:hover { color: var(--text-2); }
 }
 /* 모바일 대응 코드 */
 @media (max-width: 600px) {
-  nav { padding: 0 5%; }
+  nav {
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+    padding: 0 5%;
+  }
+  nav > .logo {
+    min-width: 0;
+  }
+  nav > .nav-right {
+    min-width: 0;
+  }
+  .logo {
+    gap: 8px;
+    font-size: 1rem;
+  }
+  .logo-mark {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+  }
+  .logo-name {
+    font-size: 1rem;
+  }
+  .nav-right {
+    gap: 8px;
+    overflow: hidden;
+  }
+  .nav-right-auth {
+    gap: 8px;
+  }
+  .nav-right .nav-user {
+    padding: 6px 8px;
+    font-size: 0.82rem;
+  }
+  .nav-user-name,
+  .nav-user-suffix,
+  .nav-mobile-hide {
+    display: none !important;
+  }
+  .nav-mobile-only {
+    display: inline-flex !important;
+  }
+  .nav-right .btn-login {
+    padding: 8px 14px;
+    font-size: 0.78rem;
+  }
+  .theme-toggle {
+    width: 40px;
+    height: 22px;
+  }
+  .theme-toggle::after {
+    width: 16px;
+    height: 16px;
+  }
+  [data-theme="dark"] .theme-toggle::after {
+    transform: translateX(17px);
+  }
   .hero { padding: clamp(10px, 2.5vh, 24px) 5%; }
   section { padding: 56px 5%; }
   .hero h1 { font-size: 2.1rem; }

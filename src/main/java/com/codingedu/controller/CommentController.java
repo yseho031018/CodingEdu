@@ -47,7 +47,7 @@ public class CommentController {
         if (userDetails == null) {
             return "redirect:/login";
         }
-        commentService.deleteComment(commentId, userDetails.getUsername());
+        commentService.deleteComment(commentId, postId, userDetails.getUsername());
         return "redirect:/community/" + postId;
     }
 }

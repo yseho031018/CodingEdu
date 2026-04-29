@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class ChallengeService {
 
+    private static final Set<String> VALID_STATUSES = Set.of("active", "upcoming", "ended");
+
     private final ChallengeRepository challengeRepository;
     private final ChallengeParticipationRepository participationRepository;
 
@@ -37,15 +39,13 @@ public class ChallengeService {
 
     public Challenge getChallengeById(Long id) {
         return challengeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 챌린지입니다."));
+                .orElseThrow(() -> new IllegalArgumentException("Challenge does not exist."));
     }
 
-    // 참가자 수 = 시딩 기본값 + 실제 DB 가입자 수
     public int getTotalParticipantCount(Challenge challenge) {
         return challenge.getParticipantCount() + participationRepository.countByChallenge(challenge);
     }
 
-    // 남은 일수 (active: endDate - today, upcoming: startDate - today)
     public long getDaysLeft(Challenge challenge) {
         LocalDate today = LocalDate.now();
         if ("active".equals(challenge.getStatus()) && challenge.getEndDate() != null) {
@@ -59,7 +59,6 @@ public class ChallengeService {
         return 0;
     }
 
-    // 진행률 (active 챌린지: 경과일 / 총 기간)
     public int getProgressPct(Challenge challenge) {
         if (!"active".equals(challenge.getStatus()) || challenge.getEndDate() == null) return 0;
         LocalDate today = LocalDate.now();
@@ -70,7 +69,6 @@ public class ChallengeService {
         return (int) (elapsed * 100 / totalDays);
     }
 
-    // 로그인 사용자가 참가한 챌린지 ID 집합
     public Set<Long> getJoinedChallengeIds(User user) {
         return participationRepository.findByUserOrderByJoinedAtDesc(user)
                 .stream()
@@ -88,14 +86,19 @@ public class ChallengeService {
 
     @Transactional
     public void complete(User user, Challenge challenge, String githubUrl) {
+        requireActive(challenge);
         ChallengeParticipation p = participationRepository.findByUserAndChallenge(user, challenge)
-                .orElseThrow(() -> new IllegalArgumentException("참여 정보가 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("Participation does not exist."));
         if (p.isCompleted()) return;
         if (githubUrl != null && !githubUrl.isBlank()) {
-            if (!githubUrl.matches("^https?://github\\.com/.+/.+")) {
-                throw new IllegalArgumentException("유효한 GitHub 저장소 URL을 입력해주세요. (예: https://github.com/user/repo)");
+            String safeGithubUrl = githubUrl.trim();
+            if (!safeGithubUrl.matches("^https?://github\\.com/[^/\\s]+/[^/\\s]+/?$")) {
+                throw new IllegalArgumentException("Enter a valid GitHub repository URL.");
             }
-            p.setGithubUrl(githubUrl);
+            if (safeGithubUrl.length() > 300) {
+                throw new IllegalArgumentException("GitHub URL is too long.");
+            }
+            p.setGithubUrl(safeGithubUrl);
         }
         p.setCompletedAt(java.time.LocalDateTime.now());
         participationRepository.save(p);
@@ -103,6 +106,7 @@ public class ChallengeService {
 
     @Transactional
     public void join(User user, Challenge challenge) {
+        requireActive(challenge);
         if (participationRepository.existsByUserAndChallenge(user, challenge)) return;
         ChallengeParticipation p = new ChallengeParticipation();
         p.setUser(user);
@@ -133,16 +137,24 @@ public class ChallengeService {
                                      String status, boolean featured,
                                      LocalDate startDate, LocalDate endDate,
                                      int totalTasks) {
-        if (title == null || title.isBlank()) throw new IllegalArgumentException("챌린지 제목은 필수입니다.");
-        if (!java.util.Set.of("active", "upcoming", "ended").contains(status))
-            throw new IllegalArgumentException("상태는 active/upcoming/ended 중 하나여야 합니다.");
-        if (startDate == null) throw new IllegalArgumentException("시작일은 필수입니다.");
-        if (totalTasks < 1) throw new IllegalArgumentException("총 과제 수는 1 이상이어야 합니다.");
+        String safeTitle = requireText(title, "title", 255);
+        if (!VALID_STATUSES.contains(status)) {
+            throw new IllegalArgumentException("status must be active, upcoming, or ended.");
+        }
+        if (startDate == null) {
+            throw new IllegalArgumentException("startDate is required.");
+        }
+        if (endDate != null && endDate.isBefore(startDate)) {
+            throw new IllegalArgumentException("endDate must not be before startDate.");
+        }
+        if (totalTasks < 1) {
+            throw new IllegalArgumentException("totalTasks must be at least 1.");
+        }
 
         Challenge c = new Challenge();
-        c.setTitle(title);
-        c.setDescription(description);
-        c.setIcon(icon);
+        c.setTitle(safeTitle);
+        c.setDescription(description == null ? "" : description.trim());
+        c.setIcon(icon == null ? "" : icon.trim());
         c.setStatus(status);
         c.setFeatured(featured);
         c.setStartDate(startDate);
@@ -154,8 +166,9 @@ public class ChallengeService {
 
     @Transactional
     public void updateStatus(Long id, String status) {
-        if (!java.util.Set.of("active", "upcoming", "ended").contains(status))
-            throw new IllegalArgumentException("상태는 active/upcoming/ended 중 하나여야 합니다.");
+        if (!VALID_STATUSES.contains(status)) {
+            throw new IllegalArgumentException("status must be active, upcoming, or ended.");
+        }
         Challenge c = getChallengeById(id);
         c.setStatus(status);
         challengeRepository.save(c);
@@ -164,5 +177,29 @@ public class ChallengeService {
     @Transactional
     public void deleteChallenge(Long id) {
         challengeRepository.deleteById(id);
+    }
+
+    private void requireActive(Challenge challenge) {
+        if (!"active".equals(challenge.getStatus())) {
+            throw new IllegalArgumentException("Challenge is not active.");
+        }
+        LocalDate today = LocalDate.now();
+        if (challenge.getStartDate() != null && today.isBefore(challenge.getStartDate())) {
+            throw new IllegalArgumentException("Challenge has not started.");
+        }
+        if (challenge.getEndDate() != null && today.isAfter(challenge.getEndDate())) {
+            throw new IllegalArgumentException("Challenge has ended.");
+        }
+    }
+
+    private String requireText(String value, String fieldName, int maxLength) {
+        String trimmed = value == null ? "" : value.trim();
+        if (trimmed.isBlank()) {
+            throw new IllegalArgumentException(fieldName + " is required.");
+        }
+        if (trimmed.length() > maxLength) {
+            throw new IllegalArgumentException(fieldName + " is too long.");
+        }
+        return trimmed;
     }
 }

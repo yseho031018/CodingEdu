@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class CommentService {
 
+    private static final int MAX_CONTENT_LENGTH = 5000;
+
     private final CommentRepository commentRepository;
     private final NotificationService notificationService;
 
@@ -62,7 +64,7 @@ public class CommentService {
     @Transactional
     public Comment addComment(String content, Post post, User author) {
         Comment comment = new Comment();
-        comment.setContent(content);
+        comment.setContent(requireContent(content));
         comment.setPost(post);
         comment.setAuthor(author);
         commentRepository.save(comment);
@@ -73,11 +75,30 @@ public class CommentService {
 
     @Transactional
     public void deleteComment(Long commentId, String username) {
+        deleteComment(commentId, null, username);
+    }
+
+    @Transactional
+    public void deleteComment(Long commentId, Long postId, String username) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
+                .orElseThrow(() -> new IllegalArgumentException("Comment does not exist."));
+        if (postId != null && !comment.getPost().getId().equals(postId)) {
+            throw new IllegalArgumentException("Comment does not belong to the requested post.");
+        }
         if (!comment.getAuthor().getUsername().equals(username)) {
-            throw new IllegalArgumentException("삭제 권한이 없습니다.");
+            throw new IllegalArgumentException("No permission to delete this comment.");
         }
         commentRepository.delete(comment);
+    }
+
+    private String requireContent(String content) {
+        String trimmed = content == null ? "" : content.trim();
+        if (trimmed.isBlank()) {
+            throw new IllegalArgumentException("content is required.");
+        }
+        if (trimmed.length() > MAX_CONTENT_LENGTH) {
+            throw new IllegalArgumentException("content is too long.");
+        }
+        return trimmed;
     }
 }

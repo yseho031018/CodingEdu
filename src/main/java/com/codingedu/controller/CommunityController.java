@@ -1,6 +1,7 @@
 package com.codingedu.controller;
 
 import com.codingedu.entity.Post;
+import com.codingedu.entity.PostLike;
 import com.codingedu.entity.User;
 import com.codingedu.security.CustomUserDetails;
 import com.codingedu.service.CommentService;
@@ -85,7 +86,9 @@ public class CommunityController {
         if (userDetails != null) {
             User user = userService.findByUsername(userDetails.getUsername());
             model.addAttribute("currentUsername", userDetails.getUsername());
+            model.addAttribute("reactionType", postService.getReactionType(post, user));
             model.addAttribute("isLiked", postService.isLikedByUser(post, user));
+            model.addAttribute("isDisappointed", postService.isDisappointedByUser(post, user));
         }
         return "community-detail";
     }
@@ -103,6 +106,29 @@ public class CommunityController {
         User user = userService.findByUsername(userDetails.getUsername());
         boolean liked = postService.toggleLike(post, user);
         return ResponseEntity.ok(Map.of("liked", liked, "likeCount", post.getLikeCount()));
+    }
+
+    @PostMapping("/{id}/reaction")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> toggleReaction(
+            @PathVariable(name = "id") Long id,
+            @RequestParam(name = "type") String type,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).body(Map.of("error", "로그인이 필요합니다."));
+        }
+        Post post = postService.getPostById(id);
+        User user = userService.findByUsername(userDetails.getUsername());
+        String reactionType = "DISAPPOINTED".equalsIgnoreCase(type)
+                ? PostLike.TYPE_DISAPPOINTED
+                : PostLike.TYPE_LIKE;
+        PostService.ReactionResult result = postService.toggleReaction(post, user, reactionType);
+        return ResponseEntity.ok(Map.of(
+                "reactionType", result.reactionType(),
+                "active", result.active(),
+                "likeCount", result.likeCount(),
+                "disappointedCount", result.disappointedCount()
+        ));
     }
 
     // 5. 글 수정 폼 보여주기

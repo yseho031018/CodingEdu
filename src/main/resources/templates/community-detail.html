@@ -57,16 +57,22 @@
         }
         .btn-comment-delete:hover { color: var(--danger); background: var(--danger-soft); }
 
-        .like-btn {
+        .reaction-group { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+        .reaction-btn {
             display: inline-flex; align-items: center; gap: 8px;
             padding: 10px 24px; border-radius: 50px; border: 2px solid var(--border);
             background: var(--bg-surface); cursor: pointer; font-size: .95rem; font-weight: 700;
-            color: var(--ink-3); transition: all .2s; margin-top: 24px;
+            color: var(--ink-3); transition: all .2s;
         }
-        .like-btn:hover { border-color: var(--danger); color: var(--danger); background: var(--danger-soft); }
-        .like-btn.liked { border-color: var(--danger); color: var(--danger); background: var(--danger-soft); }
-        .like-btn .heart { font-size: 1.1rem; transition: transform .2s; }
-        .like-btn:hover .heart, .like-btn.liked .heart { transform: scale(1.2); }
+        .reaction-btn:hover { transform: translateY(-1px); }
+        .reaction-btn .reaction-icon { font-size: 1.1rem; transition: transform .2s; }
+        .reaction-btn:hover .reaction-icon, .reaction-btn.active .reaction-icon { transform: scale(1.15); }
+        .reaction-btn.like:hover, .reaction-btn.like.active {
+            border-color: var(--danger); color: var(--danger); background: var(--danger-soft);
+        }
+        .reaction-btn.disappointed:hover, .reaction-btn.disappointed.active {
+            border-color: var(--warning); color: var(--warning); background: var(--amber-soft);
+        }
     </style>
 </head>
 <body style="background: var(--bg-section);">
@@ -98,18 +104,25 @@
         게시글 내용
     </div>
 
-    <!-- 좋아요 버튼 -->
+    <!-- 반응 버튼 -->
     <div style="margin-top: 30px; padding-top: 24px; border-top: 1px solid var(--border-card);">
-        <button id="likeBtn" class="like-btn" th:classappend="${isLiked} ? 'liked' : ''"
-                sec:authorize="isAuthenticated()"
-                th:data-post-id="${post.id}"
-                th:data-liked="${isLiked}">
-            <span class="heart" th:text="${isLiked} ? '❤️' : '🤍'">🤍</span>
-            <span id="likeCount" th:text="${post.likeCount}">0</span>
-            <span>좋아요</span>
-        </button>
+        <div class="reaction-group" sec:authorize="isAuthenticated()">
+            <button type="button" class="reaction-btn like" th:classappend="${isLiked} ? 'active' : ''"
+                    th:data-post-id="${post.id}" data-reaction-type="LIKE">
+                <span class="reaction-icon" th:text="${isLiked} ? '❤️' : '🤍'">🤍</span>
+                <span id="likeCount" th:text="${post.likeCount}">0</span>
+                <span>좋아요</span>
+            </button>
+            <button type="button" class="reaction-btn disappointed" th:classappend="${isDisappointed} ? 'active' : ''"
+                    th:data-post-id="${post.id}" data-reaction-type="DISAPPOINTED">
+                <span class="reaction-icon" th:text="${isDisappointed} ? '💛' : '💭'">💭</span>
+                <span id="disappointedCount" th:text="${post.disappointedCount}">0</span>
+                <span>아쉬워요</span>
+            </button>
+        </div>
         <div sec:authorize="isAnonymous()" style="display:inline-block; margin-top:12px; color:var(--ink-3); font-size:.9rem;">
             <span>🤍 <strong th:text="${post.likeCount}">0</strong> 좋아요</span>
+            <span style="margin-left: 12px;">💭 <strong th:text="${post.disappointedCount}">0</strong> 아쉬워요</span>
         </div>
     </div>
 
@@ -178,32 +191,39 @@
 <footer th:replace="~{index :: footer}"></footer>
 
 <script>
-    const likeBtn = document.getElementById('likeBtn');
-    if (likeBtn) {
-        likeBtn.addEventListener('click', function () {
+    const reactionBtns = document.querySelectorAll('.reaction-btn');
+    reactionBtns.forEach((btn) => {
+        btn.addEventListener('click', function () {
             const postId = this.dataset.postId;
+            const reactionType = this.dataset.reactionType;
             const csrfToken = document.cookie.split(';')
                 .map(c => c.trim())
                 .find(c => c.startsWith('XSRF-TOKEN='));
             const token = csrfToken ? decodeURIComponent(csrfToken.split('=')[1]) : '';
 
-            fetch(`/community/${postId}/like`, {
+            fetch(`/community/${postId}/reaction?type=${encodeURIComponent(reactionType)}`, {
                 method: 'POST',
                 headers: { 'X-XSRF-TOKEN': token }
             })
             .then(res => res.json())
             .then(data => {
                 if (data.error) { alert(data.error); return; }
-                document.getElementById('likeCount').textContent = data.likeCount;
-                const heart = likeBtn.querySelector('.heart');
-                if (data.liked) {
-                    likeBtn.classList.add('liked');
-                    heart.textContent = '❤️';
-                } else {
-                    likeBtn.classList.remove('liked');
-                    heart.textContent = '🤍';
-                }
+                updateReactionUi(data);
             });
+        });
+    });
+
+    function updateReactionUi(data) {
+        document.getElementById('likeCount').textContent = data.likeCount;
+        document.getElementById('disappointedCount').textContent = data.disappointedCount;
+
+        reactionBtns.forEach((btn) => {
+            const type = btn.dataset.reactionType;
+            const icon = btn.querySelector('.reaction-icon');
+            const active = data.active && data.reactionType === type;
+            btn.classList.toggle('active', active);
+            if (type === 'LIKE') icon.textContent = active ? '❤️' : '🤍';
+            if (type === 'DISAPPOINTED') icon.textContent = active ? '💛' : '💭';
         });
     }
 </script>

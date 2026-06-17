@@ -15,4 +15,9 @@ public class LegalController {
     public String privacy() {
         return "privacy";
     }
+
+    @GetMapping("/ai")
+    public String ai() {
+        return "ai";
+    }
 }

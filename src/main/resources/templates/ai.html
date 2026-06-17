@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta th:name="_csrf" th:content="${_csrf != null ? _csrf.token : ''}"/>
+    <meta th:name="_csrf_header" th:content="${_csrf != null ? _csrf.headerName : 'X-CSRF-TOKEN'}"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>AI 도우미 - CodingEdu</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/tailwind.css">
+    <link rel="stylesheet" href="/css/design-refresh.css">
+    <style>
+        .page-ai .course-page-main {
+            min-height: 100vh;
+        }
+
+        .ai-page-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 320px;
+            gap: 24px;
+            align-items: stretch;
+        }
+
+        .ai-chat-card,
+        .ai-guide-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-card);
+            border-radius: 18px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .ai-chat-card {
+            min-height: 680px;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            overflow: hidden;
+        }
+
+        .ai-chat-hero {
+            padding: 28px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            border-bottom: 1px solid var(--border);
+            background:
+                radial-gradient(circle at 18% 20%, rgba(79, 85, 231, .13), transparent 28%),
+                linear-gradient(135deg, rgba(238, 240, 255, .92), rgba(255, 255, 255, .72));
+        }
+
+        .ai-chat-title {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            min-width: 0;
+        }
+
+        .ai-page-face {
+            --aiEyeX: 0px;
+            --aiEyeY: 0px;
+            flex: 0 0 auto;
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            display: inline-block;
+            position: relative;
+            background: radial-gradient(circle at 35% 28%, #f9fbff 0 18%, #dceaff 54%, #bcd5ff 100%);
+            border: 6px solid rgba(255, 255, 255, .86);
+            box-shadow: 0 10px 22px rgba(79, 85, 231, .18);
+        }
+
+        .ai-page-face::before,
+        .ai-page-face::after {
+            content: "";
+            position: absolute;
+            top: 31px;
+            width: 8px;
+            height: 14px;
+            border-radius: 999px;
+            background: #17233a;
+            transform: translate(var(--aiEyeX), var(--aiEyeY));
+            transition: transform .12s ease;
+        }
+
+        .ai-page-face::before { left: 18px; }
+        .ai-page-face::after { right: 18px; }
+
+        .ai-chat-title h1 {
+            margin: 0;
+            color: var(--ink-1);
+            font-size: clamp(2rem, 3vw, 3.1rem);
+            line-height: 1.1;
+            font-weight: 900;
+            letter-spacing: 0;
+        }
+
+        .ai-chat-title p {
+            margin: 8px 0 0;
+            color: var(--ink-2);
+            font-size: 1.08rem;
+            line-height: 1.65;
+        }
+
+        .ai-status-pill {
+            flex: 0 0 auto;
+            padding: 10px 16px;
+            border-radius: 999px;
+            color: #4f55e7;
+            background: rgba(255, 255, 255, .78);
+            border: 1px solid rgba(79, 85, 231, .18);
+            font-weight: 800;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .ai-page-body {
+            min-height: 0;
+            padding: 28px 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .ai-message {
+            max-width: min(76%, 760px);
+            padding: 16px 18px;
+            border-radius: 18px;
+            background: var(--bg-section);
+            color: var(--ink-2);
+            font-size: 1.02rem;
+            line-height: 1.7;
+            font-weight: 650;
+            white-space: pre-wrap;
+        }
+
+        .ai-message.user {
+            align-self: flex-end;
+            background: #4f55e7;
+            color: #fff;
+            border-bottom-right-radius: 6px;
+            box-shadow: 0 12px 22px rgba(79, 85, 231, .2);
+        }
+
+        .ai-message.assistant {
+            align-self: flex-start;
+            border-bottom-left-radius: 6px;
+        }
+
+        .ai-quick-prompts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 2px;
+        }
+
+        .ai-quick-prompts button,
+        .ai-example-button {
+            padding: 10px 14px;
+            border: 1px solid rgba(79, 85, 231, .24);
+            border-radius: 999px;
+            background: var(--bg-surface);
+            color: #4f55e7;
+            font-size: .95rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: .18s ease;
+        }
+
+        .ai-quick-prompts button:hover,
+        .ai-example-button:hover {
+            transform: translateY(-1px);
+            border-color: #4f55e7;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .ai-page-form {
+            padding: 20px 24px 24px;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px;
+            border-top: 1px solid var(--border);
+            background: color-mix(in srgb, var(--bg-section) 72%, transparent);
+        }
+
+        .ai-page-input {
+            min-width: 0;
+            height: 58px;
+            padding: 0 18px;
+            border: 1px solid var(--border-card);
+            border-radius: 14px;
+            background: var(--bg-surface);
+            color: var(--ink-1);
+            font-size: 1rem;
+            font-weight: 650;
+            outline: none;
+        }
+
+        .ai-page-input:focus {
+            border-color: #4f55e7;
+            box-shadow: 0 0 0 4px rgba(79, 85, 231, .12);
+        }
+
+        .ai-page-send {
+            height: 58px;
+            padding: 0 22px;
+            border: 0;
+            border-radius: 14px;
+            background: #4f55e7;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 12px 22px rgba(79, 85, 231, .2);
+        }
+
+        .ai-guide-card {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .ai-guide-card h2 {
+            margin: 0;
+            color: var(--ink-1);
+            font-size: 1.35rem;
+            font-weight: 900;
+        }
+
+        .ai-guide-block {
+            padding: 18px;
+            border-radius: 14px;
+            background: var(--bg-section);
+            border: 1px solid var(--border);
+        }
+
+        .ai-guide-block strong {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--ink-1);
+            font-size: 1rem;
+        }
+
+        .ai-guide-block p {
+            margin: 0 0 12px;
+            color: var(--ink-2);
+            font-size: .95rem;
+            line-height: 1.6;
+        }
+
+        [data-theme="dark"] .ai-chat-card,
+        [data-theme="dark"] .ai-guide-card {
+            background: rgba(23, 26, 35, .96);
+            border-color: rgba(148, 163, 184, .16);
+            box-shadow: 0 22px 44px rgba(2, 6, 23, .28);
+        }
+
+        [data-theme="dark"] .ai-chat-hero {
+            background:
+                radial-gradient(circle at 18% 20%, rgba(116, 121, 255, .24), transparent 30%),
+                linear-gradient(135deg, rgba(31, 38, 57, .96), rgba(17, 24, 39, .86));
+            border-bottom-color: rgba(148, 163, 184, .16);
+        }
+
+        [data-theme="dark"] .ai-status-pill,
+        [data-theme="dark"] .ai-quick-prompts button,
+        [data-theme="dark"] .ai-example-button,
+        [data-theme="dark"] .ai-page-input {
+            background: rgba(15, 23, 42, .72);
+            border-color: rgba(129, 140, 248, .28);
+            color: #c7d2fe;
+        }
+
+        [data-theme="dark"] .ai-message.assistant,
+        [data-theme="dark"] .ai-guide-block {
+            background: rgba(15, 23, 42, .7);
+            border-color: rgba(148, 163, 184, .14);
+        }
+
+        [data-theme="dark"] .ai-page-form {
+            background: rgba(15, 23, 42, .5);
+            border-top-color: rgba(148, 163, 184, .16);
+        }
+
+        @media (max-width: 1180px) {
+            .ai-page-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ai-chat-card {
+                min-height: 620px;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .ai-chat-hero {
+                align-items: flex-start;
+                flex-direction: column;
+                padding: 22px;
+            }
+
+            .ai-chat-title {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .ai-message {
+                max-width: 92%;
+            }
+
+            .ai-page-form {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="page-courses page-ai">
+<div class="course-app-shell">
+    <aside class="course-sidebar">
+        <a href="/" class="course-side-logo">
+            <span class="brand-text"><b>Coding</b>Edu</span>
+        </a>
+
+        <nav class="course-side-nav" aria-label="주요 메뉴">
+            <a href="/"><img src="/images/course-menu/home.png" alt="" aria-hidden="true">홈</a>
+            <a href="/learn"><img src="/images/course-menu/courses.png" alt="" aria-hidden="true">강의</a>
+            <a href="/quiz"><img src="/images/course-menu/quiz.png" alt="" aria-hidden="true">퀴즈</a>
+            <a href="/challenge"><img src="/images/course-menu/challenge.png" alt="" aria-hidden="true">챌린지</a>
+            <a href="/community"><img src="/images/course-menu/community.png" alt="" aria-hidden="true">커뮤니티</a>
+            <a href="/ai" class="active"><img src="/images/course-menu/ai.svg" alt="" aria-hidden="true">AI 도우미</a>
+            <a href="/mypage"><img src="/images/course-menu/mypage.png" alt="" aria-hidden="true">마이페이지</a>
+            <a href="/settings"><img src="/images/course-menu/settings.png" alt="" aria-hidden="true">설정</a>
+        </nav>
+
+        <div class="course-side-account">
+            <a href="/login" sec:authorize="isAnonymous()">로그인</a>
+            <a href="/register" sec:authorize="isAnonymous()" class="primary">회원가입</a>
+            <a href="/mypage" sec:authorize="isAuthenticated()" class="primary">내 학습 기록</a>
+        </div>
+    </aside>
+
+    <main class="course-page-main">
+        <header class="course-page-heading">
+            <div>
+                <span class="course-page-kicker">AI HELPER</span>
+                <h1>AI 도우미</h1>
+                <p>퀴즈 오답, 다음 강의, 질문 정리를 넓은 화면에서 편하게 확인하세요.</p>
+            </div>
+            <button class="course-theme-button" id="themeToggle" title="테마 전환" aria-label="다크/라이트 모드 전환"></button>
+        </header>
+
+        <div class="ai-page-grid">
+            <section class="ai-chat-card" aria-label="AI 도우미 채팅">
+                <div class="ai-chat-hero">
+                    <div class="ai-chat-title">
+                        <span class="ai-page-face" aria-hidden="true"></span>
+                        <div>
+                            <h1>무엇을 도와드릴까요?</h1>
+                            <p>강의 흐름, 퀴즈 오답, 커뮤니티 질문을 빠르게 정리해드릴게요.</p>
+                        </div>
+                    </div>
+                    <span class="ai-status-pill">Gemini 연결</span>
+                </div>
+
+                <div class="ai-page-body" id="aiPageBody">
+                    <div class="ai-message assistant">안녕하세요. CodingEdu AI 도우미입니다. 아래 버튼을 누르거나 궁금한 내용을 직접 입력해보세요.</div>
+                    <div class="ai-quick-prompts" aria-label="빠른 질문">
+                        <button type="button" data-prompt="오답 해설">오답 해설</button>
+                        <button type="button" data-prompt="다음 강의 추천">다음 강의 추천</button>
+                        <button type="button" data-prompt="질문 글 정리">질문 글 정리</button>
+                        <button type="button" data-prompt="오늘 학습 계획">오늘 학습 계획</button>
+                    </div>
+                </div>
+
+                <form class="ai-page-form" id="aiPageForm">
+                    <input class="ai-page-input" id="aiPageInput" type="text" placeholder="궁금한 내용을 입력하세요" autocomplete="off">
+                    <button class="ai-page-send" type="submit">보내기</button>
+                </form>
+            </section>
+
+            <aside class="ai-guide-card" aria-label="AI 도우미 예시">
+                <h2>추천 질문</h2>
+                <div class="ai-guide-block">
+                    <strong>퀴즈가 막힐 때</strong>
+                    <p>틀린 문제의 선택지와 이유를 적으면 핵심 개념을 짚어드려요.</p>
+                    <button class="ai-example-button" type="button" data-prompt="JavaScript 퀴즈 오답을 쉽게 설명해줘">오답 설명 받기</button>
+                </div>
+                <div class="ai-guide-block">
+                    <strong>강의 순서가 고민될 때</strong>
+                    <p>현재 수준을 알려주면 다음에 들을 강의를 추천해드려요.</p>
+                    <button class="ai-example-button" type="button" data-prompt="HTML과 CSS를 끝냈는데 다음 강의를 추천해줘">강의 추천 받기</button>
+                </div>
+                <div class="ai-guide-block">
+                    <strong>질문 글을 다듬을 때</strong>
+                    <p>상황, 오류, 시도한 내용을 정리해서 커뮤니티 글로 바꿔드려요.</p>
+                    <button class="ai-example-button" type="button" data-prompt="커뮤니티에 올릴 질문 글을 정리해줘">질문 정리 받기</button>
+                </div>
+            </aside>
+        </div>
+    </main>
+</div>
+
+<script src="/js/nav.js"></script>
+<script>
+(function () {
+    var body = document.getElementById('aiPageBody');
+    var form = document.getElementById('aiPageForm');
+    var input = document.getElementById('aiPageInput');
+    var face = document.querySelector('.ai-page-face');
+    if (!body || !form || !input) return;
+
+    function fallbackAnswer(text) {
+        var normalized = (text || '').toLowerCase();
+        if (normalized.indexOf('오답') >= 0 || normalized.indexOf('퀴즈') >= 0) {
+            return '틀린 문제를 다시 볼 때는 먼저 선택한 답이 왜 헷갈렸는지 확인하고, 관련 강의의 핵심 개념을 한 번 더 복습하는 흐름이 좋아요.';
+        }
+        if (normalized.indexOf('강의') >= 0 || normalized.indexOf('추천') >= 0 || normalized.indexOf('순서') >= 0) {
+            return '처음이라면 HTML, CSS, JavaScript로 웹 기초를 잡고 Java, PHP, MySQL 같은 백엔드와 데이터베이스 강의로 확장하는 순서를 추천해요.';
+        }
+        if (normalized.indexOf('커뮤니티') >= 0 || normalized.indexOf('질문') >= 0) {
+            return '질문 글은 목표, 발생한 문제, 오류 메시지, 시도한 방법 순서로 적으면 답변자가 상황을 빠르게 이해할 수 있어요.';
+        }
+        if (normalized.indexOf('계획') >= 0 || normalized.indexOf('학습') >= 0) {
+            return '오늘은 강의 1개 시청, 관련 퀴즈 풀이, 오답 복습, 짧은 커뮤니티 기록 순서로 진행하면 학습 흐름이 안정적이에요.';
+        }
+        return '강의, 퀴즈, 챌린지, 커뮤니티 중 궁금한 부분을 알려주시면 다음 행동으로 이어지도록 짧게 정리해드릴게요.';
+    }
+
+    function csrfToken() {
+        var metaToken = document.querySelector('meta[name="_csrf"]');
+        if (metaToken && metaToken.content) return metaToken.content;
+        var match = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]+)/);
+        return match ? decodeURIComponent(match[1]) : '';
+    }
+
+    function addMessage(text, isUser) {
+        var message = document.createElement('div');
+        message.className = 'ai-message ' + (isUser ? 'user' : 'assistant');
+        message.textContent = text;
+        body.appendChild(message);
+        body.scrollTop = body.scrollHeight;
+        return message;
+    }
+
+    function requestAiAnswer(text) {
+        var headers = { 'Content-Type': 'application/json' };
+        var token = csrfToken();
+        if (token) headers['X-XSRF-TOKEN'] = token;
+
+        return fetch('/api/ai/chat', {
+            method: 'POST',
+            headers: headers,
+            credentials: 'same-origin',
+            body: JSON.stringify({ message: text })
+        })
+            .then(function (response) {
+                if (!response.ok) throw new Error('AI request failed');
+                return response.json();
+            })
+            .then(function (data) {
+                return data && data.reply ? data.reply : fallbackAnswer(text);
+            })
+            .catch(function () {
+                return fallbackAnswer(text);
+            });
+    }
+
+    function send(text) {
+        var value = (text || '').trim();
+        if (!value) return;
+        addMessage(value, true);
+        input.value = '';
+        var pending = addMessage('답변을 준비하고 있어요...', false);
+        requestAiAnswer(value).then(function (reply) {
+            pending.textContent = reply;
+            body.scrollTop = body.scrollHeight;
+        });
+    }
+
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        send(input.value);
+    });
+
+    document.querySelectorAll('[data-prompt]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            send(button.dataset.prompt || button.textContent);
+        });
+    });
+
+    document.addEventListener('mousemove', function (event) {
+        if (!face) return;
+        var rect = face.getBoundingClientRect();
+        var dx = event.clientX - (rect.left + rect.width / 2);
+        var dy = event.clientY - (rect.top + rect.height / 2);
+        var distance = Math.hypot(dx, dy) || 1;
+        face.style.setProperty('--aiEyeX', (dx / distance * 3).toFixed(2) + 'px');
+        face.style.setProperty('--aiEyeY', (dy / distance * 3).toFixed(2) + 'px');
+    });
+})();
+</script>
+</body>
+</html>

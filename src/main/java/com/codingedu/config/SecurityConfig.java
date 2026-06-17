@@ -50,7 +50,7 @@ public class SecurityConfig {
                         "/community", "/community/**", "/user/**", "/login", "/login/**",
                         "/register", "/register/**", "/login_process",
                         "/forgot-password", "/forgot-password/**",
-                        "/terms", "/privacy", "/api/ai/**", "/css/**", "/js/**", "/images/**").permitAll()
+                        "/terms", "/privacy", "/ai", "/api/ai/**", "/css/**", "/js/**", "/images/**").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

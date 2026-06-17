@@ -815,8 +815,8 @@ section { padding: 100px 7%; }
   transform: translate(var(--aiEyeX), var(--aiEyeY)) scaleY(var(--aiBlink, 1));
   animation: aiBuddyBlink 5.5s ease-in-out infinite;
 }
-.ai-buddy-face::before { left: 14px; }
-.ai-buddy-face::after { right: 14px; }
+.ai-buddy-face::before { left: 11px; }
+.ai-buddy-face::after { right: 11px; }
 /* 주기적 깜빡임만 담당 — 시선 이동은 JS가 변수로 제어 */
 @keyframes aiBuddyBlink {
   0%, 6%, 48%, 54%, 100% { --aiBlink: 1; }

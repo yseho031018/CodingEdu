@@ -57,6 +57,7 @@
 // AI 학습 도우미 플로팅 챗봇
 (function () {
   if (document.getElementById('ai-buddy')) return;
+  if (document.body.classList.contains('page-ai')) return;
 
   var buddy = document.createElement('div');
   buddy.className = 'ai-buddy';

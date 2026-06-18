@@ -49,7 +49,7 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) {
-        seedAdminUser();
+        seedTestUsers();
         seedLessonCourses();
         seedChallenges();
         refreshChallengeWindows();
@@ -309,17 +309,42 @@ public class DataInitializer implements CommandLineRunner {
         quizRepository.save(buildQuiz(topic, icon, title, description, difficulty, timeLimit, qs));
     }
 
-    // ── 관리자 계정 자동 생성 ────────────────────────────────────────
-    private void seedAdminUser() {
-        if (userRepository.findByUsername("admin").isPresent()) return;
-        User admin = new User();
-        admin.setUsername("admin");
-        admin.setPassword(passwordEncoder.encode("admin1234!"));
-        admin.setNickname("관리자");
-        admin.setEmail("admin@codingedu.com");
-        admin.setRole("ROLE_ADMIN");
-        userRepository.save(admin);
-        System.out.println("[DataInitializer] 관리자 계정 생성 완료 (admin)");
+    // ── 교수님 검수용 테스트 계정 생성 및 권한 동기화 ───────────────
+    private void seedTestUsers() {
+        upsertTestUser(
+            "admin",
+            "admin1234",
+            "관리자",
+            "admin@codingedu.com",
+            "ROLE_ADMIN"
+        );
+        upsertTestUser(
+            "user",
+            "user1234",
+            "테스트사용자",
+            "user@codingedu.com",
+            "ROLE_USER"
+        );
+    }
+
+    private void upsertTestUser(String username,
+                                String rawPassword,
+                                String nickname,
+                                String email,
+                                String role) {
+        User user = userRepository.findByUsername(username).orElseGet(() -> {
+            User created = new User();
+            created.setUsername(username);
+            created.setNickname(nickname);
+            created.setEmail(email);
+            return created;
+        });
+
+        if (!passwordEncoder.matches(rawPassword, user.getPassword() == null ? "" : user.getPassword())) {
+            user.setPassword(passwordEncoder.encode(rawPassword));
+        }
+        user.setRole(role);
+        userRepository.save(user);
     }
 
     // ── 강의 코스 시드 (upsert) ──────────────────────────────────────

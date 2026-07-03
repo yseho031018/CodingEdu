@@ -539,6 +539,17 @@ button {
   font-weight: 900;
 }
 
+.inventory-empty {
+  display: grid;
+  place-items: center;
+  min-height: 44px;
+  border: 2px dashed rgba(143, 170, 181, 0.36);
+  border-radius: 7px;
+  color: #9fb4bc;
+  font-size: 13px;
+  font-weight: 900;
+}
+
 .toast {
   position: absolute;
   left: 50%;

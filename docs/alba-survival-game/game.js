@@ -92,6 +92,14 @@ const shopItems = [
   { id: "eggs", name: "계란", icon: "🥚", price: 6000, desc: "자취생 단백질 현실템" },
 ];
 
+const mealItemEffects = {
+  컵라면: { effect: { mental: 4, stamina: 7 }, message: "컵라면으로 뜨끈하게 한 끼를 해결했다." },
+  생수: { effect: { mental: 1, stamina: 4 }, message: "생수를 마셔서 몸이 조금 가벼워졌다." },
+  즉석밥: { effect: { mental: 3, stamina: 8 }, message: "즉석밥으로 든든하게 배를 채웠다." },
+  에너지드링크: { effect: { mental: 2, stamina: 6 }, message: "에너지드링크로 잠깐 버틸 힘을 얻었다." },
+  계란: { effect: { mental: 3, stamina: 7 }, message: "계란으로 단백질을 챙겼다." },
+};
+
 const stocks = [
   { id: "kr-bank", market: "domestic", marketName: "국내", name: "민트은행", price: 15800, basePrice: 15800, change: 0.2, owned: 0, avg: 0, volatility: 0.014 },
   { id: "kr-food", market: "domestic", marketName: "국내", name: "한끼푸드", price: 22400, basePrice: 22400, change: -0.3, owned: 0, avg: 0, volatility: 0.017 },
@@ -198,6 +206,8 @@ const state = {
   commuteOpen: false,
   scheduleOpen: false,
   shopOpen: false,
+  missedShifts: 0,
+  fired: false,
   activeShift: null,
   monthDay: 8,
   rentDue: RENT_TOTAL,
@@ -229,13 +239,9 @@ const state = {
   logs: [
     "[알림] 현관문 앞에서 E를 누르면 스케줄에 맞는 알바 장소로 출근해.",
     "[규칙] 업무를 70% 이상 처리해야 퇴근 정산이 가능해.",
-    "[생활] 자취자금 목표는 3,000,000원. 월세와 관리비도 챙겨야 해.",
+    "[생활] 식사는 아이템 구매에서 산 음식이나 음료가 있어야 할 수 있어.",
   ],
-  inventory: [
-    { icon: "🍜", count: 3, name: "컵라면" },
-    { icon: "🥤", count: 1, name: "에너지드링크" },
-    { icon: "💧", count: 1, name: "생수" },
-  ],
+  inventory: [],
 };
 
 syncClock();
@@ -262,15 +268,15 @@ const scenes = {
       }),
       createTask({
         id: "meal",
-        name: "라면 먹기",
-        icon: "🍜",
+        name: "식사 하기",
+        icon: "🍽️",
         x: 835,
         y: 190,
         target: 1,
         minutes: 20,
-        effect: { mental: 4, stamina: 7 },
-        message: "라면으로 한 끼를 해결했다.",
-        action: "eatRamen",
+        effect: {},
+        message: "구매해 둔 음식으로 식사를 했다.",
+        action: "eatMeal",
       }),
       createTask({
         id: "laundry",
@@ -827,6 +833,7 @@ function advanceMinutes(minutes) {
   state.absoluteMinutes += minutes;
   syncClock();
   updateStockPrices(minutes);
+  checkMissedCurrentShift();
 }
 
 function shiftAbsStart(shift) {
@@ -834,6 +841,48 @@ function shiftAbsStart(shift) {
   let start = weekStart + shift.dayIndex * 1440 + shift.start;
   if (start < state.absoluteMinutes - 12 * 60) start += WEEK_MINUTES;
   return start;
+}
+
+function checkMissedCurrentShift() {
+  if (state.fired || state.activeShift || state.scene !== "home" || state.commuteOpen) return false;
+
+  const shift = currentShift();
+  if (!shift || shift.duration <= 0 || shift.period === "휴무") return false;
+
+  const startAbs = shiftAbsStart(shift);
+  const endAbs = startAbs + shift.duration;
+  if (state.absoluteMinutes <= endAbs) return false;
+
+  recordMissedShift(shift);
+  return true;
+}
+
+function recordMissedShift(shift) {
+  const missedText = `${dayNames[shift.dayIndex]}요일 ${timeText(shift.start)} ${shiftText(shift)}`;
+  state.missedShifts += 1;
+  state.activeShift = null;
+  state.progress = {};
+  state.stats.boss = clamp(state.stats.boss - 18, 0, 100);
+  state.stats.customer = clamp(state.stats.customer - 4, 0, 100);
+  state.stats.mental = clamp(state.stats.mental - 8, 0, 100);
+  state.lastShift = {
+    hours: "결근",
+    pay: 0,
+    boss: -18,
+    customer: -4,
+    success: 0,
+  };
+  state.scheduleIndex = (state.scheduleIndex + 1) % weeklySchedule.length;
+
+  if (state.missedShifts >= 3) {
+    state.fired = true;
+    addLog(`[해고] ${missedText} 근무까지 출근 실패 3회가 누적되어 알바에서 잘렸다.`);
+    showToast("출근 실패 3회로 해고됐다.");
+    return;
+  }
+
+  addLog(`[경고] ${missedText} 근무에 출근하지 못했다. 결근 경고 ${state.missedShifts}/3회.`);
+  showToast(`출근 실패 경고 ${state.missedShifts}/3`);
 }
 
 function dist(a, b) {
@@ -953,17 +1002,32 @@ function useInventory(name) {
   return true;
 }
 
-function handleHomeAction(taskItem) {
-  if (taskItem.action === "eatRamen") {
-    if (useInventory("컵라면")) {
-      addLog("[생활] 집에 있던 컵라면을 하나 먹었다.");
-    } else {
-      state.stats.cash = Math.max(0, state.stats.cash - 1800);
-      addLog("[생활] 컵라면이 없어서 편의점에서 하나 사 먹었다. (-1,800원)");
-    }
+function useMealInventory() {
+  const item = state.inventory.find((entry) => mealItemEffects[entry.name] && entry.count > 0);
+  if (!item) return null;
+  item.count -= 1;
+  state.inventory = state.inventory.filter((entry) => entry.count > 0);
+  return item;
+}
+
+function completeMealTask(taskItem) {
+  const item = useMealInventory();
+  if (!item) {
+    showToast("먹을 아이템이 없어.");
+    addLog("[식사] 먹을 수 있는 구매 아이템이 없다. 아이템 구매에서 식사거리를 먼저 사야 한다.");
     return;
   }
 
+  const meal = mealItemEffects[item.name];
+  setProgress(taskItem, progressOf(taskItem) + 1);
+  advanceMinutes(taskItem.minutes);
+  applyEffect(meal.effect);
+  addLog(`[식사] ${item.icon} ${meal.message}`);
+  showToast(`${item.name} 먹었다!`);
+  renderUi();
+}
+
+function handleHomeAction(taskItem) {
   if (taskItem.action === "save") {
     const amount = Math.min(30000, state.stats.cash);
     if (amount <= 0) {
@@ -1168,6 +1232,11 @@ function interact() {
     return;
   }
 
+  if (state.scene === "home" && taskItem.id === "meal") {
+    completeMealTask(taskItem);
+    return;
+  }
+
   if (state.scene === "home" && taskItem.id === "sleep") {
     finishRestDayBySleeping(taskItem);
     return;
@@ -1199,6 +1268,17 @@ function interact() {
 function showCommuteChoice() {
   const shift = currentShift();
   if (state.scene !== "home") return;
+
+  if (state.fired) {
+    showToast("이미 해고돼서 출근할 수 없어.");
+    addLog("[해고] 이 알바는 더 이상 출근할 수 없다. 새 알바를 구해야 한다.");
+    return;
+  }
+
+  if (checkMissedCurrentShift()) {
+    renderUi();
+    return;
+  }
 
   if (shift.period === "휴무") {
     showToast("오늘은 휴무야. 집에서 회복하자.");
@@ -1255,6 +1335,10 @@ function renderCommutePanel(shift) {
 function startCommute(method) {
   const option = commuteOptions[method];
   const shift = currentShift();
+  if (state.fired) {
+    showToast("이미 해고돼서 출근할 수 없어.");
+    return;
+  }
   if (!option || shift.period === "휴무") return;
 
   if (state.stats.cash < option.cost) {
@@ -1356,15 +1440,23 @@ function renderUi() {
   sideTitle.textContent = state.scene === "home" ? scene.sideTitle : scene.sideTitle;
   dayTimeText.textContent = clockText();
   shiftPlaceText.textContent =
-    state.scene === "home" ? `다음: ${shiftText(shift)}` : `${shiftText(currentWork)} 진행 ${totals.pct}%`;
+    state.fired
+      ? "해고 상태"
+      : state.scene === "home"
+        ? `다음: ${shiftText(shift)}`
+        : `${shiftText(currentWork)} 진행 ${totals.pct}%`;
   nextWorkText.textContent =
-    state.scene === "home"
+    state.fired
+      ? `출근 실패 ${state.missedShifts}/3회 · 새 알바 필요`
+      : state.scene === "home"
       ? shift.period === "휴무"
         ? `${dayNames[shift.dayIndex]}요일 휴무`
         : `${dayNames[shift.dayIndex]}요일 ${timeText(shift.start)} ${shiftText(shift)}`
       : `업무 ${totals.pct}% / ${WORK_PASS_RATE}% 이상 퇴근 가능`;
   actionHint.textContent =
-    state.scene === "home"
+    state.fired
+      ? "해고 상태 · 자취방에서 다시 준비하기"
+      : state.scene === "home"
       ? "WASD/클릭 이동 · 현관문 앞 E 출근 · Tab 핸드폰"
       : "WASD/클릭 이동 · E 처리 · Tab 핸드폰";
 
@@ -1427,6 +1519,7 @@ function renderMemoryPanel(totals) {
       <div class="memory-row"><span>월세</span><strong>월세/관리비</strong><span>${money(state.rentDue)}</span></div>
       <div class="memory-row"><span>방</span><strong>방 체크</strong><span>${state.roomChecks}/5</span></div>
       <div class="memory-row"><span>현금</span><strong>보유 현금</strong><span>${money(state.stats.cash)}</span></div>
+      <div class="memory-row"><span>경고</span><strong>결근 경고</strong><span>${state.missedShifts}/3</span></div>
     </div>
   `;
 }
@@ -1446,7 +1539,7 @@ function renderBottomPanels() {
 
   inventoryList.innerHTML = state.inventory
     .map((item) => `<div class="inventory-item" title="${item.name}">${item.icon}<small>${item.count}</small></div>`)
-    .join("");
+    .join("") || `<div class="inventory-empty">없음</div>`;
 }
 
 function drawCover(img) {

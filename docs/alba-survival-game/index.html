@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>알바 생존기</title>
+    <link rel="stylesheet" href="./styles.css?v=16" />
+  </head>
+  <body>
+    <div class="scale-shell">
+      <main class="game-frame">
+        <header class="game-top">
+          <section class="brand">
+            <h1>알바 생존기</h1>
+            <p>열심히 알바해서 자취 성공하자!</p>
+          </section>
+
+          <section class="top-card schedule-card">
+            <span id="dayTimeText">월요일 20:40</span>
+            <strong id="shiftPlaceText">다음: 야간 편의점</strong>
+          </section>
+
+          <section class="top-card savings-card">
+            <div class="card-main">
+              <span>자취자금</span>
+              <strong id="savingsText">301,000원 / 3,000,000원</strong>
+            </div>
+            <div class="wide-meter"><span id="savingsBar"></span></div>
+          </section>
+
+          <section class="top-card stat-card">
+            <div class="stat-pill">
+              <span>멘탈</span>
+              <strong id="mentalValue">49</strong>
+              <div class="mini-meter"><span id="mentalBar"></span></div>
+            </div>
+            <div class="stat-pill">
+              <span>체력</span>
+              <strong id="staminaValue">57</strong>
+              <div class="mini-meter yellow"><span id="staminaBar"></span></div>
+            </div>
+          </section>
+
+          <section class="top-card next-card">
+            <span>오늘 일정</span>
+            <strong id="nextWorkText">월요일 21:00 야간 편의점</strong>
+          </section>
+        </header>
+
+        <section class="game-main">
+          <section class="stage-wrap">
+            <canvas id="gameCanvas" width="1328" height="694" tabindex="0" aria-label="알바 생존기 플레이 화면"></canvas>
+            <div id="sceneBadge" class="scene-badge">내 자취방</div>
+            <div id="actionHint" class="action-hint">WASD/클릭 이동 · 현관문 앞 E 출근 · Tab 핸드폰</div>
+            <div id="toast" class="toast" aria-live="polite"></div>
+          </section>
+
+          <aside class="side-stack">
+            <section class="side-panel">
+              <h2 id="sideTitle">퇴근 후 할 일</h2>
+              <div id="questList" class="quest-list"></div>
+              <button class="select-key" type="button">E : 처리하기</button>
+            </section>
+
+            <section id="memoryPanel" class="memory-panel"></section>
+          </aside>
+
+          <section class="bottom-dashboard">
+            <div class="log-panel">
+              <div id="logList" class="log-list"></div>
+            </div>
+
+            <div class="summary-panel">
+              <h3>오늘의 요약</h3>
+              <div id="summaryList"></div>
+            </div>
+
+            <div class="item-panel">
+              <h3>보유 아이템</h3>
+              <div id="inventoryList" class="inventory-list"></div>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <section id="commutePanel" class="commute-panel" aria-hidden="true"></section>
+    <section id="phone" class="phone-panel" aria-hidden="true"></section>
+
+    <script src="./game.js?v=38"></script>
+  </body>
+</html>

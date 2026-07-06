@@ -5,8 +5,6 @@ const ctx = canvas.getContext("2d");
 const toast = document.getElementById("toast");
 const phone = document.getElementById("phone");
 const commutePanel = document.getElementById("commutePanel");
-const schedulePanel = document.getElementById("schedulePanel");
-const shopPanel = document.getElementById("shopPanel");
 const sceneBadge = document.getElementById("sceneBadge");
 const sideTitle = document.getElementById("sideTitle");
 const questList = document.getElementById("questList");
@@ -78,19 +76,6 @@ const commuteOptions = {
     note: "비싸지만 빠르다. 야간 출근 직전에는 꽤 든든하다.",
   },
 };
-
-const shopItems = [
-  { id: "ramen", name: "컵라면", icon: "🍜", price: 1800, desc: "퇴근 후 바로 먹는 비상식량" },
-  { id: "water", name: "생수", icon: "💧", price: 900, desc: "야간 알바 뒤 탈수 방지용" },
-  { id: "rice", name: "즉석밥", icon: "🍚", price: 2200, desc: "반찬만 있으면 한 끼 해결" },
-  { id: "energy", name: "에너지드링크", icon: "🥤", price: 2500, desc: "졸릴 때 버티는 마지막 카드" },
-  { id: "trashbag", name: "종량제봉투", icon: "🗑️", price: 2000, desc: "방치하면 자취방 평점 하락" },
-  { id: "tissue", name: "휴지", icon: "🧻", price: 4500, desc: "없으면 삶의 질이 바로 무너짐" },
-  { id: "detergent", name: "세탁세제", icon: "🧴", price: 6900, desc: "근무복 빨래 필수템" },
-  { id: "wipes", name: "물티슈", icon: "🧽", price: 3200, desc: "책상과 바닥 급한 청소용" },
-  { id: "shampoo", name: "샴푸", icon: "🫧", price: 7500, desc: "면접 전날 급하게 찾게 되는 것" },
-  { id: "eggs", name: "계란", icon: "🥚", price: 6000, desc: "자취생 단백질 현실템" },
-];
 
 const stocks = [
   { id: "kr-bank", market: "domestic", marketName: "국내", name: "민트은행", price: 15800, basePrice: 15800, change: 0.2, owned: 0, avg: 0, volatility: 0.014 },
@@ -196,8 +181,6 @@ const state = {
   phoneView: "home",
   phoneMarket: "domestic",
   commuteOpen: false,
-  scheduleOpen: false,
-  shopOpen: false,
   activeShift: null,
   monthDay: 8,
   rentDue: RENT_TOTAL,
@@ -293,6 +276,18 @@ const scenes = {
         minutes: 10,
         effect: { mental: 2 },
         message: "이번 주 근무표를 확인했다. 지각 리스크가 줄었다.",
+      }),
+      createTask({
+        id: "saving",
+        name: "저축 확인",
+        icon: "₩",
+        x: 715,
+        y: 452,
+        target: 1,
+        minutes: 5,
+        effect: {},
+        message: "현금을 자취자금 통장으로 옮겼다.",
+        action: "save",
       }),
       createTask({
         id: "rent",
@@ -999,53 +994,16 @@ function handleHomeAction(taskItem) {
   }
 
   if (taskItem.action === "buyItems") {
-    showShopPanel();
+    const cost = 8000;
+    if (state.stats.cash < cost) {
+      addLog("[구매] 돈이 부족해서 오늘은 장을 못 봤다.");
+      return;
+    }
+    state.stats.cash -= cost;
+    addInventory("컵라면", "🍜", 1);
+    addInventory("생수", "💧", 1);
+    addLog(`[구매] 컵라면과 생수를 샀다. (-${money(cost)})`);
   }
-}
-
-function transferToSavings(amount) {
-  const actual = Math.min(amount, state.stats.cash);
-  if (actual <= 0) {
-    showToast("저축할 현금이 없어.");
-    addLog("[토스] 지금은 자취자금으로 옮길 현금이 없다.");
-    return;
-  }
-
-  state.stats.cash -= actual;
-  state.stats.savings += actual;
-  addBankHistory("저축", "자취자금 저축", -actual);
-  advanceMinutes(2);
-  addLog(`[토스] ${money(actual)}을 자취자금 통장에 넣었다.`);
-  showToast(`${money(actual)} 저축 완료!`);
-  renderUi();
-  if (state.phoneOpen) renderPhone();
-}
-
-function buyShopItem(id) {
-  const item = shopItems.find((entry) => entry.id === id);
-  if (!item) return;
-
-  if (state.stats.cash < item.price) {
-    showToast(`${item.name} 살 돈이 부족해.`);
-    addLog(`[구매] ${item.name}을 사려면 ${money(item.price)}이 필요하다.`);
-    return;
-  }
-
-  state.stats.cash -= item.price;
-  addInventory(item.name, item.icon, 1);
-  addBankHistory("지출", item.name, -item.price);
-  advanceMinutes(3);
-
-  const buyTask = scenes.home.tasks.find((taskItem) => taskItem.id === "buyItems");
-  if (buyTask && !isDone(buyTask)) {
-    setProgress(buyTask, 1);
-    applyEffect(buyTask.effect);
-  }
-
-  addLog(`[구매] ${item.icon} ${item.name}을 샀다. (-${money(item.price)})`);
-  showToast(`${item.name} 구매 완료!`);
-  renderUi();
-  renderShopPanel();
 }
 
 function buyStock(id, mode = "unit") {
@@ -1127,7 +1085,7 @@ function maybeWorkEvent() {
 }
 
 function interact() {
-  if (state.commuteOpen || state.scheduleOpen || state.shopOpen) return;
+  if (state.commuteOpen) return;
 
   if (playerNearDoor()) {
     showCommuteChoice();
@@ -1142,24 +1100,6 @@ function interact() {
 
   if (taskItem.kind === "clockOut") {
     finishShift();
-    return;
-  }
-
-  if (state.scene === "home" && taskItem.id === "schedule") {
-    if (!isDone(taskItem)) {
-      setProgress(taskItem, progressOf(taskItem) + 1);
-      advanceMinutes(taskItem.minutes);
-      applyEffect(taskItem.effect);
-      addLog(`[완료] ${taskItem.message}`);
-      showToast("시간표 확인 완료!");
-    }
-    showSchedulePanel();
-    renderUi();
-    return;
-  }
-
-  if (state.scene === "home" && taskItem.id === "buyItems") {
-    showShopPanel();
     return;
   }
 
@@ -1481,7 +1421,7 @@ function drawTaskMarkers() {
 
   for (const taskItem of interactiveTasks()) {
     if (taskItem.kind === "clockOut") continue;
-    if (isDone(taskItem) && !["schedule", "buyItems"].includes(taskItem.id)) continue;
+    if (isDone(taskItem)) continue;
     const active = near && near.id === taskItem.id;
     const label = `E ${taskItem.icon} ${taskItem.name}`;
     const labelFont = "900 16px Malgun Gothic, sans-serif";
@@ -1604,7 +1544,7 @@ function draw() {
 }
 
 function update(dt) {
-  if (state.commuteOpen || state.scheduleOpen || state.shopOpen) return;
+  if (state.commuteOpen) return;
 
   let dx = 0;
   let dy = 0;
@@ -1642,8 +1582,6 @@ function focusGame() {
 
 function togglePhone(force = null) {
   if (force !== false && state.commuteOpen) closeCommuteChoice();
-  if (force !== false && state.scheduleOpen) closeSchedulePanel();
-  if (force !== false && state.shopOpen) closeShopPanel();
   const nextOpen = force === null ? !state.phoneOpen : force;
   if (nextOpen && !state.phoneOpen) state.phoneView = "home";
   state.phoneOpen = nextOpen;
@@ -1689,34 +1627,17 @@ function renderPhoneHome() {
 }
 
 function renderBankApp() {
-  const savingsPct = clamp((state.stats.savings / GOAL) * 100, 0, 100);
   return `
     <div class="bank-hero">
       <span>내 계좌 총합</span>
       <strong>${money(accountTotal())}</strong>
       <small>현금 + 자취자금 + 주식 평가금액</small>
     </div>
-    <div class="phone-card bank-goal-card">
-      <div class="bank-goal-head">
-        <span>자취자금 목표</span>
-        <strong>${money(state.stats.savings)} / ${money(GOAL)}</strong>
-      </div>
-      <div class="wide-meter bank-goal-meter"><span style="width: ${savingsPct}%"></span></div>
-      <small>목표까지 ${money(Math.max(0, GOAL - state.stats.savings))} 남음</small>
-    </div>
     <div class="phone-card bank-card">
       <div class="bank-row"><span>보유 현금</span><strong>${money(state.stats.cash)}</strong></div>
       <div class="bank-row"><span>자취자금</span><strong>${money(state.stats.savings)}</strong></div>
       <div class="bank-row"><span>주식 평가금액</span><strong>${money(portfolioValue())}</strong></div>
       <div class="bank-row"><span>월세·관리비 남은 금액</span><strong>${money(state.rentDue)}</strong></div>
-    </div>
-    <div class="phone-card bank-actions">
-      <h3>자취자금 저축</h3>
-      <div>
-        <button type="button" data-bank-action="save" data-save-amount="30000" ${state.stats.cash <= 0 ? "disabled" : ""}>3만원 저축</button>
-        <button type="button" data-bank-action="save" data-save-amount="100000" ${state.stats.cash <= 0 ? "disabled" : ""}>10만원 저축</button>
-        <button type="button" data-bank-action="save-all" ${state.stats.cash <= 0 ? "disabled" : ""}>남은 현금 전부</button>
-      </div>
     </div>
     <div class="phone-card">
       <h3>최근 거래</h3>
@@ -1800,103 +1721,6 @@ function renderScheduleApp() {
   `;
 }
 
-function showSchedulePanel() {
-  togglePhone(false);
-  state.scheduleOpen = true;
-  renderSchedulePanel();
-  schedulePanel.classList.add("is-visible");
-  schedulePanel.setAttribute("aria-hidden", "false");
-}
-
-function closeSchedulePanel() {
-  state.scheduleOpen = false;
-  schedulePanel.classList.remove("is-visible");
-  schedulePanel.setAttribute("aria-hidden", "true");
-  focusGame();
-}
-
-function renderSchedulePanel() {
-  const cells = weeklySchedule
-    .map((shift, index) => {
-      const isCurrent = index === state.scheduleIndex;
-      const isRest = shift.duration <= 0;
-      const time = isRest ? "휴무" : `${timeText(shift.start)}-${timeText(shift.start + shift.duration)}`;
-      const label = isRest ? "자취방 정리" : shiftText(shift);
-      return `
-        <article class="schedule-cell ${isCurrent ? "is-current" : ""} ${isRest ? "is-rest" : ""}">
-          <span class="schedule-day">${dayNames[shift.dayIndex]}요일</span>
-          <strong>${time}</strong>
-          <em>${label}</em>
-          ${isCurrent ? "<b>오늘</b>" : ""}
-        </article>
-      `;
-    })
-    .join("");
-
-  schedulePanel.innerHTML = `
-    <div class="schedule-card-modal" role="dialog" aria-modal="true" aria-label="이번 주 근무 시간표">
-      <button class="schedule-close" type="button" aria-label="닫기">×</button>
-      <div class="schedule-pin left"></div>
-      <div class="schedule-pin right"></div>
-      <h2>이번 주 근무 시간표</h2>
-      <p>${clockText()} 기준으로 다음 출근 시간을 확인했다.</p>
-      <div class="schedule-board" aria-label="요일별 근무 시간표">
-        ${cells}
-      </div>
-      <div class="schedule-legend">
-        <span><i class="work"></i>근무</span>
-        <span><i class="rest"></i>휴무</span>
-        <span><i class="today"></i>오늘</span>
-      </div>
-      <button class="schedule-ok" type="button" data-schedule-close>확인</button>
-    </div>
-  `;
-}
-
-function showShopPanel() {
-  togglePhone(false);
-  state.shopOpen = true;
-  renderShopPanel();
-  shopPanel.classList.add("is-visible");
-  shopPanel.setAttribute("aria-hidden", "false");
-}
-
-function closeShopPanel() {
-  state.shopOpen = false;
-  shopPanel.classList.remove("is-visible");
-  shopPanel.setAttribute("aria-hidden", "true");
-  focusGame();
-}
-
-function renderShopPanel() {
-  shopPanel.innerHTML = `
-    <div class="shop-card-modal" role="dialog" aria-modal="true" aria-label="자취 아이템 구매">
-      <button class="shop-close" type="button" aria-label="닫기">×</button>
-      <div class="shop-header">
-        <span>편의점 장보기</span>
-        <h2>자취 필수템 구매</h2>
-        <strong>보유 현금 ${money(state.stats.cash)}</strong>
-      </div>
-      <div class="shop-grid">
-        ${shopItems
-          .map(
-            (item) => `
-              <button class="shop-item" type="button" data-shop-item="${item.id}" ${state.stats.cash < item.price ? "disabled" : ""}>
-                <span class="shop-icon">${item.icon}</span>
-                <strong>${item.name}</strong>
-                <em>${money(item.price)}</em>
-                <small>${item.desc}</small>
-              </button>
-            `,
-          )
-          .join("")}
-      </div>
-      <p class="shop-note">구매한 물건은 보유 아이템에 쌓이고, 토스 앱 거래내역에도 지출로 남는다.</p>
-      <button class="shop-ok" type="button" data-shop-close>닫기</button>
-    </div>
-  `;
-}
-
 function renderOffdayApp() {
   const shift = currentShift();
   return `
@@ -1950,18 +1774,6 @@ loop.last = performance.now();
 window.addEventListener(
   "keydown",
   (event) => {
-    if (state.scheduleOpen) {
-      if (event.key === "Escape") closeSchedulePanel();
-      event.preventDefault();
-      return;
-    }
-
-    if (state.shopOpen) {
-      if (event.key === "Escape") closeShopPanel();
-      event.preventDefault();
-      return;
-    }
-
     if (state.commuteOpen) {
       if (event.key === "Escape") closeCommuteChoice();
       event.preventDefault();
@@ -2002,7 +1814,7 @@ window.addEventListener(
 );
 
 canvas.addEventListener("pointerdown", (event) => {
-  if (state.commuteOpen || state.scheduleOpen || state.shopOpen) return;
+  if (state.commuteOpen) return;
   focusGame();
   const box = canvas.getBoundingClientRect();
   const point = {
@@ -2040,40 +1852,11 @@ commutePanel.addEventListener("pointerdown", (event) => {
   if (event.target === commutePanel) closeCommuteChoice();
 });
 
-schedulePanel.addEventListener("pointerdown", (event) => {
-  event.stopPropagation();
-  if (event.target.closest(".schedule-close") || event.target.closest("[data-schedule-close]")) {
-    closeSchedulePanel();
-    return;
-  }
-  if (event.target === schedulePanel) closeSchedulePanel();
-});
-
-shopPanel.addEventListener("pointerdown", (event) => {
-  event.stopPropagation();
-  const closeButton = event.target.closest(".shop-close");
-  const closeAction = event.target.closest("[data-shop-close]");
-  const itemButton = event.target.closest("[data-shop-item]");
-
-  if (closeButton || closeAction) {
-    closeShopPanel();
-    return;
-  }
-
-  if (itemButton) {
-    buyShopItem(itemButton.dataset.shopItem);
-    return;
-  }
-
-  if (event.target === shopPanel) closeShopPanel();
-});
-
 phone.addEventListener("click", (event) => {
   const closeButton = event.target.closest("[data-phone-close]");
   const viewButton = event.target.closest("[data-phone-view]");
   const marketButton = event.target.closest("[data-stock-market]");
   const stockButton = event.target.closest("[data-stock-action]");
-  const bankButton = event.target.closest("[data-bank-action]");
 
   if (closeButton) {
     togglePhone(false);
@@ -2098,13 +1881,6 @@ phone.addEventListener("click", (event) => {
     if (action === "buy") buyStock(id);
     if (action === "allin") buyStock(id, "allin");
     if (action === "sell") sellStock(id);
-    return;
-  }
-
-  if (bankButton) {
-    const action = bankButton.dataset.bankAction;
-    if (action === "save") transferToSavings(Number(bankButton.dataset.saveAmount) || 0);
-    if (action === "save-all") transferToSavings(state.stats.cash);
   }
 });
 

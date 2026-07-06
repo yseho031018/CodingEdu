@@ -1460,10 +1460,9 @@ function renderUi() {
       ? "WASD/클릭 이동 · 현관문 앞 E 출근 · Tab 핸드폰"
       : "WASD/클릭 이동 · E 처리 · Tab 핸드폰";
 
-  const liveAccountTotal = accountTotal();
-  const accountPct = clamp((liveAccountTotal / GOAL) * 100, 0, 100);
-  savingsText.textContent = `${money(liveAccountTotal)} / ${money(GOAL)}`;
-  savingsBar.style.width = `${accountPct}%`;
+  const savingsPct = clamp((state.stats.savings / GOAL) * 100, 0, 100);
+  savingsText.textContent = `${money(state.stats.savings)} / ${money(GOAL)}`;
+  savingsBar.style.width = `${savingsPct}%`;
   mentalValue.textContent = Math.round(state.stats.mental);
   mentalBar.style.width = `${state.stats.mental}%`;
   staminaValue.textContent = Math.round(state.stats.stamina);

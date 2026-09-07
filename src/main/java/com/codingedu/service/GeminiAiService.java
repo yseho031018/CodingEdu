@@ -1,7 +1,7 @@
 package com.codingedu.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -52,7 +52,7 @@ public class GeminiAiService {
         String requestBody;
         try {
             requestBody = buildRequestBody(systemInstruction, userPrompt);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             return Optional.empty();
         }
 
@@ -87,7 +87,7 @@ public class GeminiAiService {
         }
     }
 
-    private String buildRequestBody(String systemInstruction, String userPrompt) throws JsonProcessingException {
+    private String buildRequestBody(String systemInstruction, String userPrompt) throws JacksonException {
         String prompt = """
                 [역할 지시]
                 %s
@@ -104,7 +104,7 @@ public class GeminiAiService {
         return objectMapper.writeValueAsString(body);
     }
 
-    private Optional<String> extractText(String responseBody) throws JsonProcessingException {
+    private Optional<String> extractText(String responseBody) throws JacksonException {
         GeminiResponse response = objectMapper.readValue(responseBody, GeminiResponse.class);
         if (response.candidates() == null || response.candidates().isEmpty()) {
             return Optional.empty();
@@ -147,3 +147,4 @@ public class GeminiAiService {
     private record Content(List<Part> parts) {}
     private record Part(String text) {}
 }
+

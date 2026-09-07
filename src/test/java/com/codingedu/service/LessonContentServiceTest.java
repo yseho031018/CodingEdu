@@ -1,7 +1,7 @@
 package com.codingedu.service;
 
 import com.codingedu.entity.LessonCourse;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.DefaultResourceLoader;
 
@@ -66,3 +66,4 @@ class LessonContentServiceTest {
                 .containsEntry("javascript", "dPRtcRwKo-Y");
     }
 }
+

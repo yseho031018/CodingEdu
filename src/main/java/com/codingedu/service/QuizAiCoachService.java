@@ -4,8 +4,8 @@ import com.codingedu.entity.Choice;
 import com.codingedu.entity.Quiz;
 import com.codingedu.entity.QuizResult;
 import com.codingedu.entity.QuizResultDetail;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -178,7 +178,7 @@ public class QuizAiCoachService {
             List<String> studyTips = sanitizeTips(parsed.studyTips(), fallback.studyTips());
             List<WrongReview> wrongReviews = mergeWrongReviews(fallback.wrongReviews(), parsed.wrongReviews());
             return Optional.of(new AiQuizFeedback(summary, focusConcept, nextAction, studyTips, wrongReviews));
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             return Optional.empty();
         }
     }
@@ -273,3 +273,4 @@ public class QuizAiCoachService {
             String explanation
     ) {}
 }
+

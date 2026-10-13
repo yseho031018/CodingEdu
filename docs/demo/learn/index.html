@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" content="87543966-df6a-458b-840d-7bd7b7cff2bf"/>
+    <meta name="_csrf_header" content="X-XSRF-TOKEN"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>강의 - CodeEdu</title>
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/tailwind.css">
+    <link rel="stylesheet" href="../css/design-refresh.css">
+    <link rel="stylesheet" href="../css/site-nav.css">
+<link rel="stylesheet" href="../demo.css">
+</head>
+<body class="page-courses">
+<div class="demo-banner" role="note">목업 버전이에요 · 로그인, 퀴즈 응시, AI 도우미 등 서버가 필요한 기능은 동작하지 않아요.</div>
+<nav>
+  <a href="../index.html" class="logo">
+    <span class="brand-text"><b>Coding</b>Edu</span>
+  </a>
+
+  <div class="nav-links">
+    <a href="../index.html">홈</a>
+    <a href="../learn/index.html">강의</a>
+    <a href="../quiz/index.html">퀴즈</a>
+    <a href="../notice.html">챌린지</a>
+    <a href="../notice.html">커뮤니티</a>
+    <a href="../notice.html">AI 도우미</a>
+    
+  </div>
+
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeToggle" title="테마 전환" aria-label="다크/라이트 모드 전환"></button>
+
+    <div class="nav-right-auth">
+      <a href="../notice.html" class="btn-login ghost">로그인</a>
+      <a href="../notice.html" class="btn-login">회원가입</a>
+    </div>
+
+    
+  </div>
+</nav>
+
+<main class="course-page-main">
+        <header class="course-page-heading">
+            <div>
+                <span class="course-page-kicker">COURSES</span>
+                <h1>강의</h1>
+                <p>생활코딩 강의로 웹 개발의 기초부터 차근차근 배워보세요.</p>
+            </div>
+        </header>
+
+        <!-- H6: 처음 온 사용자가 순서를 기억하지 않아도 되도록 추천 순서를 목록 위에 보여줌 -->
+        <a class="course-roadmap-bar" href="../index.html#learningRoadmap">
+            <span class="course-roadmap-label">처음이라면 이 순서로</span>
+            <ol class="course-roadmap-steps">
+                
+                    <li><b>1</b><span>HTML &amp; Internet</span></li>
+                
+                    <li><b>2</b><span>CSS</span></li>
+                
+                    <li><b>3</b><span>JavaScript</span></li>
+                
+            </ol>
+            <span class="course-roadmap-link">전체 학습 지도 보기 ›</span>
+        </a>
+
+        <div class="course-page-grid">
+            <section class="course-catalog-v2">
+                <div class="course-toolbar">
+                    <div class="course-tabs" role="tablist" aria-label="강의 필터">
+                        <button class="course-tab active" data-filter="all">전체</button>
+                        <button class="course-tab" data-filter="html,css,javascript">웹 기초</button>
+                        <button class="course-tab" data-filter="react,nextjs">프론트엔드</button>
+                        <button class="course-tab" data-filter="java,php,python">프로그래밍</button>
+                        <button class="course-tab" data-filter="mysql,sqljoin">데이터베이스</button>
+                        <button class="course-tab" data-filter="git">개발 도구</button>
+                    </div>
+                    <label class="course-search">
+                        <span class="sr-only">강의 검색</span>
+                        <input type="search" id="courseSearch" placeholder="강의 검색 (예: CSS, 데이터베이스)" autocomplete="off">
+                    </label>
+                </div>
+
+                <div class="course-grid-v2">
+                    <a href="../learn/html/index.html"
+                       class="course-card-v2  course-html"
+                       data-course-type="html" data-search="WEB1 - HTML &amp; Internet HTML &amp; Internet 웹 개발 입문 웹 페이지의 기본 구조와 인터넷 동작 배우기">
+                        
+                        <div class="course-thumbnail course-youtube-thumbnail">
+                            <img src="https://i.ytimg.com/vi/tZooW6PritE/hqdefault.jpg"
+                                 alt="WEB1 - HTML &amp; Internet 유튜브 썸네일"
+                                 loading="lazy">
+                            <span class="course-play-badge"
+                                  aria-hidden="true"></span>
+                            
+                            
+                        </div>
+                        <div class="course-card-body">
+                            <!-- H2: WEB1·DATABASE2 같은 원래 강의명 대신 분야·단계와 쉬운 이름을 표시 -->
+                            <span class="course-step-label">웹 개발 입문 · 1단계</span>
+                            <h2>HTML &amp; Internet</h2>
+                            <p class="course-meta-line">입문 · 약 3시간 30분 · 레슨 28개</p>
+                            <p class="course-prereq">선수 강의 없음</p>
+                            
+                            <!-- H1: 진도율은 로그인한 사용자에게만 표시 -->
+                            
+                        </div>
+                    </a><a href="../learn/css/index.html"
+                       class="course-card-v2  course-css"
+                       data-course-type="css" data-search="WEB2 - CSS CSS 웹 개발 입문 웹 페이지를 원하는 모습으로 꾸미기">
+                        
+                        <div class="course-thumbnail course-youtube-thumbnail">
+                            <img src="https://i.ytimg.com/vi/Ok0bBJPtgJI/hqdefault.jpg"
+                                 alt="WEB2 - CSS 유튜브 썸네일"
+                                 loading="lazy">
+                            <span class="course-play-badge"
+                                  aria-hidden="true"></span>
+                            
+                            
+                        </div>
+                        <div class="course-card-body">
+                            <!-- H2: WEB1·DATABASE2 같은 원래 강의명 대신 분야·단계와 쉬운 이름을 표시 -->
+                            <span class="course-step-label">웹 개발 입문 · 2단계</span>
+                            <h2>CSS</h2>
+                            <p class="course-meta-line">입문 · 레슨 15개</p>
+                            <p class="course-prereq">선수 강의: HTML &amp; Internet</p>
+                            
+                            <!-- H1: 진도율은 로그인한 사용자에게만 표시 -->
+                            
+                        </div>
+                    </a><a href="../learn/javascript/index.html"
+                       class="course-card-v2  course-javascript"
+                       data-course-type="javascript" data-search="WEB2 - JavaScript JavaScript 웹 개발 입문 웹 페이지에 동작과 상호작용 더하기">
+                        
+                        <div class="course-thumbnail course-youtube-thumbnail">
+                            <img src="https://i.ytimg.com/vi/dPRtcRwKo-Y/hqdefault.jpg"
+                                 alt="WEB2 - JavaScript 유튜브 썸네일"
+                                 loading="lazy">
+                            <span class="course-play-badge"
+                                  aria-hidden="true"></span>
+                            
+                            
+                        </div>
+                        <div class="course-card-body">
+                            <!-- H2: WEB1·DATABASE2 같은 원래 강의명 대신 분야·단계와 쉬운 이름을 표시 -->
+                            <span class="course-step-label">웹 개발 입문 · 3단계</span>
+                            <h2>JavaScript</h2>
+                            <p class="course-meta-line">입문 · 레슨 38개</p>
+                            <p class="course-prereq">선수 강의: CSS</p>
+                            
+                            <!-- H1: 진도율은 로그인한 사용자에게만 표시 -->
+                            
+                        </div>
+                    </a><a href="../learn/java/index.html"
+                       class="course-card-v2  course-java"
+                       data-course-type="java" data-search="Java 입문 수업 Java 입문 백엔드 Java 문법과 객체지향 기초 다지기">
+                        
+                        <div class="course-thumbnail course-youtube-thumbnail">
+                            <img src="https://i.ytimg.com/vi/jdTsJzXmgU0/hqdefault.jpg"
+                                 alt="Java 입문 수업 유튜브 썸네일"
+                                 loading="lazy">
+                            <span class="course-play-badge"
+                                  aria-hidden="true"></span>
+                            
+                            
+                        </div>
+                        <div class="course-card-body">
+                            <!-- H2: WEB1·DATABASE2 같은 원래 강의명 대신 분야·단계와 쉬운 이름을 표시 -->
+                            <span class="course-step-label">백엔드 · 3단계</span>
+                            <h2>Java 입문</h2>
+                            <p class="course-meta-line">입문 · 약 15시간 10분 · 레슨 100개</p>
+                            <p class="course-prereq">선수 강의: PHP</p>
+                            
+                            <!-- H1: 진도율은 로그인한 사용자에게만 표시 -->
+                            
+                        </div>
+                    </a><a href="../learn/php/index.html"
+                       class="course-card-v2  course-php"
+                       data-course-type="php" data-search="WEB2-PHP PHP 백엔드 폼 처리와 서버 측 웹 애플리케이션 흐름 익히기">
+                        
+                        <div class="course-thumbnail course-youtube-thumbnail">
+                            <img src="https://i.ytimg.com/vi/Qh_6JheU_gY/hqdefault.jpg"
+                                 alt="WEB2-PHP 유튜브 썸네일"
+                                 loading="lazy">
+                            <span class="course-play-badge"
+                                  aria-hidden="true"></span>
+                            
+                            
+                        </div>
+                        <div class="course-card-body">
+                            <!-- H2: WEB1·DATABASE2 같은 원래 강의명 대신 분야·단계와 쉬운 이름을 표시 -->
+                            <span class="course-step-label">백엔드 · 2단계</span>
+                            <h2>PHP</h2>
+                            <p class="course-meta-line">입문 · 약 6시간 10분 · 레슨 42개</p>
+                            <p class="course-prereq">선수 강의: Git</p>
+                            
+                            <!-- H1: 진도율은 로그인한 사용자에게만 표시 -->
+                            
+                        </div>
+                    </a><a href="../learn/mysql/index.html"
+                       class="course-card-v2  course-mysql"
+                       data-course-type="mysql" data-search="DATABASE2 - MySQL MySQL 데이터베이스 관계형 데이터베이스와 SQL 기본 문법 익히기">
+                        
+                        <div class="course-thumbnail course-youtube-thumbnail">
+                            <img src="https://i.ytimg.com/vi/h_XDmyz--0w/hqdefault.jpg"
+                                 alt="DATABASE2 - MySQL 유튜브 썸네일"
+                                 loading="lazy">
+                            <span class="course-play-badge"
+                                  aria-hidden="true"></span>
+                            
+                            
+                        </div>
+                        <div class="course-card-body">
+                            <!-- H2: WEB1·DATABASE2 같은 원래 강의명 대신 분야·단계와 쉬운 이름을 표시 -->
+                            <span class="course-step-label">데이터베이스 · 1단계</span>
+                            <h2>MySQL</h2>
+                            <p class="course-meta-line">입문 · 약 3시간 20분 · 레슨 27개</p>
+                            <p class="course-prereq">선수 강의 없음</p>
+                            
+                            <!-- H1: 진도율은 로그인한 사용자에게만 표시 -->
+                            
+                        </div>
+                    </a><a href="../learn/sqljoin/index.html"
+                       class="course-card-v2  course-sqljoin"
+                       data-course-type="sqljoin" data-search="SQL JOIN SQL JOIN 데이터베이스 테이블을 나누고 JOIN으로 연결하기">
+                        
+                        <div class="course-thumbnail course-youtube-thumbnail">
+                            <img src="https://i.ytimg.com/vi/2Xa54XBXbk0/hqdefault.jpg"
+                                 alt="SQL JOIN 유튜브 썸네일"
+                                 loading="lazy">
+                            <span class="course-play-badge"
+                                  aria-hidden="true"></span>
+                            
+                            
+                        </div>
+                        <div class="course-card-body">
+                            <!-- H2: WEB1·DATABASE2 같은 원래 강의명 대신 분야·단계와 쉬운 이름을 표시 -->
+                            <span class="course-step-label">데이터베이스 · 2단계</span>
+                            <h2>SQL JOIN</h2>
+                            <p class="course-meta-line">입문 · 약 51분 · 레슨 8개</p>
+                            <p class="course-prereq">선수 강의: MySQL</p>
+                            
+                            <!-- H1: 진도율은 로그인한 사용자에게만 표시 -->
+                            
+                        </div>
+                    </a><a href="../learn/python/index.html"
+                       class="course-card-v2  course-python"
+                       data-course-type="python" data-search="Python 입문수업 Python 기초 Python 입문 변수·조건문·반복문으로 프로그래밍 기초 익히기">
+                        
+                        <div class="course-thumbnail course-youtube-thumbnail">
+                            <img src="https://i.ytimg.com/vi/-3DHpwy498o/hqdefault.jpg"
+                                 alt="Python 입문수업 유튜브 썸네일"
+                                 loading="lazy">
+                            <span class="course-play-badge"
+                                  aria-hidden="true"></span>
+                            
+                            
+                        </div>
+                        <div class="course-card-body">
+                            <!-- H2: WEB1·DATABASE2 같은 원래 강의명 대신 분야·단계와 쉬운 이름을 표시 -->
+                            <span class="course-step-label">Python 입문 · 1단계</span>
+                            <h2>Python 기초</h2>
+                            <p class="course-meta-line">입문 · 약 1시간 40분 · 레슨 18개</p>
+                            <p class="course-prereq">선수 강의 없음</p>
+                            
+                            <!-- H1: 진도율은 로그인한 사용자에게만 표시 -->
+                            
+                        </div>
+                    </a><a href="../learn/react/index.html"
+                       class="course-card-v2  course-react"
+                       data-course-type="react" data-search="React 2022 개정판 React 프론트엔드 컴포넌트로 화면을 나누고 CRUD 흐름 익히기">
+                        
+                        <div class="course-thumbnail course-youtube-thumbnail">
+                            <img src="https://i.ytimg.com/vi/AoMv0SIjZL8/hqdefault.jpg"
+                                 alt="React 2022 개정판 유튜브 썸네일"
+                                 loading="lazy">
+                            <span class="course-play-badge"
+                                  aria-hidden="true"></span>
+                            
+                            
+                        </div>
+                        <div class="course-card-body">
+                            <!-- H2: WEB1·DATABASE2 같은 원래 강의명 대신 분야·단계와 쉬운 이름을 표시 -->
+                            <span class="course-step-label">프론트엔드 · 2단계</span>
+                            <h2>React</h2>
+                            <p class="course-meta-line">입문 · 약 1시간 40분 · 레슨 10개</p>
+                            <p class="course-prereq">선수 강의: JavaScript</p>
+                            
+                            <!-- H1: 진도율은 로그인한 사용자에게만 표시 -->
+                            
+                        </div>
+                    </a><a href="../learn/nextjs/index.html"
+                       class="course-card-v2  course-nextjs"
+                       data-course-type="nextjs" data-search="Next.js 13 Next.js 프론트엔드 라우팅과 서버 렌더링으로 앱 완성하기">
+                        
+                        <div class="course-thumbnail course-youtube-thumbnail">
+                            <img src="https://i.ytimg.com/vi/9KOaR6QMb9A/hqdefault.jpg"
+                                 alt="Next.js 13 유튜브 썸네일"
+                                 loading="lazy">
+                            <span class="course-play-badge"
+                                  aria-hidden="true"></span>
+                            
+                            
+                        </div>
+                        <div class="course-card-body">
+                            <!-- H2: WEB1·DATABASE2 같은 원래 강의명 대신 분야·단계와 쉬운 이름을 표시 -->
+                            <span class="course-step-label">프론트엔드 · 3단계</span>
+                            <h2>Next.js</h2>
+                            <p class="course-meta-line">입문 · 레슨 18개</p>
+                            <p class="course-prereq">선수 강의: React</p>
+                            
+                            <!-- H1: 진도율은 로그인한 사용자에게만 표시 -->
+                            
+                        </div>
+                    </a><a href="../learn/git/index.html"
+                       class="course-card-v2  course-git"
+                       data-course-type="git" data-search="GIT1 Git 백엔드 버전 관리로 코드를 안전하게 기록하기">
+                        
+                        <div class="course-thumbnail course-youtube-thumbnail">
+                            <img src="https://i.ytimg.com/vi/uKtBJ65UWoM/hqdefault.jpg"
+                                 alt="GIT1 유튜브 썸네일"
+                                 loading="lazy">
+                            <span class="course-play-badge"
+                                  aria-hidden="true"></span>
+                            
+                            
+                        </div>
+                        <div class="course-card-body">
+                            <!-- H2: WEB1·DATABASE2 같은 원래 강의명 대신 분야·단계와 쉬운 이름을 표시 -->
+                            <span class="course-step-label">백엔드 · 1단계</span>
+                            <h2>Git</h2>
+                            <p class="course-meta-line">입문 · 약 45분 · 레슨 8개</p>
+                            <p class="course-prereq">선수 강의 없음</p>
+                            
+                            <!-- H1: 진도율은 로그인한 사용자에게만 표시 -->
+                            
+                        </div>
+                    </a>
+                </div>
+
+                <div class="course-empty" id="courseEmpty" role="status">
+                    <strong id="courseEmptyTitle">해당 강의가 아직 준비 중입니다.</strong>
+                    <span id="courseEmptyHint">다른 카테고리의 강의를 먼저 둘러보세요.</span>
+                </div>
+            </section>
+
+            <aside class="course-progress-panel">
+                <span class="course-page-kicker">MY LEARNING</span>
+                <h2>나의 학습 현황</h2>
+                
+                
+                    <p class="course-login-copy">로그인하면 학습 진도와<br>수강 기록을 확인할 수 있어요.</p>
+                    <a href="../notice.html" class="course-record-button primary">로그인하고 학습 시작하기</a>
+                
+            </aside>
+        </div>
+</main>
+
+<script src="../js/nav.js"></script>
+<script>
+    const courseTabs = document.querySelectorAll('.course-tab');
+    const courseCards = document.querySelectorAll('.course-card-v2');
+    const courseEmpty = document.getElementById('courseEmpty');
+
+    document.querySelectorAll('.course-youtube-thumbnail img[data-fallback-src]').forEach(img => {
+        img.addEventListener('error', function handleThumbnailError() {
+            this.removeEventListener('error', handleThumbnailError);
+            if (this.dataset.fallbackSrc) this.src = this.dataset.fallbackSrc;
+        });
+    });
+
+    const courseSearch = document.getElementById('courseSearch');
+    const emptyTitle = document.getElementById('courseEmptyTitle');
+    const emptyHint = document.getElementById('courseEmptyHint');
+
+    // 카테고리 탭과 검색어를 함께 적용
+    function applyCourseFilter() {
+        const active = document.querySelector('.course-tab.active');
+        const filter = active ? active.dataset.filter : 'all';
+        const filterTypes = filter === 'all' ? [] : filter.split(',').map(type => type.trim());
+        const query = courseSearch.value.trim().toLowerCase();
+        let visible = 0;
+        courseCards.forEach(card => {
+            const inTab = filter === 'all' || filterTypes.includes(card.dataset.courseType);
+            const inSearch = !query || (card.dataset.search || '').toLowerCase().includes(query);
+            card.hidden = !(inTab && inSearch);
+            if (!card.hidden) visible++;
+        });
+        if (query) {
+            emptyTitle.textContent = "'" + courseSearch.value.trim() + "'에 맞는 강의가 없어요.";
+            emptyHint.textContent = '다른 검색어를 입력하거나 전체 탭에서 찾아보세요.';
+        } else {
+            emptyTitle.textContent = '해당 강의가 아직 준비 중입니다.';
+            emptyHint.textContent = '다른 카테고리의 강의를 먼저 둘러보세요.';
+        }
+        courseEmpty.classList.toggle('visible', visible === 0);
+    }
+
+    courseTabs.forEach(tab => {
+        tab.addEventListener('click', function () {
+            courseTabs.forEach(item => item.classList.remove('active'));
+            this.classList.add('active');
+            applyCourseFilter();
+        });
+    });
+    courseSearch.addEventListener('input', applyCourseFilter);
+
+    async function toggleFavorite(btn) {
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content || '';
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';
+        try {
+            const res = await fetch(`/api/learn/${btn.dataset.lang}/favorite`, {
+                method: 'POST',
+                headers: { [csrfHeader]: csrfToken }
+            });
+            if (res.status === 401 || res.status === 403) {
+                alert('로그인이 필요합니다.');
+                return;
+            }
+            const data = await res.json();
+            if (data.success) {
+                btn.textContent = data.favorite ? '♥' : '♡';
+                btn.setAttribute('aria-pressed', data.favorite ? 'true' : 'false');
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+/* 목업 전용: 서버가 필요한 AI 도우미는 숨기고 목업 안내를 표시 */
+#ai-buddy, .ai-buddy, .ai-buddy-panel { display: none !important; }
+.demo-banner {
+  padding: 8px 16px; text-align: center; font-size: .82rem; font-weight: 600;
+  background: #eef0ff; color: #3f46d5; border-bottom: 1px solid #d8dcff;
+}
+[data-theme="dark"] .demo-banner { background: #1e2250; color: #c7d2fe; border-color: #2e3470; }

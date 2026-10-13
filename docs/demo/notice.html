@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>목업 안내 - CodingEdu</title>
+<style>
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 16px;
+         background: #f7f8fc; color: #0f172a; font-family: Inter, system-ui, sans-serif; }
+  .box { max-width: 420px; padding: 32px 28px; text-align: center; background: #fff;
+         border: 1px solid #e4e8f0; border-radius: 16px; box-shadow: 0 2px 8px rgba(28,39,68,.05); }
+  .box b { color: #4f55e7; }
+  h1 { margin: 0 0 10px; font-size: 1.3rem; }
+  p { margin: 0 0 22px; color: #475569; line-height: 1.7; }
+  .actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  a, button { padding: 10px 16px; border-radius: 8px; font: inherit; font-weight: 700; font-size: .9rem;
+              text-decoration: none; cursor: pointer; }
+  a { background: #4f55e7; color: #fff; border: 1px solid #4f55e7; }
+  button { background: #fff; color: #0f172a; border: 1px solid #e4e8f0; }
+</style>
+</head>
+<body>
+  <div class="box">
+    <h1><b>Coding</b>Edu 목업</h1>
+    <p>이 기능은 서버가 필요해서 목업에서는 동작하지 않아요.<br>홈·강의·퀴즈 화면과 학습 지도를 둘러보세요.</p>
+    <div class="actions">
+      <button type="button" onclick="history.back()">이전 화면</button>
+      <a href="index.html">홈으로</a>
+    </div>
+  </div>
+</body>
+</html>

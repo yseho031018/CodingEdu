@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>마이페이지 - CodeEdu</title>
+    <link rel="stylesheet" href="../../css/common.css">
+    <link rel="stylesheet" href="../../css/tailwind.css">
+    <link rel="stylesheet" href="../../css/design-refresh.css">
+    <style>
+        .mypage-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 36px;
+            padding: 0;
+            max-width: 1240px;
+            margin: 0 auto;
+        }
+
+        /* 사이드바 - 프로필 카드 */
+        .profile-card {
+            background: var(--bg-surface);
+            border-radius: 24px;
+            padding: 36px 28px;
+            border: 1px solid var(--border-card);
+            text-align: center;
+            position: sticky;
+            top: 88px;
+            height: fit-content;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+        .profile-card:hover {
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(79,85,231,0.12);
+        }
+        .profile-avatar-wrap {
+            width: 92px; height: 92px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-h));
+            padding: 3px;
+            margin: 0 auto 18px;
+        }
+        .profile-avatar {
+            width: 86px; height: 86px;
+            background: var(--bg-surface);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; color: var(--accent); font-weight: 900;
+        }
+        .profile-name { font-size: 1.3rem; font-weight: 800; color: var(--ink-1); margin-bottom: 4px; letter-spacing: -0.02em; }
+        .profile-username { font-size: .88rem; color: var(--ink-3); margin-bottom: 12px; font-weight: 500; }
+        .profile-email { font-size: .84rem; color: var(--ink-2); margin-bottom: 8px; word-break: break-all; font-weight: 500; }
+        .profile-since { font-size: .8rem; color: var(--ink-3); font-weight: 500; }
+
+        .profile-divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+        .stat-row { display: flex; justify-content: space-around; gap: 8px; }
+        .stat-box {
+            text-align: center;
+            background: var(--bg-section);
+            border-radius: 16px;
+            padding: 14px 10px;
+            flex: 1;
+            border: 1px solid var(--border-card);
+            transition: all 0.2s ease;
+        }
+        .stat-box:hover { transform: translateY(-2px); border-color: rgba(79,85,231,0.15); }
+        .stat-box .num {
+            font-size: 1.5rem; font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--accent-h));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.03em;
+        }
+        .stat-box .label { font-size: .75rem; color: var(--ink-3); margin-top: 4px; font-weight: 600; }
+
+        /* 메인 콘텐츠 */
+        .section-block {
+            background: var(--bg-surface);
+            border-radius: 24px;
+            padding: 32px;
+            border: 1px solid var(--border-card);
+            margin-bottom: 28px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+        .section-block:hover {
+            box-shadow: var(--shadow-md);
+            border-color: rgba(79,85,231,0.08);
+        }
+        .block-title {
+            font-size: 1.15rem; font-weight: 800; color: var(--ink-1);
+            margin-bottom: 24px; padding-bottom: 14px;
+            border-bottom: 2px solid var(--accent-soft);
+            display: flex; align-items: center; gap: 10px;
+            letter-spacing: -0.02em;
+        }
+
+        /* 전체 학습 진도 요약 */
+        .overall-progress {
+            display: flex; align-items: center; gap: 24px; margin-bottom: 28px;
+        }
+        .big-progress-circle {
+            flex-shrink: 0;
+            width: 110px; height: 110px;
+            border-radius: 50%;
+            background: conic-gradient(var(--accent) calc(var(--pct) * 1%), var(--border) 0%);
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+            box-shadow: var(--shadow-sm);
+        }
+        .big-progress-circle::after {
+            content: '';
+            position: absolute;
+            width: 78px; height: 78px;
+            background: var(--bg-surface);
+            border-radius: 50%;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.04);
+        }
+        .big-progress-inner {
+            position: relative; z-index: 1;
+            font-size: 1.15rem; font-weight: 900;
+            background: linear-gradient(135deg, var(--accent), var(--accent-h));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .overall-text h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; color: var(--ink-1); }
+        .overall-text p { font-size: .9rem; color: var(--ink-2); font-weight: 500; }
+
+        /* 언어별 진도 그리드 */
+        .course-progress-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 14px;
+        }
+        .course-progress-item {
+            background: var(--bg);
+            border-radius: 18px;
+            padding: 18px 20px;
+            border: 1px solid var(--border-card);
+            text-decoration: none;
+            color: var(--ink-1);
+            transition: all 0.25s cubic-bezier(0.22,1,0.36,1);
+            display: block;
+        }
+        .course-progress-item:hover {
+            border-color: rgba(79,85,231,0.2);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-3px);
+        }
+        .course-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .course-item-name { font-size: .92rem; font-weight: 700; }
+        .course-item-count { font-size: .78rem; color: var(--ink-3); font-weight: 600; }
+        .mini-bar { height: 6px; background: var(--border-card); border-radius: 100px; overflow: hidden; }
+        .mini-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-h)); border-radius: 100px; transition: width .5s cubic-bezier(0.22,1,0.36,1); }
+        .course-item-pct { font-size: .78rem; color: var(--accent); font-weight: 700; margin-top: 6px; }
+
+        /* 퀴즈 이력 */
+        .quiz-history-list { display: flex; flex-direction: column; gap: 12px; }
+        .quiz-history-item {
+            display: flex; align-items: center; gap: 18px;
+            padding: 16px 20px;
+            border-radius: 16px;
+            border: 1px solid var(--border-card);
+            background: var(--bg);
+            text-decoration: none;
+            color: var(--ink-1);
+            transition: all 0.25s ease;
+        }
+        .quiz-history-item:hover {
+            border-color: rgba(79,85,231,0.18);
+            background: var(--bg-surface);
+            box-shadow: var(--shadow-sm);
+            transform: translateX(4px);
+        }
+        .grade-badge {
+            width: 48px; height: 48px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; font-weight: 900;
+            flex-shrink: 0;
+        }
+        .grade-A { background: var(--success-soft); color: var(--success); }
+        .grade-B { background: var(--accent-soft); color: var(--accent); }
+        .grade-C { background: var(--amber-soft); color: var(--warning); }
+        .grade-D { background: var(--amber-soft); color: var(--amber); }
+        .grade-F { background: var(--danger-soft); color: var(--danger); }
+        .quiz-history-info { flex: 1; }
+        .quiz-history-title { font-size: .95rem; font-weight: 700; margin-bottom: 3px; }
+        .quiz-history-meta { font-size: .8rem; color: var(--ink-3); font-weight: 500; }
+        .quiz-score-pill {
+            font-size: .86rem; font-weight: 700;
+            padding: 5px 14px; border-radius: 50px;
+            background: var(--accent-soft); color: var(--accent);
+        }
+        .quiz-empty { text-align: center; color: var(--ink-3); padding: 28px; font-size: .92rem; font-weight: 500; }
+
+        /* 내 게시글 */
+        .post-list { display: flex; flex-direction: column; gap: 10px; }
+        .post-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 18px;
+            border-radius: 14px;
+            border: 1px solid var(--border-card);
+            text-decoration: none;
+            color: var(--ink-1);
+            transition: all 0.25s ease;
+            background: var(--bg);
+        }
+        .post-item:hover {
+            border-color: rgba(79,85,231,0.18);
+            background: var(--bg-surface);
+            box-shadow: var(--shadow-sm);
+            transform: translateX(4px);
+        }
+        .post-item-title { font-size: .92rem; font-weight: 600; flex: 1; }
+        .post-item-meta { font-size: .78rem; color: var(--ink-3); white-space: nowrap; margin-left: 16px; font-weight: 500; }
+        .post-category-tag {
+            font-size: .72rem; font-weight: 700;
+            padding: 3px 10px; border-radius: 50px;
+            background: var(--accent-soft); color: var(--accent);
+            margin-right: 10px; flex-shrink: 0;
+        }
+        .post-empty { text-align: center; color: var(--ink-3); padding: 28px; font-size: .92rem; font-weight: 500; }
+
+        /* 관리자 전용 버튼 */
+        .admin-panel-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 12px 16px;
+            margin-top: 18px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--warning-soft), var(--amber-soft));
+            color: var(--warning);
+            border: 1.5px solid rgba(245,158,11,0.2);
+            font-size: .88rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            letter-spacing: -0.01em;
+        }
+        .admin-panel-link:hover {
+            background: linear-gradient(135deg, var(--warning), #d97706);
+            color: #fff;
+            box-shadow: 0 6px 18px rgba(245,158,11,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .mypage-layout { grid-template-columns: 1fr; padding: 24px 4%; gap: 24px; }
+            .profile-card { position: static; padding: 28px 22px; }
+            .profile-avatar-wrap { width: 76px; height: 76px; }
+            .profile-avatar { width: 70px; height: 70px; font-size: 1.7rem; }
+            .big-progress-circle { width: 90px; height: 90px; }
+            .big-progress-circle::after { width: 64px; height: 64px; }
+            .stat-row { gap: 8px; }
+            .stat-box { padding: 12px 8px; }
+            .block-title { font-size: 1.05rem; }
+            .section-block { padding: 24px; border-radius: 20px; }
+            .course-progress-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+<link rel="stylesheet" href="../../demo.css">
+</head>
+<body class="page-courses">
+<div class="course-app-shell">
+    <aside class="course-sidebar">
+        <a href="../../me/index.html" class="course-side-logo">
+            <span class="brand-text"><b>Coding</b>Edu</span>
+        </a>
+
+        <nav class="course-side-nav" aria-label="주요 메뉴">
+            <a href="../../me/index.html"><img src="../../images/course-menu/home.png" alt="" aria-hidden="true">홈</a>
+            <a href="../../me/learn/index.html"><img src="../../images/course-menu/courses.png" alt="" aria-hidden="true">강의</a>
+            <a href="../../me/quiz/index.html"><img src="../../images/course-menu/quiz.png" alt="" aria-hidden="true">퀴즈</a>
+            <a href="../../notice.html"><img src="../../images/course-menu/challenge.png" alt="" aria-hidden="true">챌린지</a>
+            <a href="../../notice.html"><img src="../../images/course-menu/community.png" alt="" aria-hidden="true">커뮤니티</a>
+            <a href="../../notice.html"><img src="../../images/course-menu/ai.svg" alt="" aria-hidden="true">AI 도우미</a>
+            <a href="../../me/mypage/index.html" class="active"><img src="../../images/course-menu/mypage.png" alt="" aria-hidden="true">마이페이지</a>
+            <a href="../../notice.html"><img src="../../images/course-menu/settings.png" alt="" aria-hidden="true">설정</a>
+        </nav>
+
+        <div class="course-side-account">
+            
+            
+            <a href="../../me/mypage/index.html" class="primary">내 학습 기록</a>
+        </div>
+    </aside>
+
+    <main class="course-page-main">
+        <header class="course-page-heading">
+            <div>
+                <span class="course-page-kicker">MY PAGE</span>
+                <h1>마이페이지</h1>
+                <p>나의 학습 현황과 활동을 한눈에 확인하세요.</p>
+            </div>
+            <button class="course-theme-button" id="themeToggle" title="테마 전환" aria-label="다크/라이트 모드 전환"></button>
+        </header>
+
+        <div class="mypage-layout">
+
+    <!-- 사이드바: 프로필 -->
+    <aside>
+        <div class="profile-card">
+            <div class="profile-avatar-wrap">
+                <div class="profile-avatar">데</div>
+            </div>
+            <div class="profile-name">데모학습자</div>
+            <div class="profile-username">@demo_learner</div>
+            <div class="profile-email">demo@example.com</div>
+            <div class="profile-since">가입일: 2026.10.14</div>
+
+            <hr class="profile-divider">
+
+            <div class="stat-row">
+                <div class="stat-box">
+                    <div class="num">38</div>
+                    <div class="label">완료 강의</div>
+                </div>
+                <div class="stat-box">
+                    <div class="num">3</div>
+                    <div class="label">퀴즈 응시</div>
+                </div>
+                <div class="stat-box">
+                    <div class="num">0</div>
+                    <div class="label">작성 글</div>
+                </div>
+            </div>
+
+            <!-- 관리자 전용 링크 -->
+            
+        </div>
+    </aside>
+
+    <!-- 메인 콘텐츠 -->
+    <div class="mypage-content">
+
+        <!-- 전체 학습 진도 -->
+        <div class="section-block reveal">
+            <div class="block-title">📚 학습 진도</div>
+
+            <div class="overall-progress">
+                <div class="big-progress-circle" style="--pct:12">
+                    <div class="big-progress-inner">12%</div>
+                </div>
+                <div class="overall-text">
+                    <h3>전체 학습률</h3>
+                    <p>38 / 312 강의 완료</p>
+                    
+                </div>
+            </div>
+
+            <div class="course-progress-grid">
+                <a href="../../me/learn/html/index.html"
+                   class="course-progress-item">
+                    <div class="course-item-header">
+                        <span class="course-item-name">HTML WEB1 - HTML &amp; Internet</span>
+                        <span class="course-item-count">28/28</span>
+                    </div>
+                    <div class="mini-bar">
+                        <div class="mini-bar-fill" style="width:100%"></div>
+                    </div>
+                    <div class="course-item-pct">100% 완료</div>
+                </a><a href="../../me/learn/css/index.html"
+                   class="course-progress-item">
+                    <div class="course-item-header">
+                        <span class="course-item-name">🎨 WEB2 - CSS</span>
+                        <span class="course-item-count">6/15</span>
+                    </div>
+                    <div class="mini-bar">
+                        <div class="mini-bar-fill" style="width:40%"></div>
+                    </div>
+                    <div class="course-item-pct">40% 완료</div>
+                </a><a href="../../me/learn/javascript/index.html"
+                   class="course-progress-item">
+                    <div class="course-item-header">
+                        <span class="course-item-name">⚡ WEB2 - JavaScript</span>
+                        <span class="course-item-count">0/38</span>
+                    </div>
+                    <div class="mini-bar">
+                        <div class="mini-bar-fill" style="width:0%"></div>
+                    </div>
+                    <div class="course-item-pct">0% 완료</div>
+                </a><a href="../../me/learn/java/index.html"
+                   class="course-progress-item">
+                    <div class="course-item-header">
+                        <span class="course-item-name">JAVA Java 입문 수업</span>
+                        <span class="course-item-count">0/100</span>
+                    </div>
+                    <div class="mini-bar">
+                        <div class="mini-bar-fill" style="width:0%"></div>
+                    </div>
+                    <div class="course-item-pct">0% 완료</div>
+                </a><a href="../../me/learn/php/index.html"
+                   class="course-progress-item">
+                    <div class="course-item-header">
+                        <span class="course-item-name">PHP WEB2-PHP</span>
+                        <span class="course-item-count">0/42</span>
+                    </div>
+                    <div class="mini-bar">
+                        <div class="mini-bar-fill" style="width:0%"></div>
+                    </div>
+                    <div class="course-item-pct">0% 완료</div>
+                </a><a href="../../me/learn/mysql/index.html"
+                   class="course-progress-item">
+                    <div class="course-item-header">
+                        <span class="course-item-name">SQL DATABASE2 - MySQL</span>
+                        <span class="course-item-count">4/27</span>
+                    </div>
+                    <div class="mini-bar">
+                        <div class="mini-bar-fill" style="width:14%"></div>
+                    </div>
+                    <div class="course-item-pct">14% 완료</div>
+                </a><a href="../../me/learn/sqljoin/index.html"
+                   class="course-progress-item">
+                    <div class="course-item-header">
+                        <span class="course-item-name">JOIN SQL JOIN</span>
+                        <span class="course-item-count">0/8</span>
+                    </div>
+                    <div class="mini-bar">
+                        <div class="mini-bar-fill" style="width:0%"></div>
+                    </div>
+                    <div class="course-item-pct">0% 완료</div>
+                </a><a href="../../me/learn/python/index.html"
+                   class="course-progress-item">
+                    <div class="course-item-header">
+                        <span class="course-item-name">PY Python 입문수업</span>
+                        <span class="course-item-count">0/18</span>
+                    </div>
+                    <div class="mini-bar">
+                        <div class="mini-bar-fill" style="width:0%"></div>
+                    </div>
+                    <div class="course-item-pct">0% 완료</div>
+                </a><a href="../../me/learn/react/index.html"
+                   class="course-progress-item">
+                    <div class="course-item-header">
+                        <span class="course-item-name">REACT React 2022 개정판</span>
+                        <span class="course-item-count">0/10</span>
+                    </div>
+                    <div class="mini-bar">
+                        <div class="mini-bar-fill" style="width:0%"></div>
+                    </div>
+                    <div class="course-item-pct">0% 완료</div>
+                </a><a href="../../me/learn/nextjs/index.html"
+                   class="course-progress-item">
+                    <div class="course-item-header">
+                        <span class="course-item-name">NEXT Next.js 13</span>
+                        <span class="course-item-count">0/18</span>
+                    </div>
+                    <div class="mini-bar">
+                        <div class="mini-bar-fill" style="width:0%"></div>
+                    </div>
+                    <div class="course-item-pct">0% 완료</div>
+                </a><a href="../../me/learn/git/index.html"
+                   class="course-progress-item">
+                    <div class="course-item-header">
+                        <span class="course-item-name">GIT GIT1</span>
+                        <span class="course-item-count">0/8</span>
+                    </div>
+                    <div class="mini-bar">
+                        <div class="mini-bar-fill" style="width:0%"></div>
+                    </div>
+                    <div class="course-item-pct">0% 완료</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 퀴즈 이력 -->
+        <div class="section-block reveal">
+            <div class="block-title">
+                🎯 퀴즈 이력
+                <span style="font-size:.82rem; font-weight:600; color:var(--ink-3);">· 최고 B등급</span>
+            </div>
+
+            <div class="quiz-history-list">
+                <a href="../../notice.html"
+                   class="quiz-history-item">
+                    <div class="grade-badge grade-B">B</div>
+                    <div class="quiz-history-info">
+                        <div class="quiz-history-title">⚛️ React 핵심 개념</div>
+                        <div class="quiz-history-meta">2026.10.14 11:05</div>
+                    </div>
+                    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+                        <div class="quiz-score-pill">4/5 (80%)</div>
+                        <div style="font-size:.78rem; color:var(--danger); font-weight:700;">오답 1개</div>
+                    </div>
+                </a><a href="../../notice.html"
+                   class="quiz-history-item">
+                    <div class="grade-badge grade-B">B</div>
+                    <div class="quiz-history-info">
+                        <div class="quiz-history-title">🔀 Git 버전 관리 기초</div>
+                        <div class="quiz-history-meta">2026.10.14 11:05</div>
+                    </div>
+                    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+                        <div class="quiz-score-pill">4/5 (80%)</div>
+                        <div style="font-size:.78rem; color:var(--danger); font-weight:700;">오답 1개</div>
+                    </div>
+                </a><a href="../../notice.html"
+                   class="quiz-history-item">
+                    <div class="grade-badge grade-B">B</div>
+                    <div class="quiz-history-info">
+                        <div class="quiz-history-title">🧮 알고리즘과 자료구조</div>
+                        <div class="quiz-history-meta">2026.10.14 11:05</div>
+                    </div>
+                    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+                        <div class="quiz-score-pill">4/5 (80%)</div>
+                        <div style="font-size:.78rem; color:var(--danger); font-weight:700;">오답 1개</div>
+                    </div>
+                </a>
+            </div>
+
+            
+        </div>
+
+        <!-- 참여중인 챌린지 -->
+        <div class="section-block reveal">
+            <div class="block-title">
+                🏆 참여중인 챌린지
+                <span style="font-size:.82rem; font-weight:600; color:var(--ink-3);">총 0개</span>
+            </div>
+
+            
+
+            <div class="post-empty">
+                참여한 챌린지가 없어요.<br>
+                <a href="../../notice.html" style="color:var(--accent); font-weight:700;">챌린지 보러 가기 →</a>
+            </div>
+        </div>
+
+        <!-- 내 게시글 -->
+        <div class="section-block reveal">
+            <div class="block-title">
+                💬 내 게시글
+                <span style="font-size:.82rem; font-weight:600; color:var(--ink-3);">총 0개</span>
+            </div>
+
+            
+
+            <div class="post-empty">
+                작성한 게시글이 없어요.<br>
+                <a href="../../notice.html" style="color:var(--accent); font-weight:700;">글 쓰러 가기 →</a>
+            </div>
+        </div>
+
+    </div>
+        </div>
+    </main>
+</div>
+
+<script src="../../js/nav.js"></script>
+
+</body>
+</html>

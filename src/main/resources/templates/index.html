@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="/css/design-refresh.css">
 <link rel="stylesheet" href="/css/roadmap.css">
 <link rel="stylesheet" href="/css/site-nav.css">
+<link rel="stylesheet" href="/css/mobile.css">
 </head>
 <body class="page-index">
 
@@ -25,13 +26,13 @@
   </a>
 
   <div class="nav-links">
-    <a href="/">홈</a>
-    <a href="/learn">강의</a>
-    <a href="/quiz">퀴즈</a>
-    <a href="/challenge">챌린지</a>
-    <a href="/community">커뮤니티</a>
-    <a href="/ai">AI 도우미</a>
-    <a href="/mypage" sec:authorize="isAuthenticated()">마이페이지</a>
+    <a href="/" data-tab="home">홈</a>
+    <a href="/learn" data-tab="learn">강의</a>
+    <a href="/quiz" data-tab="quiz">퀴즈</a>
+    <a href="/challenge" data-tab="more">챌린지</a>
+    <a href="/community" data-tab="more">커뮤니티</a>
+    <a href="/ai" data-tab="more">AI 도우미</a>
+    <a href="/mypage" data-tab="my" sec:authorize="isAuthenticated()">마이페이지</a>
   </div>
 
   <div class="nav-right">
@@ -73,9 +74,8 @@
       <div class="home-hero-actions">
         <a href="/learn" class="home-primary-btn" sec:authorize="isAnonymous()">강의 시작하기</a>
         <a sec:authorize="isAuthenticated()" class="home-primary-btn"
-           th:with="cg=${continueLang != null ? courseGuides[continueLang] : null}"
            th:href="${continueLang != null} ? @{/learn/{lang}(lang=${continueLang})} : '#learningRoadmap'"
-           th:text="${cg != null} ? '이어서 학습: ' + ${cg.name} : '학습 시작하기'">이어서 학습</a>
+           th:text="${continueCourseName != null} ? '이어서 학습: ' + ${continueCourseName} : '학습 시작하기'">이어서 학습</a>
         <a href="#learningRoadmap" class="home-secondary-btn">학습 지도 보기</a>
       </div>
     </div>

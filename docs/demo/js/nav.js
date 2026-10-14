@@ -32,6 +32,110 @@
   });
 })();
 
+// 모바일 하단 탭바 + 더보기 시트 (상단 내비 링크로 구성 → 서버·정적 목업 모두 같은 주소 사용)
+(function () {
+  var topNav = document.querySelector('nav .nav-links');
+  if (!topNav || document.getElementById('mobileTabbar')) return;
+
+  var ICONS = {
+    home: '<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5.5v-6h-5v6H4a1 1 0 0 1-1-1z"/>',
+    learn: '<path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H19v15H5.5a1.5 1.5 0 0 0 0 3H19M8 7h7"/>',
+    quiz: '<path d="M9 11.5 11 13.5 15.5 9M5 3h14v18H5z"/>',
+    my: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
+    more: '<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>'
+  };
+  function icon(name) {
+    return '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + ICONS[name] + '</svg>';
+  }
+  function linkFor(tab) { return topNav.querySelector('a[data-tab="' + tab + '"]'); }
+
+  // <nav>로 만들면 사이트 공통 nav 스타일(sticky·높이)이 적용되므로 div + role 사용
+  var bar = document.createElement('div');
+  bar.id = 'mobileTabbar';
+  bar.className = 'mobile-tabbar';
+  bar.setAttribute('role', 'navigation');
+  bar.setAttribute('aria-label', '하단 메뉴');
+
+  function addTab(name, label, source) {
+    if (!source) return;
+    var a = document.createElement('a');
+    a.href = source.getAttribute('href');
+    a.innerHTML = icon(name) + '<span>' + label + '</span>';
+    if (source.classList.contains('active')) {
+      a.classList.add('active');
+      a.setAttribute('aria-current', 'page');
+    }
+    bar.appendChild(a);
+  }
+  addTab('home', '홈', linkFor('home'));
+  addTab('learn', '강의', linkFor('learn'));
+  addTab('quiz', '퀴즈', linkFor('quiz'));
+  // 로그인 상태면 마이페이지, 아니면 로그인
+  var mySource = linkFor('my') || document.querySelector('nav .nav-right a.btn-login.ghost');
+  addTab('my', linkFor('my') ? 'MY' : '로그인', mySource);
+
+  var moreBtn = document.createElement('button');
+  moreBtn.type = 'button';
+  moreBtn.innerHTML = icon('more') + '<span>더보기</span>';
+  moreBtn.setAttribute('aria-haspopup', 'dialog');
+  moreBtn.setAttribute('aria-expanded', 'false');
+  moreBtn.setAttribute('aria-controls', 'mobileMoreSheet');
+  bar.appendChild(moreBtn);
+
+  // 더보기 시트: 나머지 메뉴 + 계정 메뉴
+  var sheet = document.createElement('div');
+  sheet.id = 'mobileMoreSheet';
+  sheet.className = 'mobile-sheet';
+  sheet.setAttribute('role', 'dialog');
+  sheet.setAttribute('aria-modal', 'true');
+  sheet.setAttribute('aria-label', '더보기 메뉴');
+  sheet.hidden = true;
+  var items = '';
+  topNav.querySelectorAll('a[data-tab="more"]').forEach(function (a) {
+    items += '<a href="' + a.getAttribute('href') + '">' + a.textContent.trim() + '<span aria-hidden="true">›</span></a>';
+  });
+  var accountLinks = document.querySelectorAll('nav .nav-right a[href]:not(.nav-mobile-only)');
+  accountLinks.forEach(function (a) {
+    var text = a.textContent.replace(/[⚙️🔔👤]/g, '').replace(/\s+/g, ' ').trim();
+    if (a.classList.contains('nav-notify')) text = '알림';
+    // 탭바에 이미 있는 로그인·마이페이지(사용자 이름) 링크는 제외
+    if (!text || a === mySource || a.classList.contains('nav-user')) return;
+    items += '<a href="' + a.getAttribute('href') + '">' + text + '<span aria-hidden="true">›</span></a>';
+  });
+  // 상단바의 폼은 로그아웃 폼 하나뿐 (정적 목업에서는 action 주소가 바뀌므로 위치로 찾음)
+  var logoutForm = document.querySelector('nav .nav-right form');
+  if (logoutForm) items += '<button type="button" data-logout>로그아웃</button>';
+  sheet.innerHTML = '<div class="mobile-sheet-panel"><div class="mobile-sheet-head"><strong>더보기</strong>'
+    + '<button type="button" class="mobile-sheet-close" aria-label="닫기">✕</button></div>'
+    + '<div class="mobile-sheet-list">' + items + '</div></div>';
+
+  function openSheet() {
+    sheet.hidden = false;
+    requestAnimationFrame(function () { sheet.classList.add('open'); });
+    moreBtn.setAttribute('aria-expanded', 'true');
+    var first = sheet.querySelector('.mobile-sheet-list a, .mobile-sheet-list button');
+    if (first) first.focus();
+  }
+  function closeSheet() {
+    sheet.classList.remove('open');
+    moreBtn.setAttribute('aria-expanded', 'false');
+    setTimeout(function () { sheet.hidden = true; }, 200);
+    moreBtn.focus();
+  }
+  moreBtn.addEventListener('click', function () { sheet.hidden ? openSheet() : closeSheet(); });
+  sheet.addEventListener('click', function (e) {
+    if (e.target === sheet || e.target.closest('.mobile-sheet-close')) closeSheet();
+    if (e.target.closest('[data-logout]') && logoutForm) logoutForm.submit();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !sheet.hidden) closeSheet();
+  });
+
+  document.body.appendChild(sheet);
+  document.body.appendChild(bar);
+  document.body.classList.add('has-mobile-tabbar');
+})();
+
 // 다크모드 토글
 (function () {
   var html = document.documentElement;

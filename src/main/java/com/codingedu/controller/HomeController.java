@@ -97,8 +97,12 @@ public class HomeController {
         var roadmapTracks = learningRoadmapService.buildTracks(progressByLang);
         model.addAttribute("roadmapTracks", roadmapTracks);
         model.addAttribute("roadmapInitialTrack", learningRoadmapService.initialTrack(roadmapTracks));
-        model.addAttribute("courseGuides", learningRoadmapService.courseGuides());
-        model.addAttribute("continueLang", learningRoadmapService.continueLang(progressByLang));
+        var courseGuides = learningRoadmapService.courseGuides();
+        String continueLang = learningRoadmapService.continueLang(progressByLang);
+        model.addAttribute("courseGuides", courseGuides);
+        model.addAttribute("continueLang", continueLang);
+        model.addAttribute("continueCourseName",
+                continueLang != null && courseGuides.containsKey(continueLang) ? courseGuides.get(continueLang).name() : null);
         return "index";
     }
 

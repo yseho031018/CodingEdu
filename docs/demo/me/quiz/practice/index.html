@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="UTF-8">
+    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>연습 퀴즈 - CodeEdu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../../css/common.css">
+<link rel="stylesheet" href="../../../css/tailwind.css">
+<link rel="stylesheet" href="../../../css/design-refresh.css">
+<style>
+  .course-page-heading { max-width: 660px; }
+  .quiz-wrap {
+    padding: 0;
+    display: flex; align-items: flex-start; justify-content: center;
+  }
+  .card {
+    width: 100%; max-width: 660px;
+    background: var(--bg-surface);
+    border-radius: 8px;
+    padding: 40px 36px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-card);
+    transition: background 0.3s, border-color 0.3s;
+  }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── INTRO ── */
+  .intro-hero {
+    text-align: center;
+    padding-bottom: 28px;
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+  }
+  .intro-icon { font-size: 3rem; margin-bottom: 14px; display: block; }
+  .intro-hero h1 {
+    font-size: 1.85rem; font-weight: 900;
+    color: var(--ink-1); letter-spacing: -0.02em;
+    margin: 0 0 10px;
+  }
+  .intro-hero p { color: var(--ink-2); font-size: .95rem; font-weight: 500; }
+
+  .section-label {
+    font-size: .78rem; font-weight: 850;
+    color: var(--ink-3); letter-spacing: 0.05em;
+    text-transform: uppercase; margin-bottom: 14px;
+  }
+
+  /* 난이도 선택 */
+  .diff-btns { display: flex; gap: 12px; margin-bottom: 28px; }
+  .diff-btn {
+    flex: 1; padding: 18px 12px; border-radius: 8px;
+    border: 1px solid var(--border-card);
+    background: var(--bg-section);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+  }
+  .diff-btn:hover { border-color: var(--accent); background: var(--bg-surface); transform: translateY(-2px); }
+  .diff-btn.selected { border-color: var(--accent); background: var(--accent-soft); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .diff-btn .lbl {
+    font-size: 1rem; font-weight: 850;
+    color: var(--ink-1); margin-bottom: 5px;
+    letter-spacing: -0.01em;
+  }
+  .diff-btn.selected .lbl { color: var(--accent); }
+  .diff-btn .desc { color: var(--ink-3); font-size: .8rem; font-weight: 600; }
+
+  /* 장르 선택 */
+  .genre-btns { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 28px; }
+  .genre-btn {
+    padding: 8px 18px; border-radius: 6px;
+    border: 1px solid var(--border-card);
+    background: var(--bg-section);
+    color: var(--ink-2); font-size: .88rem; font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .genre-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--bg-surface); }
+  .genre-btn.selected {
+    border-color: var(--accent); background: var(--accent-soft);
+    color: var(--accent); font-weight: 800;
+  }
+
+  /* 문제 수 선택 */
+  .count-btns { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 32px; }
+  .count-btn {
+    padding: 9px 24px; border-radius: 6px;
+    border: 1px solid var(--border-card); background: var(--bg-section);
+    color: var(--ink-2); font-size: .9rem; font-weight: 750;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .count-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--bg-surface); }
+  .count-btn.selected {
+    border-color: var(--accent); background: var(--accent-soft); color: var(--accent);
+  }
+
+  /* 시작 버튼 */
+  .quiz-play-btn {
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; min-width: 160px; padding: 18px 24px; 
+    border-radius: 8px; border: none; cursor: pointer;
+    background: var(--accent); color: white;
+    font-size: 1.15rem; font-weight: 850; letter-spacing: -0.01em;
+    transition: all .2s ease;
+    box-shadow: 0 4px 12px rgba(79,85,231,0.2);
+    text-align: center; white-space: nowrap;
+    box-sizing: border-box;
+    margin-top: 10px;
+  }
+  .quiz-play-btn:hover:not(:disabled) {
+    background: var(--accent-h);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(79,85,231,0.3);
+  }
+  .quiz-play-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  /* ── QUIZ SCREEN ── */
+  .quiz-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px; font-size: .84rem; color: var(--ink-2); font-weight: 500;
+  }
+  .xp-badge {
+    background: var(--amber-soft); color: var(--amber);
+    font-weight: 700; padding: 5px 13px;
+    border-radius: 50px; font-size: .82rem;
+  }
+  .progress-wrap {
+    height: 5px; background: var(--border);
+    border-radius: 10px; margin-bottom: 20px; overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%; border-radius: 10px;
+    background: linear-gradient(90deg, var(--accent), var(--amber));
+    transition: width 0.4s cubic-bezier(0.22,1,0.36,1); width: 0%;
+  }
+
+  .meta-tags { margin-bottom: 16px; display: flex; gap: 8px; }
+  .meta-tag {
+    padding: 4px 13px; border-radius: 50px;
+    font-size: .76rem; font-weight: 600;
+  }
+  .meta-tag-genre { background: var(--accent-soft); color: var(--accent); }
+  .meta-tag-diff  { background: var(--bg-section);  color: var(--ink-2); }
+
+  .question-text {
+    background: var(--bg-section);
+    border-radius: 16px; padding: 20px 22px;
+    border: 1px solid var(--border-card);
+    margin-bottom: 18px;
+    font-size: 1rem; font-weight: 600;
+    color: var(--ink-1); line-height: 1.75;
+    letter-spacing: -0.01em;
+  }
+
+  .options-wrap { display: flex; flex-direction: column; gap: 9px; margin-bottom: 16px; }
+  .option-btn {
+    background: var(--bg);
+    border: 1.5px solid var(--border-card);
+    border-radius: 14px;
+    padding: 13px 18px;
+    color: var(--ink-1); font-size: .92rem; font-weight: 500;
+    text-align: left; cursor: pointer;
+    transition: border-color 0.18s, background 0.18s, transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+    letter-spacing: -0.005em;
+  }
+  .option-btn:hover:not(.disabled) {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    transform: translateX(3px);
+  }
+  .option-btn.disabled { cursor: default; }
+  .option-btn.correct {
+    background: var(--success-soft);
+    border-color: var(--success);
+    color: var(--success); font-weight: 700;
+  }
+  .option-btn.wrong {
+    background: var(--danger-soft);
+    border-color: var(--danger);
+    color: var(--danger); font-weight: 700;
+  }
+
+  .explanation {
+    display: none;
+    background: var(--amber-soft);
+    border-left: 3px solid var(--amber);
+    border-radius: 12px; padding: 14px 18px;
+    color: var(--ink-2); font-size: .88rem; line-height: 1.65;
+    margin-bottom: 16px;
+  }
+
+  /* ── RESULT ── */
+  .result-header { text-align: center; margin-bottom: 28px; }
+  .result-icon { font-size: 3.2rem; display: block; margin-bottom: 12px; }
+  .result-title {
+    font-size: 1.6rem; font-weight: 800;
+    color: var(--ink-1); letter-spacing: -0.03em;
+    margin: 0 0 6px;
+  }
+  .result-sub { color: var(--ink-2); font-size: .9rem; }
+
+  .stat-grid {
+    display: flex; justify-content: center; gap: 0;
+    margin-bottom: 24px;
+    background: var(--bg-section);
+    border-radius: 18px; padding: 20px;
+    border: 1px solid var(--border-card);
+  }
+  .stat-item { flex: 1; text-align: center; }
+  .stat-item + .stat-item {
+    border-left: 1px solid var(--border);
+  }
+  .stat-val {
+    font-size: 2.2rem; font-weight: 900;
+    letter-spacing: -0.03em; line-height: 1.1;
+  }
+  .stat-lbl { color: var(--ink-3); font-size: .78rem; margin-top: 5px; font-weight: 500; }
+
+  .history-dots {
+    display: flex; gap: 6px; justify-content: center;
+    flex-wrap: wrap; margin-bottom: 24px;
+  }
+  .dot {
+    padding: 4px 12px; border-radius: 50px;
+    font-size: .76rem; font-weight: 600;
+  }
+  .dot.y { background: var(--success-soft); color: var(--success); border: 1px solid rgba(5,150,105,0.2); }
+  .dot.n { background: var(--danger-soft);  color: var(--danger);  border: 1px solid rgba(220,38,38,0.2); }
+
+  .result-btns { display: flex; flex-direction: column; gap: 10px; }
+  .btn-secondary {
+    width: 100%; padding: 14px; border-radius: 8px;
+    border: 1px solid var(--border-card);
+    background: var(--bg-surface); color: var(--ink-2);
+    font-size: .95rem; font-weight: 750; cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .btn-secondary:hover {
+    border-color: var(--accent); color: var(--accent);
+    background: var(--accent-soft); transform: translateY(-1px);
+  }
+
+  /* 에러 메시지 */
+  #error-msg {
+    color: var(--danger); font-size: .84rem;
+    font-weight: 600; margin-bottom: 12px;
+    padding: 10px 14px; background: var(--danger-soft);
+    border-radius: 10px; border-left: 3px solid var(--danger);
+  }
+</style>
+<link rel="stylesheet" href="../../../demo.css">
+</head>
+<body class="page-courses">
+<div class="course-app-shell">
+    <aside class="course-sidebar">
+        <a href="../../../me/index.html" class="course-side-logo">
+            <span class="brand-text"><b>Coding</b>Edu</span>
+        </a>
+
+        <nav class="course-side-nav" aria-label="주요 메뉴">
+            <a href="../../../me/index.html"><img src="../../../images/course-menu/home.png" alt="" aria-hidden="true">홈</a>
+            <a href="../../../me/learn/index.html"><img src="../../../images/course-menu/courses.png" alt="" aria-hidden="true">강의</a>
+            <a href="../../../me/quiz/index.html" class="active"><img src="../../../images/course-menu/quiz.png" alt="" aria-hidden="true">퀴즈</a>
+            <a href="../../../notice.html"><img src="../../../images/course-menu/challenge.png" alt="" aria-hidden="true">챌린지</a>
+            <a href="../../../notice.html"><img src="../../../images/course-menu/community.png" alt="" aria-hidden="true">커뮤니티</a>
+            <a href="../../../notice.html"><img src="../../../images/course-menu/ai.svg" alt="" aria-hidden="true">AI 도우미</a>
+            <a href="../../../me/mypage/index.html"><img src="../../../images/course-menu/mypage.png" alt="" aria-hidden="true">마이페이지</a>
+            <a href="../../../notice.html"><img src="../../../images/course-menu/settings.png" alt="" aria-hidden="true">설정</a>
+        </nav>
+
+        <div class="course-side-account">
+            
+            
+            <a href="../../../me/mypage/index.html" class="primary">내 학습 기록</a>
+        </div>
+    </aside>
+
+    <main class="course-page-main">
+        <header class="course-page-heading">
+            <div>
+                <span class="course-page-kicker">PRACTICE</span>
+                <h1>연습 퀴즈</h1>
+                <p>난이도와 주제를 골라 즉석에서 풀어보는 빠른 연습 모드입니다.</p>
+            </div>
+            <button class="course-theme-button" id="themeToggle" title="테마 전환" aria-label="다크/라이트 모드 전환"></button>
+        </header>
+
+        <div class="quiz-wrap">
+  <div class="card reveal">
+
+    <!-- INTRO SCREEN -->
+    <div id="screen-intro" class="screen active">
+      <div class="intro-hero">
+        <span class="intro-icon">💻</span>
+        <h1>코딩 연습 퀴즈</h1>
+        <p>코딩 지식을 테스트하고 실력을 키워보세요!</p>
+      </div>
+
+      <div class="section-label">난이도 선택</div>
+      <div class="diff-btns">
+        <div class="diff-btn" data-diff="easy" onclick="setDifficulty('easy')">
+          <div class="lbl">🌱 입문</div><div class="desc">코딩 기초</div>
+        </div>
+        <div class="diff-btn" data-diff="normal" onclick="setDifficulty('normal')">
+          <div class="lbl">💻 실무</div><div class="desc">주니어 개발자</div>
+        </div>
+        <div class="diff-btn" data-diff="hard" onclick="setDifficulty('hard')">
+          <div class="lbl">🔥 심화</div><div class="desc">시니어 개발자</div>
+        </div>
+      </div>
+
+      <div class="section-label">기술 스택 / 주제</div>
+      <div class="genre-btns" id="genre-container"></div>
+
+      <div class="section-label">문제 수</div>
+      <div class="count-btns">
+        <div class="count-btn selected" data-count="5"  onclick="setCount(5)">5문제</div>
+        <div class="count-btn" data-count="10" onclick="setCount(10)">10문제</div>
+        <div class="count-btn" data-count="15" onclick="setCount(15)">15문제</div>
+        <div class="count-btn" data-count="20" onclick="setCount(20)">20문제</div>
+      </div>
+
+      <p id="error-msg" style="display:none;"></p>
+      <button id="btn-start" class="quiz-play-btn" disabled onclick="startQuiz()">시작하기 →</button>
+    </div>
+
+
+    <!-- QUIZ SCREEN -->
+    <div id="screen-quiz" class="screen">
+      <div class="quiz-header">
+        <span id="quiz-progress-txt">문제 1 / 5</span>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <span id="quiz-streak" style="display:none; color:var(--amber); font-weight:800; font-size:.82rem;"></span>
+          <span class="xp-badge" id="quiz-xp-txt">⭐ 0 XP</span>
+        </div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-bar" id="quiz-progress-bar"></div>
+      </div>
+
+      <div class="meta-tags">
+        <span class="meta-tag meta-tag-genre" id="q-genre">장르</span>
+        <span class="meta-tag meta-tag-diff"  id="q-diff">난이도</span>
+      </div>
+
+      <div class="question-text" id="q-text">질문 내용</div>
+
+      <div class="options-wrap" id="q-options"></div>
+
+      <div class="explanation" id="q-exp">
+        💡 <span id="q-exp-text">해설</span>
+        <span style="color:var(--amber); margin-left:8px; display:none; font-weight:700;" id="q-exp-bonus">🔥 연속 보너스!</span>
+      </div>
+
+      <button class="quiz-play-btn" id="btn-next" style="display:none;" onclick="nextQuestion()">다음 문제 →</button>
+    </div>
+
+
+    <!-- RESULT SCREEN -->
+    <div id="screen-result" class="screen">
+      <div class="result-header">
+        <span class="result-icon">🏆</span>
+        <div class="result-title" id="r-title">완료!</div>
+        <p class="result-sub">라운드 완료!</p>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-item">
+          <div class="stat-val" style="color:var(--accent);" id="r-score">0/5</div>
+          <div class="stat-lbl">정답</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val" style="color:var(--amber);" id="r-xp">0</div>
+          <div class="stat-lbl">총 XP</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val" style="color:var(--success);" id="r-pct">0%</div>
+          <div class="stat-lbl">정답률</div>
+        </div>
+      </div>
+
+      <div class="history-dots" id="r-history"></div>
+
+      <div class="result-btns">
+        <button class="quiz-play-btn" onclick="startQuiz()">한번 더 도전!</button>
+        <button class="btn-secondary" onclick="setScreen('intro')">⚙️ 설정 변경</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+    </main>
+</div>
+
+<script src="../../../js/nav.js"></script>
+
+<script>
+  const DIFFICULTIES = {
+    "easy":   { label: "🌱 입문", color: "var(--success)", xp: 10 },
+    "normal": { label: "💻 실무", color: "var(--accent)",  xp: 20 },
+    "hard":   { label: "🔥 심화", color: "var(--danger)",  xp: 35 }
+  };
+  const GENRES = ["HTML/CSS","JavaScript","React","Java","Python","자료구조/알고리즘"];
+  const RANKS = [
+    { min: 0,   title: "🐣 코딩 뉴비",     color: "var(--ink-3)" },
+    { min: 50,  title: "⌨️ 주니어 개발자", color: "var(--success)" },
+    { min: 120, title: "🚀 미들급 개발자", color: "var(--accent)" },
+    { min: 250, title: "💡 시니어 개발자", color: "var(--accent-h)" },
+    { min: 420, title: "👑 테크 리드",     color: "var(--amber)" }
+  ];
+
+  const OFFLINE_QUESTIONS = [
+    { genre:"HTML/CSS",     difficulty:"easy",   q:"HTML에서 가장 큰 제목을 나타내는 태그는?", options:["<heading>","<h1>","<h6>","<title>"], answer:1, explanation:"<h1>부터 <h6>까지의 제목 태그 중 <h1>이 가장 크고 중요한 제목을 의미합니다." },
+    { genre:"HTML/CSS",     difficulty:"normal", q:"CSS에서 요소의 배경색을 지정하는 속성은?", options:["color","bg-color","background-color","background-style"], answer:2, explanation:"배경색을 설정할 때는 background-color 속성을 사용합니다." },
+    { genre:"HTML/CSS",     difficulty:"hard",   q:"CSS flex에서 주축(main-axis) 기준으로 요소를 정렬하는 속성은?", options:["align-items","justify-content","align-content","flex-direction"], answer:1, explanation:"주축 방향 정렬은 justify-content를 사용합니다." },
+    { genre:"JavaScript",   difficulty:"easy",   q:"자바스크립트에서 변수를 선언할 때 사용할 수 없는 키워드는?", options:["var","let","const","def"], answer:3, explanation:"def는 파이썬에서 사용하는 키워드입니다." },
+    { genre:"JavaScript",   difficulty:"normal", q:"배열의 모든 요소에 함수를 실행하고 새 배열을 반환하는 메서드는?", options:["forEach()","map()","filter()","reduce()"], answer:1, explanation:"map() 메서드는 새로운 배열을 반환합니다." },
+    { genre:"JavaScript",   difficulty:"hard",   q:"자바스크립트의 클로저(Closure)에 대한 설명으로 올바른 것은?", options:["선언될 당시의 렉시컬 환경을 기억하는 함수","최상위 스코프에 선언된 전역 변수","이벤트 루프의 실행 단위","클래스 내부에 선언된 정적 메서드"], answer:0, explanation:"클로저는 함수와 렉시컬 환경과의 조합입니다." },
+    { genre:"React",        difficulty:"easy",   q:"리액트 컴포넌트의 상태를 관리하기 위해 사용하는 훅은?", options:["useEffect","useContext","useState","useMemo"], answer:2, explanation:"useState로 상태 변수를 선언합니다." },
+    { genre:"React",        difficulty:"normal", q:"useEffect 훅에서 의존성 배열을 빈 배열([])로 설정하면?", options:["렌더링될 때마다 실행","마운트될 때 한 번만 실행","언마운트된다","생략한 것과 동일"], answer:1, explanation:"빈 배열은 첫 렌더링 시에만 실행됨을 보장합니다." },
+    { genre:"React",        difficulty:"hard",   q:"가상 돔을 실제 돔과 비교하여 변경된 부분만 적용하는 과정은?", options:["Reconciliation","Hydration","Memoization","Transpilation"], answer:0, explanation:"최소한의 연산만 수행하는 이 과정을 재조정(Reconciliation)이라고 합니다." },
+    { genre:"Java",         difficulty:"easy",   q:"자바 프로그램의 실행 진입점이 되는 메서드 이름은?", options:["start()","init()","run()","main()"], answer:3, explanation:"public static void main(String[] args)에서 실행이 시작됩니다." },
+    { genre:"Java",         difficulty:"normal", q:"부모 클래스의 메서드를 자식 클래스에서 재정의하는 것은?", options:["Overloading","Overriding","Encapsulation","Polymorphism"], answer:1, explanation:"상속받은 메서드의 내용을 변경하는 것을 오버라이딩이라고 합니다." },
+    { genre:"Java",         difficulty:"hard",   q:"Java 8에서 NPE 방지를 위해 도입된 클래스는?", options:["Optional","Nullable","NullChecker","SafeReference"], answer:0, explanation:"Optional<T>는 NPE 발생을 방지하는 명시적 방법입니다." },
+    { genre:"Python",       difficulty:"easy",   q:"파이썬에서 화면에 데이터를 출력할 때 사용하는 함수는?", options:["echo","console.log()","print()","System.out.print()"], answer:2, explanation:"파이썬의 표준 출력 함수는 print() 입니다." },
+    { genre:"Python",       difficulty:"normal", q:"키(key)와 값(value)의 쌍으로 이루어진 파이썬 자료형은?", options:["List","Tuple","Set","Dictionary"], answer:3, explanation:"딕셔너리를 통해 값을 빠르게 매핑할 수 있습니다." },
+    { genre:"Python",       difficulty:"hard",   q:"이터러블 객체를 순회할 때 인덱스와 원소를 동시에 얻는 함수는?", options:["zip()","map()","enumerate()","filter()"], answer:2, explanation:"enumerate()는 인덱스를 함께 제공합니다." },
+    { genre:"자료구조/알고리즘", difficulty:"easy",   q:"나중에 삽입된 데이터가 가장 먼저 삭제되는 LIFO 자료구조는?", options:["Queue","Stack","Linked List","Graph"], answer:1, explanation:"스택은 LIFO 구조를 따릅니다." },
+    { genre:"자료구조/알고리즘", difficulty:"normal", q:"정렬 알고리즘 중 평균 시간 복잡도가 O(n log n)이 아닌 것은?", options:["Quick Sort","Merge Sort","Bubble Sort","Heap Sort"], answer:2, explanation:"버블 정렬의 평균/최악 시간 복잡도는 O(n²)입니다." },
+    { genre:"자료구조/알고리즘", difficulty:"hard",   q:"인접한 정점부터 먼저 탐색하는 그래프 탐색 알고리즘은?", options:["DFS","BFS","Dijkstra","Binary Search"], answer:1, explanation:"너비 우선 탐색(BFS)은 큐를 사용하며 가까운 곳부터 탐색합니다." }
+  ];
+
+  let state = { difficulty:'normal', genres:[...GENRES], count:5, questions:[], currentIdx:0, totalXP:0, streak:0, sessionScore:0, answers:[] };
+
+  const genreContainer = document.getElementById("genre-container");
+  GENRES.forEach(g => {
+    const btn = document.createElement("button");
+    btn.className = "genre-btn selected";
+    btn.innerText = `✓ ${g}`;
+    btn.onclick = () => toggleGenre(g, btn);
+    genreContainer.appendChild(btn);
+  });
+
+  // 초기 난이도 시각적 활성화
+  document.querySelectorAll('.diff-btn').forEach(b => {
+    if (b.dataset.diff === state.difficulty) b.classList.add('selected');
+  });
+
+  function setScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(`screen-${id}`).classList.add('active');
+  }
+
+  function setDifficulty(diff) {
+    state.difficulty = diff;
+    document.querySelectorAll('.diff-btn').forEach(b => {
+      b.classList.toggle('selected', b.dataset.diff === diff);
+    });
+    checkStartReady();
+  }
+
+  function toggleGenre(g, btn) {
+    if (state.genres.includes(g)) {
+      if (state.genres.length <= 1) return;
+      state.genres = state.genres.filter(x => x !== g);
+      btn.classList.remove('selected');
+      btn.innerText = g;
+    } else {
+      state.genres.push(g);
+      btn.classList.add('selected');
+      btn.innerText = `✓ ${g}`;
+    }
+    checkStartReady();
+  }
+
+  function setCount(n) {
+    state.count = n;
+    document.querySelectorAll('.count-btn').forEach(b => {
+      b.classList.toggle('selected', parseInt(b.dataset.count) === n);
+    });
+  }
+
+  function checkStartReady() {
+    const btn = document.getElementById('btn-start');
+    btn.disabled = !(state.difficulty && state.genres.length > 0);
+  }
+
+  // 초기 로드 시 버튼 상태 확인
+  checkStartReady();
+
+  function generateQuestions() {
+    let available = OFFLINE_QUESTIONS.filter(q => state.genres.includes(q.genre));
+    available.sort((a, b) => {
+      if (a.difficulty === state.difficulty && b.difficulty !== state.difficulty) return -1;
+      if (a.difficulty !== state.difficulty && b.difficulty === state.difficulty) return 1;
+      return Math.random() - 0.5;
+    });
+    const selected = available.slice(0, state.count);
+    let dIdx = 1;
+    while (selected.length < state.count) {
+      selected.push({ genre:state.genres[0], difficulty:state.difficulty,
+        q:`[더미 문항 ${dIdx}] 문항 데이터가 부족합니다. 정답 1번을 누르세요.`,
+        options:["정답","오답 A","오답 B","오답 C"], answer:0, explanation:"문항 데이터베이스가 부족하여 표시되는 임시 문항입니다." });
+      dIdx++;
+    }
+    return selected;
+  }
+
+  function startQuiz() {
+    state.questions = generateQuestions();
+    state.currentIdx = 0; state.streak = 0; state.sessionScore = 0; state.answers = [];
+    renderQuestion();
+    setScreen('quiz');
+  }
+
+  function renderQuestion() {
+    const q = state.questions[state.currentIdx];
+    const diffInfo = DIFFICULTIES[state.difficulty];
+    document.getElementById('quiz-progress-txt').innerText = `문제 ${state.currentIdx + 1} / ${state.questions.length}`;
+    document.getElementById('quiz-progress-bar').style.width = `${(state.currentIdx / state.questions.length) * 100}%`;
+    document.getElementById('quiz-xp-txt').innerText = `⭐ ${state.totalXP} XP`;
+    const sEl = document.getElementById('quiz-streak');
+    if (state.streak >= 2) { sEl.style.display="inline"; sEl.innerText=`🔥 ${state.streak}연속!`; }
+    else { sEl.style.display="none"; }
+    document.getElementById('q-genre').innerText = q.genre;
+    const diffTag = document.getElementById('q-diff');
+    diffTag.innerText = diffInfo.label;
+    diffTag.style.color = diffInfo.color;
+    document.getElementById('q-text').innerText = q.q;
+    const optWrap = document.getElementById('q-options');
+    optWrap.innerHTML = "";
+    q.options.forEach((opt, idx) => {
+      const b = document.createElement("button");
+      b.className = "option-btn";
+      const markers = ["①","②","③","④"];
+      b.innerText = `${markers[idx]} ${opt}`;
+      b.onclick = () => selectAnswer(idx, b);
+      optWrap.appendChild(b);
+    });
+    document.getElementById('q-exp').style.display = "none";
+    document.getElementById('btn-next').style.display = "none";
+  }
+
+  function selectAnswer(i, btnEl) {
+    const q = state.questions[state.currentIdx];
+    const diffInfo = DIFFICULTIES[state.difficulty];
+    const correct = (i === q.answer);
+    document.getElementById('q-options').querySelectorAll('button').forEach((b, idx) => {
+      b.classList.add('disabled'); b.onclick = null;
+      if (idx === q.answer) b.classList.add('correct');
+      else if (idx === i) b.classList.add('wrong');
+    });
+    let xpGain = correct ? diffInfo.xp : 0;
+    if (correct && state.streak + 1 >= 3) xpGain = Math.round(xpGain * 1.5);
+    if (correct) { state.sessionScore++; state.totalXP += xpGain; state.streak++; }
+    else { state.streak = 0; }
+    state.answers.push({ correct, genre: q.genre });
+    document.getElementById('q-exp-text').innerText = q.explanation;
+    document.getElementById('q-exp').style.display = "block";
+    document.getElementById('q-exp-bonus').style.display = (correct && state.streak >= 3) ? "inline" : "none";
+    const nxtBtn = document.getElementById('btn-next');
+    nxtBtn.style.display = "block";
+    nxtBtn.innerText = (state.currentIdx + 1 < state.questions.length) ? "다음 문제 →" : "결과 보기 🏆";
+  }
+
+  function nextQuestion() {
+    if (state.currentIdx + 1 < state.questions.length) { state.currentIdx++; renderQuestion(); }
+    else { showResult(); }
+  }
+
+  function getRank(xp) {
+    let r = RANKS[0];
+    for (let x of RANKS) if (xp >= x.min) r = x;
+    return r;
+  }
+
+  function showResult() {
+    const rank = getRank(state.totalXP);
+    const rTitle = document.getElementById('r-title');
+    rTitle.innerText = rank.title;
+    rTitle.style.color = rank.color;
+    document.getElementById('r-score').innerText = `${state.sessionScore}/${state.questions.length}`;
+    document.getElementById('r-xp').innerText = state.totalXP;
+    document.getElementById('r-pct').innerText = `${Math.round((state.sessionScore / state.questions.length) * 100)}%`;
+    const hWrap = document.getElementById('r-history');
+    hWrap.innerHTML = "";
+    state.answers.forEach(a => {
+      const d = document.createElement("div");
+      d.className = `dot ${a.correct ? 'y' : 'n'}`;
+      d.innerText = `${a.correct ? '✓' : '✗'} ${a.genre}`;
+      hWrap.appendChild(d);
+    });
+    setScreen('result');
+  }
+</script>
+</body>
+</html>

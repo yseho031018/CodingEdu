@@ -1,1315 +1,1272 @@
-<!DOCTYPE html>
-<html lang="ko" data-theme="light">
-<head>
-    <meta charset="UTF-8">
-    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>퀴즈 - CodeEdu</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/common.css">
-    <link rel="stylesheet" href="../css/tailwind.css">
-    <link rel="stylesheet" href="../css/site-nav.css">
-    <style>
-        .page-quiz-dashboard {
-            min-height: 100vh;
-            background: #f7f8fc;
-        }
-        .quiz-shell {
-            min-height: 100vh;
-            display: grid;
-            grid-template-columns: 240px minmax(0, 1fr);
-        }
-        .quiz-side-logo {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 0 12px 26px;
-            color: var(--ink-1);
-            font-size: 1.18rem;
-            font-weight: 850;
-            text-decoration: none;
-        }
-        .quiz-side-logo em { color: #4f55e7; font-style: normal; }
-        .quiz-side-logo-mark {
-            width: 28px;
-            height: 28px;
-            display: grid;
-            place-items: center;
-            border-radius: 6px;
-            background: #4f55e7;
-            font-size: .82rem;
-        }
-        .quiz-sidebar {
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            overflow-y: auto;
-            padding: 34px 22px 28px;
-            display: flex;
-            flex-direction: column;
-            background: rgba(255, 255, 255, .86);
-            border-right: 1px solid #e7eaf1;
-            border-top-right-radius: 32px;
-            box-shadow: 12px 0 32px rgba(28, 39, 68, .04);
-        }
-        .quiz-sidebar > * { flex-shrink: 0; }
-        .quiz-side-nav {
-            position: static;
-            top: auto;
-            z-index: auto;
-            width: auto;
-            height: auto;
-            padding: 0;
-            display: grid;
-            grid-template-columns: 1fr;
-            align-items: stretch;
-            gap: 8px;
-            background: transparent;
-            border: 0;
-            box-shadow: none;
-            backdrop-filter: none;
-        }
-        .quiz-side-nav a {
-            min-height: 46px;
-            padding: 0 16px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            border-radius: 8px;
-            color: var(--ink-1);
-            font-size: 1rem;
-            font-weight: 700;
-            text-decoration: none;
-            transition: background .18s, color .18s, transform .18s, box-shadow .18s;
-        }
-        .quiz-side-nav a:hover {
-            background: #eef0ff;
-            color: #4f55e7;
-            transform: translateY(-1px);
-        }
-        .quiz-side-nav a.active {
-            background: #4f55e7;
-            color: #fff;
-            box-shadow: 0 10px 24px rgba(79, 85, 231, .24);
-        }
-        .quiz-side-nav img {
-            width: 20px;
-            height: 20px;
-            object-fit: contain;
-            opacity: .78;
-        }
-        .quiz-side-nav a.active img {
-            opacity: 1;
-            filter: brightness(0) invert(1);
-        }
-        .quiz-point-card {
-            margin-top: auto;
-            overflow: hidden;
-            border: 1px solid #e7eaf1;
-            border-radius: 8px;
-            background: #fff;
-            box-shadow: 0 8px 24px rgba(28, 39, 68, .06);
-        }
-        .quiz-point-copy {
-            min-height: 118px;
-            padding: 20px 18px;
-            display: grid;
-            align-content: center;
-            gap: 12px;
-            color: var(--ink-1);
-            font-size: .88rem;
-            font-weight: 800;
-        }
-        .quiz-trophy {
-            width: 48px;
-            height: 48px;
-            display: grid;
-            place-items: center;
-            font-size: 1.7rem;
-            border-radius: 8px;
-            background: #fff7d6;
-        }
-        .quiz-point-total {
-            padding: 16px 18px;
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            border-top: 1px solid #eef0f5;
-            color: var(--ink-2);
-            font-size: .86rem;
-            font-weight: 700;
-        }
-        .quiz-point-total strong {
-            color: var(--ink-1);
-            font-size: 1.05rem;
-        }
-        .quiz-side-account {
-            margin-top: 14px;
-            padding-top: 16px;
-            display: grid;
-            gap: 8px;
-            border-top: 1px solid #e7eaf1;
-        }
-        .quiz-side-account a {
-            padding: 9px 10px;
-            border: 1px solid #e4e8f0;
-            border-radius: 6px;
-            color: var(--ink-2);
-            font-size: .82rem;
-            font-weight: 700;
-            text-align: center;
-            text-decoration: none;
-        }
-        .quiz-side-account a.primary { background: #4f55e7; border-color: #4f55e7; color: #fff; }
-
-        .quiz-main {
-            min-width: 0;
-            padding: 42px 44px 56px;
-        }
-        .quiz-layout {
-            max-width: 1280px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) 290px;
-            gap: 36px;
-            align-items: start;
-        }
-        .quiz-content {
-            min-width: 0;
-        }
-        .quiz-heading {
-            margin-bottom: 24px;
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 20px;
-        }
-        .quiz-heading .theme-toggle { flex: 0 0 auto; margin-top: 6px; }
-        .quiz-kicker { display: block; color: #4f55e7; font-size: .72rem; font-weight: 850; letter-spacing: .04em; }
-        .quiz-heading h1 {
-            margin: 5px 0 7px;
-            color: var(--ink-1);
-            font-size: 2rem;
-            line-height: 1.2;
-            font-weight: 900;
-            letter-spacing: 0;
-        }
-        .quiz-heading p {
-            margin: 0;
-            color: var(--ink-2);
-            font-size: .98rem;
-            font-weight: 500;
-        }
-
-        .quiz-stat-grid {
-            margin-bottom: 26px;
-            padding: 0;
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 16px;
-            background: transparent;
-        }
-        .quiz-stat-card {
-            min-height: 94px;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            background: #fff;
-            border: 1px solid #e7eaf1;
-            border-radius: 8px;
-            box-shadow: 0 8px 24px rgba(28, 39, 68, .05);
-        }
-        .quiz-stat-icon {
-            width: 48px;
-            height: 48px;
-            display: grid;
-            place-items: center;
-            border-radius: 50%;
-            color: #4f55e7;
-            background: #eef0ff;
-            font-size: 1.35rem;
-            flex: 0 0 auto;
-        }
-        .quiz-stat-icon.green { color: #13a86f; background: #e9fbf3; }
-        .quiz-stat-icon.orange { color: #f06423; background: #fff0e8; }
-        .quiz-stat-icon.blue { color: #2685ff; background: #e9f3ff; }
-        .quiz-stat-icon img { width: 26px; height: 26px; object-fit: contain; }
-        .quiz-stat-label {
-            display: block;
-            color: var(--ink-3);
-            font-size: .78rem;
-            font-weight: 750;
-        }
-        .quiz-stat-value {
-            margin-top: 3px;
-            display: flex;
-            align-items: baseline;
-            gap: 4px;
-            color: var(--ink-1);
-            font-size: 1.45rem;
-            line-height: 1;
-            font-weight: 900;
-            letter-spacing: 0;
-        }
-        .quiz-stat-value small {
-            color: var(--ink-2);
-            font-size: .78rem;
-            font-weight: 700;
-        }
-
-        .quiz-list-head {
-            margin-bottom: 18px;
-            padding-bottom: 14px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            border-bottom: 1px solid #e7eaf1;
-        }
-        .quiz-tabs {
-            flex: 1 1 auto;
-            min-width: 0;
-            display: flex;
-            flex-wrap: nowrap;
-            align-items: center;
-            gap: 8px;
-            overflow-x: auto;
-            padding-bottom: 6px;
-            scrollbar-width: thin;
-            scrollbar-color: #cdd3e0 transparent;
-        }
-        .quiz-tabs::-webkit-scrollbar { height: 6px; }
-        .quiz-tabs::-webkit-scrollbar-thumb { background: #cdd3e0; border-radius: 10px; }
-        .quiz-tabs::-webkit-scrollbar-track { background: transparent; }
-        .quiz-tabs a {
-            flex: 0 0 auto;
-            padding: 7px 14px;
-            display: inline-flex;
-            align-items: center;
-            border-radius: 50px;
-            background: #f1f3f9;
-            color: #64748b;
-            font-size: .88rem;
-            font-weight: 700;
-            text-decoration: none;
-            white-space: nowrap;
-            transition: background .15s, color .15s;
-        }
-        .quiz-tabs a:hover {
-            background: #e7eaf1;
-            color: var(--ink-1);
-        }
-        .quiz-tabs a.active {
-            background: #4f55e7;
-            color: #fff;
-        }
-        .quiz-controls {
-            padding-bottom: 10px;
-            display: flex;
-            gap: 10px;
-            flex: 0 0 auto;
-        }
-        .quiz-select {
-            height: 36px;
-            min-width: 118px;
-            padding: 0 34px 0 14px;
-            border: 1px solid #e5e9f1;
-            border-radius: 8px;
-            color: var(--ink-2);
-            background: #fff;
-            font-size: .82rem;
-            font-weight: 750;
-            box-shadow: 0 4px 14px rgba(28, 39, 68, .04);
-        }
-        .quiz-list {
-            padding: 0;
-            display: grid;
-            gap: 0;
-            background: transparent;
-        }
-        .quiz-row {
-            min-height: 106px;
-            padding: 18px 24px;
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) 168px 104px;
-            align-items: center;
-            gap: 24px;
-            color: var(--ink-1);
-            background: #fff;
-            border: 1px solid #e5e9f1;
-            border-radius: 8px;
-            box-shadow: 0 8px 24px rgba(28, 39, 68, .045);
-            text-decoration: none;
-            transition: border-color .18s, box-shadow .18s, transform .18s;
-        }
-        .quiz-row + .quiz-row {
-            margin-top: -1px;
-        }
-        .quiz-row:hover {
-            position: relative;
-            z-index: 1;
-            border-color: #ccd2ff;
-            box-shadow: 0 14px 34px rgba(28, 39, 68, .08);
-            transform: translateY(-2px);
-        }
-
-        .quiz-row-copy {
-            min-width: 0;
-        }
-        .quiz-title-line {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-            min-width: 0;
-        }
-        .quiz-title-line h2 {
-            margin: 0;
-            overflow: hidden;
-            color: var(--ink-1);
-            font-size: 1.1rem;
-            line-height: 1.35;
-            font-weight: 900;
-            letter-spacing: 0;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .quiz-difficulty {
-            padding: 3px 9px;
-            border-radius: 999px;
-            font-size: .68rem;
-            font-weight: 900;
-            white-space: nowrap;
-        }
-        .quiz-difficulty.easy { color: #10a875; background: #e8fbf3; }
-        .quiz-difficulty.medium { color: #4f55e7; background: #eef0ff; }
-        .quiz-difficulty.hard { color: #a855f7; background: #f4e8ff; }
-        .quiz-description {
-            margin: 5px 0 9px;
-            overflow: hidden;
-            color: var(--ink-2);
-            font-size: .86rem;
-            font-weight: 500;
-            line-height: 1.5;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .quiz-meta {
-            display: flex;
-            gap: 18px;
-            color: #71809b;
-            font-size: .75rem;
-            font-weight: 750;
-        }
-        .quiz-meta span {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .quiz-accuracy {
-            min-width: 0;
-        }
-        .quiz-accuracy-label {
-            display: block;
-            margin-bottom: 3px;
-            color: #71809b;
-            font-size: .73rem;
-            font-weight: 800;
-        }
-        .quiz-accuracy-value {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--ink-1);
-            font-size: 1.08rem;
-            line-height: 1;
-            font-weight: 900;
-        }
-        .quiz-progress {
-            width: 100%;
-            height: 4px;
-            overflow: hidden;
-            border-radius: 999px;
-            background: #e4e8f0;
-        }
-        .quiz-progress i {
-            display: block;
-            height: 100%;
-            min-width: 6px;
-            border-radius: inherit;
-            background: #4f55e7;
-        }
-        .quiz-progress i.green { background: #19c37d; }
-        .quiz-progress i.blue { background: #4f55e7; }
-        .quiz-progress i.violet { background: #a855f7; }
-        .quiz-progress i.orange { background: #f97316; }
-        .quiz-action {
-            justify-self: end;
-            min-width: 92px;
-            padding: 10px 14px;
-            border-radius: 6px;
-            color: #fff;
-            background: #4f55e7;
-            text-align: center;
-            font-size: .84rem;
-            font-weight: 850;
-            text-decoration: none;
-            box-shadow: 0 8px 18px rgba(79, 85, 231, .22);
-        }
-        .quiz-login {
-            background: #eef0ff;
-            color: #4f55e7;
-            box-shadow: none;
-        }
-        .quiz-empty {
-            padding: 56px 24px;
-            display: grid;
-            place-items: center;
-            gap: 10px;
-            color: var(--ink-3);
-            background: #fff;
-            border: 1px dashed #cfd5e2;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: 750;
-        }
-        .quiz-practice-banner {
-            margin: 24px 0 32px;
-            padding: 26px 32px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-            background: linear-gradient(135deg, #4f55e7 0%, #3b42c4 100%);
-            border-radius: 12px;
-            color: #fff;
-            box-shadow: 0 12px 32px rgba(79, 85, 231, .25);
-            position: relative;
-            overflow: hidden;
-        }
-        .quiz-practice-banner::after {
-            content: '⚡';
-            position: absolute;
-            right: -10px;
-            top: -10px;
-            font-size: 8rem;
-            opacity: 0.1;
-            transform: rotate(15deg);
-            pointer-events: none;
-        }
-        .practice-banner-copy {
-            position: relative;
-            z-index: 1;
-        }
-        .practice-banner-copy h3 {
-            margin: 0 0 6px;
-            font-size: 1.35rem;
-            font-weight: 900;
-            letter-spacing: -0.02em;
-            color: #fff;
-        }
-        .practice-banner-copy p {
-            margin: 0;
-            font-size: 1rem;
-            opacity: 0.95;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
-        }
-        .practice-banner-btn {
-            position: relative;
-            z-index: 1;
-            padding: 13px 28px;
-            border-radius: 8px;
-            background: #fff;
-            color: #4f55e7;
-            font-size: .95rem;
-            font-weight: 850;
-            text-decoration: none;
-            transition: all .2s cubic-bezier(0.4, 0, 0.2, 1);
-            white-space: nowrap;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        .practice-banner-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-            background: #f8fafc;
-        }
-        @media (max-width: 768px) {
-            .quiz-practice-banner {
-                flex-direction: column;
-                align-items: flex-start;
-                padding: 22px;
-                gap: 18px;
-            }
-            .practice-banner-btn {
-                width: 100%;
-                text-align: center;
-            }
-        }
-
-        .quiz-aside {
-            display: grid;
-            gap: 16px;
-        }
-        .quiz-panel {
-            padding: 22px;
-            background: #fff;
-            border: 1px solid #e7eaf1;
-            border-radius: 8px;
-            box-shadow: 0 8px 24px rgba(28, 39, 68, .05);
-        }
-        .quiz-panel-head {
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-        }
-        .quiz-panel h2 {
-            margin: 0;
-            color: var(--ink-1);
-            font-size: .95rem;
-            font-weight: 900;
-            letter-spacing: 0;
-        }
-        .quiz-panel-link {
-            color: #8a95aa;
-            font-size: .72rem;
-            font-weight: 800;
-            text-decoration: none;
-        }
-        .quiz-status-main {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            margin-bottom: 18px;
-        }
-        .quiz-status-ring {
-            width: 92px;
-            height: 92px;
-            padding: 7px;
-            flex: 0 0 auto;
-            border-radius: 50%;
-            background: conic-gradient(#4f55e7 var(--progress), #edf0f8 0);
-        }
-        .quiz-status-ring div {
-            width: 100%;
-            height: 100%;
-            display: grid;
-            place-items: center;
-            border-radius: 50%;
-            background: #fff;
-            color: var(--ink-1);
-            font-size: 1.25rem;
-            font-weight: 900;
-        }
-        .quiz-status-copy {
-            color: #64748b;
-            font-size: .78rem;
-            font-weight: 750;
-            line-height: 1.55;
-        }
-        .quiz-panel dl {
-            margin: 0;
-        }
-        .quiz-panel dl div {
-            padding: 8px 0;
-            display: flex;
-            justify-content: space-between;
-            gap: 14px;
-            color: #64748b;
-            font-size: .82rem;
-            font-weight: 750;
-        }
-        .quiz-panel dd {
-            color: var(--ink-1);
-            font-weight: 900;
-        }
-        .quiz-record-btn {
-            margin-top: 14px;
-            min-height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid #6d72ff;
-            border-radius: 6px;
-            color: #4f55e7;
-            background: #fff;
-            font-size: .82rem;
-            font-weight: 850;
-            text-decoration: none;
-        }
-        .ranking-list,
-        .activity-list {
-            display: grid;
-            gap: 8px;
-        }
-        .ranking-item {
-            min-height: 40px;
-            display: grid;
-            grid-template-columns: 24px 28px minmax(0, 1fr) auto;
-            align-items: center;
-            gap: 10px;
-            color: var(--ink-1);
-            font-size: .82rem;
-            font-weight: 850;
-        }
-        .ranking-item.current {
-            margin-inline: -8px;
-            padding: 0 8px;
-            border-radius: 8px;
-            color: #4f55e7;
-            background: #eef0ff;
-        }
-        .rank-avatar,
-        .activity-icon {
-            width: 28px;
-            height: 28px;
-            display: grid;
-            place-items: center;
-            border-radius: 50%;
-            background: #f3f5fb;
-            font-size: .86rem;
-        }
-        .rank-name {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .rank-points {
-            font-size: .78rem;
-        }
-        .activity-item {
-            min-height: 48px;
-            display: grid;
-            grid-template-columns: 34px minmax(0, 1fr) auto;
-            align-items: center;
-            gap: 10px;
-        }
-        .activity-icon.good { color: #4f55e7; background: #eef0ff; }
-        .activity-icon.review { color: #f97316; background: #fff0e8; }
-        .activity-title {
-            overflow: hidden;
-            color: var(--ink-1);
-            font-size: .8rem;
-            font-weight: 850;
-            line-height: 1.35;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .activity-meta {
-            color: #8a95aa;
-            font-size: .72rem;
-            font-weight: 750;
-        }
-        .activity-time {
-            color: #8a95aa;
-            font-size: .72rem;
-            font-weight: 750;
-            white-space: nowrap;
-        }
-        .panel-empty {
-            padding: 10px 0;
-            color: #8a95aa;
-            font-size: .8rem;
-            font-weight: 750;
-            line-height: 1.6;
-        }
-
-        [data-theme="dark"] .page-quiz-dashboard,
-        [data-theme="dark"].page-quiz-dashboard {
-            background: #11131a;
-        }
-        [data-theme="dark"] .quiz-sidebar,
-        [data-theme="dark"] .quiz-stat-card,
-        [data-theme="dark"] .quiz-row,
-        [data-theme="dark"] .quiz-panel,
-        [data-theme="dark"] .quiz-point-card,
-        [data-theme="dark"] .quiz-more,
-        [data-theme="dark"] .quiz-empty {
-            background: #171a23;
-            border-color: #292d38;
-        }
-        [data-theme="dark"] .quiz-select,
-        [data-theme="dark"] .quiz-status-ring div {
-            background: #171a23;
-            border-color: #292d38;
-        }
-        [data-theme="dark"] .quiz-tabs a { background: #1e2230; color: #9aa6bd; }
-        [data-theme="dark"] .quiz-tabs a:hover { background: #262b3a; color: #fff; }
-        [data-theme="dark"] .quiz-tabs a.active { background: #4f55e7; color: #fff; }
-        [data-theme="dark"] .quiz-tabs { scrollbar-color: #3a4150 transparent; }
-        [data-theme="dark"] .quiz-tabs::-webkit-scrollbar-thumb { background: #3a4150; }
-        [data-theme="dark"] .quiz-sidebar {
-            box-shadow: none;
-        }
-
-        [data-theme="dark"] .quiz-practice-banner {
-            background: linear-gradient(135deg, #373dbd 0%, #2a319c 100%);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
-        }
-        [data-theme="dark"] .practice-banner-btn {
-            background: rgba(255, 255, 255, 0.95);
-            color: #2a319c;
-        }
-
-        @media (max-width: 1320px) {
-            .quiz-main { padding-inline: 28px; }
-            .quiz-layout {
-                grid-template-columns: 1fr;
-            }
-            .quiz-aside {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-            }
-            .quiz-panel {
-                min-width: 0;
-            }
-        }
-        @media (max-width: 980px) {
-            .quiz-shell {
-                display: block;
-            }
-            .quiz-sidebar {
-                position: static;
-                height: auto;
-                padding: 12px 14px;
-                border-right: 0;
-                border-bottom: 1px solid #e7eaf1;
-                border-radius: 0;
-            }
-            .quiz-side-nav {
-                display: flex;
-                gap: 6px;
-                overflow-x: auto;
-            }
-            .quiz-side-nav a {
-                min-height: 38px;
-                padding: 0 11px;
-                gap: 8px;
-                flex: 0 0 auto;
-                font-size: .88rem;
-            }
-            .quiz-side-nav img {
-                width: 17px;
-                height: 17px;
-            }
-            .quiz-point-card,
-            .quiz-side-account {
-                display: none;
-            }
-            .quiz-stat-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-            .quiz-row {
-                grid-template-columns: minmax(0, 1fr) 132px;
-            }
-            .quiz-action {
-                grid-column: 2 / 4;
-                justify-self: stretch;
-            }
-            .quiz-aside {
-                grid-template-columns: 1fr;
-            }
-        }
-        @media (max-width: 680px) {
-            .quiz-main {
-                padding: 28px 16px 42px;
-            }
-            .quiz-heading h1 {
-                font-size: 1.75rem;
-            }
-            .quiz-stat-grid {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-            .quiz-stat-card {
-                min-height: 82px;
-                padding: 16px;
-            }
-            .quiz-list-head {
-                display: grid;
-                align-items: stretch;
-            }
-            .quiz-controls {
-                padding-bottom: 12px;
-                flex-wrap: wrap;
-            }
-            .quiz-select {
-                flex: 1 1 130px;
-            }
-            .quiz-row {
-                grid-template-columns: minmax(0, 1fr);
-                align-items: start;
-                gap: 14px;
-                padding: 16px;
-            }
-            .quiz-title-line {
-                align-items: flex-start;
-                flex-direction: column;
-                gap: 5px;
-            }
-            .quiz-title-line h2,
-            .quiz-description {
-                white-space: normal;
-            }
-            .quiz-accuracy,
-            .quiz-action {
-                grid-column: 1 / -1;
-            }
-        }
-        /* ── Heuristic fixes: 상단 내비 통일 · 검색 · 정답률 기준 · 로그인 안내 ── */
-        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-        .quiz-main { max-width: 1368px; margin: 0 auto; }
-        .quiz-search { flex: 1 1 200px; max-width: 280px; }
-        .quiz-search input {
-            width: 100%; height: 40px; padding: 0 12px; border: 1px solid #e4e8f0; border-radius: 8px;
-            background: #fff; color: inherit; font: inherit; font-size: .88rem;
-        }
-        .quiz-search input:focus { outline: 2px solid #4f55e7; outline-offset: 1px; border-color: #4f55e7; }
-        .quiz-row[hidden], .quiz-empty[hidden] { display: none; }
-        .quiz-list-head { flex-wrap: wrap; }
-        .quiz-list-head .quiz-tabs { flex: 1 1 100%; min-width: 0; }
-        .quiz-list-head .quiz-search { margin-left: 0; }
-        .quiz-list-head .quiz-controls { margin-left: auto; }
-        @media (min-width: 981px) { .quiz-row { grid-template-columns: minmax(0, 1fr) 168px 128px; } }
-        .quiz-lock { color: #64748b; font-weight: 600; }
-        .quiz-accuracy-note { display: block; margin-top: 6px; color: #64748b; font-size: .76rem; font-weight: 600; }
-        .quiz-accuracy-note.mine { color: #4f55e7; }
-        .quiz-login-copy { margin: 4px 0 16px; color: #475569; font-size: .9rem; line-height: 1.7; }
-        .quiz-record-btn.primary { background: #4f55e7; border-color: #4f55e7; color: #fff; }
-        [data-theme="dark"] .quiz-search input { background: rgba(15, 23, 42, .6); border-color: rgba(148, 163, 184, .25); }
-        [data-theme="dark"] .quiz-login-copy, [data-theme="dark"] .quiz-lock, [data-theme="dark"] .quiz-accuracy-note { color: #b7c2d8; }
-        [data-theme="dark"] .quiz-accuracy-note.mine { color: #8b8fff; }
-        @media (max-width: 680px) { .quiz-search { max-width: none; } }
-    </style>
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>퀴즈 - CodeEdu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/tailwind.css">
+    <link rel="stylesheet" href="../css/site-nav.css">
+    <link rel="stylesheet" href="../css/mobile.css">
+    <style>
+        .page-quiz-dashboard {
+            min-height: 100vh;
+            background: #f7f8fc;
+        }
+        .quiz-shell {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 240px minmax(0, 1fr);
+        }
+        .quiz-side-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 12px 26px;
+            color: var(--ink-1);
+            font-size: 1.18rem;
+            font-weight: 850;
+            text-decoration: none;
+        }
+        .quiz-side-logo em { color: #4f55e7; font-style: normal; }
+        .quiz-side-logo-mark {
+            width: 28px;
+            height: 28px;
+            display: grid;
+            place-items: center;
+            border-radius: 6px;
+            background: #4f55e7;
+            font-size: .82rem;
+        }
+        .quiz-sidebar {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 34px 22px 28px;
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, .86);
+            border-right: 1px solid #e7eaf1;
+            border-top-right-radius: 32px;
+            box-shadow: 12px 0 32px rgba(28, 39, 68, .04);
+        }
+        .quiz-sidebar > * { flex-shrink: 0; }
+        .quiz-side-nav {
+            position: static;
+            top: auto;
+            z-index: auto;
+            width: auto;
+            height: auto;
+            padding: 0;
+            display: grid;
+            grid-template-columns: 1fr;
+            align-items: stretch;
+            gap: 8px;
+            background: transparent;
+            border: 0;
+            box-shadow: none;
+            backdrop-filter: none;
+        }
+        .quiz-side-nav a {
+            min-height: 46px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            border-radius: 8px;
+            color: var(--ink-1);
+            font-size: 1rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: background .18s, color .18s, transform .18s, box-shadow .18s;
+        }
+        .quiz-side-nav a:hover {
+            background: #eef0ff;
+            color: #4f55e7;
+            transform: translateY(-1px);
+        }
+        .quiz-side-nav a.active {
+            background: #4f55e7;
+            color: #fff;
+            box-shadow: 0 10px 24px rgba(79, 85, 231, .24);
+        }
+        .quiz-side-nav img {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+            opacity: .78;
+        }
+        .quiz-side-nav a.active img {
+            opacity: 1;
+            filter: brightness(0) invert(1);
+        }
+        .quiz-point-card {
+            margin-top: auto;
+            overflow: hidden;
+            border: 1px solid #e7eaf1;
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: 0 8px 24px rgba(28, 39, 68, .06);
+        }
+        .quiz-point-copy {
+            min-height: 118px;
+            padding: 20px 18px;
+            display: grid;
+            align-content: center;
+            gap: 12px;
+            color: var(--ink-1);
+            font-size: .88rem;
+            font-weight: 800;
+        }
+        .quiz-trophy {
+            width: 48px;
+            height: 48px;
+            display: grid;
+            place-items: center;
+            font-size: 1.7rem;
+            border-radius: 8px;
+            background: #fff7d6;
+        }
+        .quiz-point-total {
+            padding: 16px 18px;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            border-top: 1px solid #eef0f5;
+            color: var(--ink-2);
+            font-size: .86rem;
+            font-weight: 700;
+        }
+        .quiz-point-total strong {
+            color: var(--ink-1);
+            font-size: 1.05rem;
+        }
+        .quiz-side-account {
+            margin-top: 14px;
+            padding-top: 16px;
+            display: grid;
+            gap: 8px;
+            border-top: 1px solid #e7eaf1;
+        }
+        .quiz-side-account a {
+            padding: 9px 10px;
+            border: 1px solid #e4e8f0;
+            border-radius: 6px;
+            color: var(--ink-2);
+            font-size: .82rem;
+            font-weight: 700;
+            text-align: center;
+            text-decoration: none;
+        }
+        .quiz-side-account a.primary { background: #4f55e7; border-color: #4f55e7; color: #fff; }
+
+        .quiz-main {
+            min-width: 0;
+            padding: 42px 44px 56px;
+        }
+        .quiz-layout {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 290px;
+            gap: 36px;
+            align-items: start;
+        }
+        .quiz-content {
+            min-width: 0;
+        }
+        .quiz-heading {
+            margin-bottom: 24px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .quiz-heading .theme-toggle { flex: 0 0 auto; margin-top: 6px; }
+        .quiz-kicker { display: block; color: #4f55e7; font-size: .72rem; font-weight: 850; letter-spacing: .04em; }
+        .quiz-heading h1 {
+            margin: 5px 0 7px;
+            color: var(--ink-1);
+            font-size: 2rem;
+            line-height: 1.2;
+            font-weight: 900;
+            letter-spacing: 0;
+        }
+        .quiz-heading p {
+            margin: 0;
+            color: var(--ink-2);
+            font-size: .98rem;
+            font-weight: 500;
+        }
+
+        .quiz-stat-grid {
+            margin-bottom: 26px;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            background: transparent;
+        }
+        .quiz-stat-card {
+            min-height: 94px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: #fff;
+            border: 1px solid #e7eaf1;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(28, 39, 68, .05);
+        }
+        .quiz-stat-icon {
+            width: 48px;
+            height: 48px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            color: #4f55e7;
+            background: #eef0ff;
+            font-size: 1.35rem;
+            flex: 0 0 auto;
+        }
+        .quiz-stat-icon.green { color: #13a86f; background: #e9fbf3; }
+        .quiz-stat-icon.orange { color: #f06423; background: #fff0e8; }
+        .quiz-stat-icon.blue { color: #2685ff; background: #e9f3ff; }
+        .quiz-stat-icon img { width: 26px; height: 26px; object-fit: contain; }
+        .quiz-stat-label {
+            display: block;
+            color: var(--ink-3);
+            font-size: .78rem;
+            font-weight: 750;
+        }
+        .quiz-stat-value {
+            margin-top: 3px;
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+            color: var(--ink-1);
+            font-size: 1.45rem;
+            line-height: 1;
+            font-weight: 900;
+            letter-spacing: 0;
+        }
+        .quiz-stat-value small {
+            color: var(--ink-2);
+            font-size: .78rem;
+            font-weight: 700;
+        }
+
+        .quiz-list-head {
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 1px solid #e7eaf1;
+        }
+        .quiz-tabs {
+            flex: 1 1 auto;
+            min-width: 0;
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: center;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+            scrollbar-width: thin;
+            scrollbar-color: #cdd3e0 transparent;
+        }
+        .quiz-tabs::-webkit-scrollbar { height: 6px; }
+        .quiz-tabs::-webkit-scrollbar-thumb { background: #cdd3e0; border-radius: 10px; }
+        .quiz-tabs::-webkit-scrollbar-track { background: transparent; }
+        .quiz-tabs a {
+            flex: 0 0 auto;
+            padding: 7px 14px;
+            display: inline-flex;
+            align-items: center;
+            border-radius: 50px;
+            background: #f1f3f9;
+            color: #64748b;
+            font-size: .88rem;
+            font-weight: 700;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: background .15s, color .15s;
+        }
+        .quiz-tabs a:hover {
+            background: #e7eaf1;
+            color: var(--ink-1);
+        }
+        .quiz-tabs a.active {
+            background: #4f55e7;
+            color: #fff;
+        }
+        .quiz-controls {
+            padding-bottom: 10px;
+            display: flex;
+            gap: 10px;
+            flex: 0 0 auto;
+        }
+        .quiz-select {
+            height: 36px;
+            min-width: 118px;
+            padding: 0 34px 0 14px;
+            border: 1px solid #e5e9f1;
+            border-radius: 8px;
+            color: var(--ink-2);
+            background: #fff;
+            font-size: .82rem;
+            font-weight: 750;
+            box-shadow: 0 4px 14px rgba(28, 39, 68, .04);
+        }
+        .quiz-list {
+            padding: 0;
+            display: grid;
+            gap: 0;
+            background: transparent;
+        }
+        .quiz-row {
+            min-height: 106px;
+            padding: 18px 24px;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 168px 104px;
+            align-items: center;
+            gap: 24px;
+            color: var(--ink-1);
+            background: #fff;
+            border: 1px solid #e5e9f1;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(28, 39, 68, .045);
+            text-decoration: none;
+            transition: border-color .18s, box-shadow .18s, transform .18s;
+        }
+        .quiz-row + .quiz-row {
+            margin-top: -1px;
+        }
+        .quiz-row:hover {
+            position: relative;
+            z-index: 1;
+            border-color: #ccd2ff;
+            box-shadow: 0 14px 34px rgba(28, 39, 68, .08);
+            transform: translateY(-2px);
+        }
+
+        .quiz-row-copy {
+            min-width: 0;
+        }
+        .quiz-title-line {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            min-width: 0;
+        }
+        .quiz-title-line h2 {
+            margin: 0;
+            overflow: hidden;
+            color: var(--ink-1);
+            font-size: 1.1rem;
+            line-height: 1.35;
+            font-weight: 900;
+            letter-spacing: 0;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .quiz-difficulty {
+            padding: 3px 9px;
+            border-radius: 999px;
+            font-size: .68rem;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+        .quiz-difficulty.easy { color: #10a875; background: #e8fbf3; }
+        .quiz-difficulty.medium { color: #4f55e7; background: #eef0ff; }
+        .quiz-difficulty.hard { color: #a855f7; background: #f4e8ff; }
+        .quiz-description {
+            margin: 5px 0 9px;
+            overflow: hidden;
+            color: var(--ink-2);
+            font-size: .86rem;
+            font-weight: 500;
+            line-height: 1.5;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .quiz-meta {
+            display: flex;
+            gap: 18px;
+            color: #71809b;
+            font-size: .75rem;
+            font-weight: 750;
+        }
+        .quiz-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .quiz-accuracy {
+            min-width: 0;
+        }
+        .quiz-accuracy-label {
+            display: block;
+            margin-bottom: 3px;
+            color: #71809b;
+            font-size: .73rem;
+            font-weight: 800;
+        }
+        .quiz-accuracy-value {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--ink-1);
+            font-size: 1.08rem;
+            line-height: 1;
+            font-weight: 900;
+        }
+        .quiz-progress {
+            width: 100%;
+            height: 4px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #e4e8f0;
+        }
+        .quiz-progress i {
+            display: block;
+            height: 100%;
+            min-width: 6px;
+            border-radius: inherit;
+            background: #4f55e7;
+        }
+        .quiz-progress i.green { background: #19c37d; }
+        .quiz-progress i.blue { background: #4f55e7; }
+        .quiz-progress i.violet { background: #a855f7; }
+        .quiz-progress i.orange { background: #f97316; }
+        .quiz-action {
+            justify-self: end;
+            min-width: 92px;
+            padding: 10px 14px;
+            border-radius: 6px;
+            color: #fff;
+            background: #4f55e7;
+            text-align: center;
+            font-size: .84rem;
+            font-weight: 850;
+            text-decoration: none;
+            box-shadow: 0 8px 18px rgba(79, 85, 231, .22);
+        }
+        .quiz-login {
+            background: #eef0ff;
+            color: #4f55e7;
+            box-shadow: none;
+        }
+        .quiz-empty {
+            padding: 56px 24px;
+            display: grid;
+            place-items: center;
+            gap: 10px;
+            color: var(--ink-3);
+            background: #fff;
+            border: 1px dashed #cfd5e2;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 750;
+        }
+        .quiz-practice-banner {
+            margin: 24px 0 32px;
+            padding: 26px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            background: linear-gradient(135deg, #4f55e7 0%, #3b42c4 100%);
+            border-radius: 12px;
+            color: #fff;
+            box-shadow: 0 12px 32px rgba(79, 85, 231, .25);
+            position: relative;
+            overflow: hidden;
+        }
+        .quiz-practice-banner::after {
+            content: '⚡';
+            position: absolute;
+            right: -10px;
+            top: -10px;
+            font-size: 8rem;
+            opacity: 0.1;
+            transform: rotate(15deg);
+            pointer-events: none;
+        }
+        .practice-banner-copy {
+            position: relative;
+            z-index: 1;
+        }
+        .practice-banner-copy h3 {
+            margin: 0 0 6px;
+            font-size: 1.35rem;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            color: #fff;
+        }
+        .practice-banner-copy p {
+            margin: 0;
+            font-size: 1rem;
+            opacity: 0.95;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .practice-banner-btn {
+            position: relative;
+            z-index: 1;
+            padding: 13px 28px;
+            border-radius: 8px;
+            background: #fff;
+            color: #4f55e7;
+            font-size: .95rem;
+            font-weight: 850;
+            text-decoration: none;
+            transition: all .2s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .practice-banner-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            background: #f8fafc;
+        }
+        @media (max-width: 768px) {
+            .quiz-practice-banner {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 22px;
+                gap: 18px;
+            }
+            .practice-banner-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        .quiz-aside {
+            display: grid;
+            gap: 16px;
+        }
+        .quiz-panel {
+            padding: 22px;
+            background: #fff;
+            border: 1px solid #e7eaf1;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(28, 39, 68, .05);
+        }
+        .quiz-panel-head {
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .quiz-panel h2 {
+            margin: 0;
+            color: var(--ink-1);
+            font-size: .95rem;
+            font-weight: 900;
+            letter-spacing: 0;
+        }
+        .quiz-panel-link {
+            color: #8a95aa;
+            font-size: .72rem;
+            font-weight: 800;
+            text-decoration: none;
+        }
+        .quiz-status-main {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+        .quiz-status-ring {
+            width: 92px;
+            height: 92px;
+            padding: 7px;
+            flex: 0 0 auto;
+            border-radius: 50%;
+            background: conic-gradient(#4f55e7 var(--progress), #edf0f8 0);
+        }
+        .quiz-status-ring div {
+            width: 100%;
+            height: 100%;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: #fff;
+            color: var(--ink-1);
+            font-size: 1.25rem;
+            font-weight: 900;
+        }
+        .quiz-status-copy {
+            color: #64748b;
+            font-size: .78rem;
+            font-weight: 750;
+            line-height: 1.55;
+        }
+        .quiz-panel dl {
+            margin: 0;
+        }
+        .quiz-panel dl div {
+            padding: 8px 0;
+            display: flex;
+            justify-content: space-between;
+            gap: 14px;
+            color: #64748b;
+            font-size: .82rem;
+            font-weight: 750;
+        }
+        .quiz-panel dd {
+            color: var(--ink-1);
+            font-weight: 900;
+        }
+        .quiz-record-btn {
+            margin-top: 14px;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #6d72ff;
+            border-radius: 6px;
+            color: #4f55e7;
+            background: #fff;
+            font-size: .82rem;
+            font-weight: 850;
+            text-decoration: none;
+        }
+        .ranking-list,
+        .activity-list {
+            display: grid;
+            gap: 8px;
+        }
+        .ranking-item {
+            min-height: 40px;
+            display: grid;
+            grid-template-columns: 24px 28px minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 10px;
+            color: var(--ink-1);
+            font-size: .82rem;
+            font-weight: 850;
+        }
+        .ranking-item.current {
+            margin-inline: -8px;
+            padding: 0 8px;
+            border-radius: 8px;
+            color: #4f55e7;
+            background: #eef0ff;
+        }
+        .rank-avatar,
+        .activity-icon {
+            width: 28px;
+            height: 28px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: #f3f5fb;
+            font-size: .86rem;
+        }
+        .rank-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .rank-points {
+            font-size: .78rem;
+        }
+        .activity-item {
+            min-height: 48px;
+            display: grid;
+            grid-template-columns: 34px minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 10px;
+        }
+        .activity-icon.good { color: #4f55e7; background: #eef0ff; }
+        .activity-icon.review { color: #f97316; background: #fff0e8; }
+        .activity-title {
+            overflow: hidden;
+            color: var(--ink-1);
+            font-size: .8rem;
+            font-weight: 850;
+            line-height: 1.35;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .activity-meta {
+            color: #8a95aa;
+            font-size: .72rem;
+            font-weight: 750;
+        }
+        .activity-time {
+            color: #8a95aa;
+            font-size: .72rem;
+            font-weight: 750;
+            white-space: nowrap;
+        }
+        .panel-empty {
+            padding: 10px 0;
+            color: #8a95aa;
+            font-size: .8rem;
+            font-weight: 750;
+            line-height: 1.6;
+        }
+
+        [data-theme="dark"] .page-quiz-dashboard,
+        [data-theme="dark"].page-quiz-dashboard {
+            background: #11131a;
+        }
+        [data-theme="dark"] .quiz-sidebar,
+        [data-theme="dark"] .quiz-stat-card,
+        [data-theme="dark"] .quiz-row,
+        [data-theme="dark"] .quiz-panel,
+        [data-theme="dark"] .quiz-point-card,
+        [data-theme="dark"] .quiz-more,
+        [data-theme="dark"] .quiz-empty {
+            background: #171a23;
+            border-color: #292d38;
+        }
+        [data-theme="dark"] .quiz-select,
+        [data-theme="dark"] .quiz-status-ring div {
+            background: #171a23;
+            border-color: #292d38;
+        }
+        [data-theme="dark"] .quiz-tabs a { background: #1e2230; color: #9aa6bd; }
+        [data-theme="dark"] .quiz-tabs a:hover { background: #262b3a; color: #fff; }
+        [data-theme="dark"] .quiz-tabs a.active { background: #4f55e7; color: #fff; }
+        [data-theme="dark"] .quiz-tabs { scrollbar-color: #3a4150 transparent; }
+        [data-theme="dark"] .quiz-tabs::-webkit-scrollbar-thumb { background: #3a4150; }
+        [data-theme="dark"] .quiz-sidebar {
+            box-shadow: none;
+        }
+
+        [data-theme="dark"] .quiz-practice-banner {
+            background: linear-gradient(135deg, #373dbd 0%, #2a319c 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+        }
+        [data-theme="dark"] .practice-banner-btn {
+            background: rgba(255, 255, 255, 0.95);
+            color: #2a319c;
+        }
+
+        @media (max-width: 1320px) {
+            .quiz-main { padding-inline: 28px; }
+            .quiz-layout {
+                grid-template-columns: 1fr;
+            }
+            .quiz-aside {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+            .quiz-panel {
+                min-width: 0;
+            }
+        }
+        @media (max-width: 980px) {
+            .quiz-shell {
+                display: block;
+            }
+            .quiz-sidebar {
+                position: static;
+                height: auto;
+                padding: 12px 14px;
+                border-right: 0;
+                border-bottom: 1px solid #e7eaf1;
+                border-radius: 0;
+            }
+            .quiz-side-nav {
+                display: flex;
+                gap: 6px;
+                overflow-x: auto;
+            }
+            .quiz-side-nav a {
+                min-height: 38px;
+                padding: 0 11px;
+                gap: 8px;
+                flex: 0 0 auto;
+                font-size: .88rem;
+            }
+            .quiz-side-nav img {
+                width: 17px;
+                height: 17px;
+            }
+            .quiz-point-card,
+            .quiz-side-account {
+                display: none;
+            }
+            .quiz-stat-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .quiz-row {
+                grid-template-columns: minmax(0, 1fr) 132px;
+            }
+            .quiz-action {
+                grid-column: 2 / 4;
+                justify-self: stretch;
+            }
+            .quiz-aside {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 680px) {
+            .quiz-main {
+                padding: 28px 16px 42px;
+            }
+            .quiz-heading h1 {
+                font-size: 1.75rem;
+            }
+            .quiz-stat-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .quiz-stat-card {
+                min-height: 82px;
+                padding: 16px;
+            }
+            .quiz-list-head {
+                display: grid;
+                align-items: stretch;
+            }
+            .quiz-controls {
+                padding-bottom: 12px;
+                flex-wrap: wrap;
+            }
+            .quiz-select {
+                flex: 1 1 130px;
+            }
+            .quiz-row {
+                grid-template-columns: minmax(0, 1fr);
+                align-items: start;
+                gap: 14px;
+                padding: 16px;
+            }
+            .quiz-title-line {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 5px;
+            }
+            .quiz-title-line h2,
+            .quiz-description {
+                white-space: normal;
+            }
+            .quiz-accuracy,
+            .quiz-action {
+                grid-column: 1 / -1;
+            }
+        }
+        /* ── Heuristic fixes: 상단 내비 통일 · 검색 · 정답률 기준 · 로그인 안내 ── */
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+        .quiz-main { max-width: 1368px; margin: 0 auto; }
+        .quiz-search { flex: 1 1 200px; max-width: 280px; }
+        .quiz-search input {
+            width: 100%; height: 40px; padding: 0 12px; border: 1px solid #e4e8f0; border-radius: 8px;
+            background: #fff; color: inherit; font: inherit; font-size: .88rem;
+        }
+        .quiz-search input:focus { outline: 2px solid #4f55e7; outline-offset: 1px; border-color: #4f55e7; }
+        .quiz-row[hidden], .quiz-empty[hidden] { display: none; }
+        .quiz-list-head { flex-wrap: wrap; }
+        .quiz-list-head .quiz-tabs { flex: 1 1 100%; min-width: 0; }
+        .quiz-list-head .quiz-search { margin-left: 0; }
+        .quiz-list-head .quiz-controls { margin-left: auto; }
+        @media (min-width: 981px) { .quiz-row { grid-template-columns: minmax(0, 1fr) 168px 128px; } }
+        .quiz-lock { color: #64748b; font-weight: 600; }
+        .quiz-accuracy-note { display: block; margin-top: 6px; color: #64748b; font-size: .76rem; font-weight: 600; }
+        .quiz-accuracy-note.mine { color: #4f55e7; }
+        .quiz-login-copy { margin: 4px 0 16px; color: #475569; font-size: .9rem; line-height: 1.7; }
+        .quiz-record-btn.primary { background: #4f55e7; border-color: #4f55e7; color: #fff; }
+        [data-theme="dark"] .quiz-search input { background: rgba(15, 23, 42, .6); border-color: rgba(148, 163, 184, .25); }
+        [data-theme="dark"] .quiz-login-copy, [data-theme="dark"] .quiz-lock, [data-theme="dark"] .quiz-accuracy-note { color: #b7c2d8; }
+        [data-theme="dark"] .quiz-accuracy-note.mine { color: #8b8fff; }
+        @media (max-width: 680px) { .quiz-search { max-width: none; } }
+    </style>
 <link rel="stylesheet" href="../demo.css">
-</head>
-<body class="page-quiz-dashboard">
-
-<nav>
-
-  <a href="../index.html" class="logo">
-
-    <span class="brand-text"><b>Coding</b>Edu</span>
-
-  </a>
-
-
-
-  <div class="nav-links">
-
-    <a href="../index.html">홈</a>
-
-    <a href="../learn/index.html">강의</a>
-
-    <a href="../quiz/index.html">퀴즈</a>
-
-    <a href="../notice.html">챌린지</a>
-
-    <a href="../notice.html">커뮤니티</a>
-
-    <a href="../notice.html">AI 도우미</a>
-
-    
-
-  </div>
-
-
-
-  <div class="nav-right">
-
-    <button class="theme-toggle" id="themeToggle" title="테마 전환" aria-label="다크/라이트 모드 전환"></button>
-
-
-
-    <div class="nav-right-auth">
-
-      <a href="../notice.html" class="btn-login ghost">로그인</a>
-
-      <a href="../notice.html" class="btn-login">회원가입</a>
-
-    </div>
-
-
-
-    
-
-  </div>
-
-</nav>
-
-    <main class="quiz-main">
-        <div class="quiz-layout">
-            <div class="quiz-content">
-                <header class="quiz-heading">
-                    <div>
-                        <span class="quiz-kicker">QUIZ</span>
-                        <h1>퀴즈</h1>
-                        <p>배운 내용을 퀴즈로 확인하고 실력을 향상시켜보세요!</p>
-                    </div>
-                </header>
-
-                
-
-                <section class="quiz-practice-banner">
-                    <div class="practice-banner-copy">
-                        <h3>⚡ 바로 풀어보는 연습 퀴즈</h3>
-                        <p>로그인 없이도 프론트엔드 개념을 빠르게 복습할 수 있습니다.</p>
-                    </div>
-                    <a href="../notice.html" class="practice-banner-btn">지금 시작하기 ›</a>
-                </section>
-
-                <div class="quiz-list-head">
-                    <nav class="quiz-tabs" aria-label="퀴즈 주제">
-                        <a href="../quiz/index.html" class=" active">전체</a>
-                        <a href="../quiz/index.html">Git</a><a href="../quiz/index.html">HTML/CSS</a><a href="../quiz/index.html">Java</a><a href="../quiz/index.html">JavaScript</a><a href="../quiz/index.html">Python</a><a href="../quiz/index.html">React</a><a href="../quiz/index.html">SQL</a><a href="../quiz/index.html">Spring Boot</a><a href="../quiz/index.html">TypeScript</a><a href="../quiz/index.html">알고리즘</a>
-                    </nav>
-
-                    <label class="quiz-search">
-                        <span class="sr-only">퀴즈 검색</span>
-                        <input type="search" id="quizSearch" placeholder="퀴즈 검색" autocomplete="off">
-                    </label>
-                    <form class="quiz-controls" method="get" action="../quiz/index.html">
-                        <input type="hidden" name="topic" value="all">
-                        <select class="quiz-select" name="difficulty" aria-label="난이도" onchange="this.form.submit()">
-                            <option value="all" selected="selected">난이도 전체</option>
-                            <option value="easy">쉬움</option>
-                            <option value="medium">보통</option>
-                            <option value="hard">어려움</option>
-                        </select>
-                        <select class="quiz-select" name="sort" aria-label="정렬" onchange="this.form.submit()">
-                            <option value="latest" selected="selected">최신순</option>
-                            <option value="oldest">오래된순</option>
-                            <option value="difficulty">난이도순</option>
-                            <option value="accuracy">정답률순</option>
-                        </select>
-                    </form>
-                </div>
-
-                <section class="quiz-list" aria-label="퀴즈 목록">
-                    <div class="quiz-empty" id="quizSearchEmpty" role="status" hidden>
-                        <strong>검색어에 맞는 퀴즈가 없어요.</strong>
-                        <span>다른 검색어를 입력하거나 주제 탭에서 찾아보세요.</span>
-                    </div>
-                    
-
-                    <article class="quiz-row" data-search="알고리즘과 자료구조 알고리즘 시간 복잡도, 정렬 알고리즘, 스택/큐, 이진 탐색, 동적 프로그래밍 등 핵심 CS 개념을 테스트합니다.">
-                        <div class="quiz-row-copy">
-                            <div class="quiz-title-line">
-                                <h2>알고리즘과 자료구조</h2>
-                                <span class="quiz-difficulty hard">어려움</span>
-                            </div>
-                            <p class="quiz-description">시간 복잡도, 정렬 알고리즘, 스택/큐, 이진 탐색, 동적 프로그래밍 등 핵심 CS 개념을 테스트합니다.</p>
-                            <div class="quiz-meta">
-                                <span>5문제</span>
-                                <span>제한 시간 30분</span>
-                                <span class="quiz-lock">🔒 로그인 후 응시·기록 저장</span>
-                            </div>
-                        </div>
-                        <div class="quiz-accuracy">
-                            <span class="quiz-accuracy-label">전체 사용자 평균 정답률</span>
-                            <strong class="quiz-accuracy-value">30%</strong>
-                            <div class="quiz-progress"><i class="orange"
-                                 style="width:30%"></i></div>
-                            
-                            
-                        </div>
-                        
-                        <a href="../notice.html" class="quiz-action quiz-login">로그인하고 시작</a>
-                    </article>
-
-                    <article class="quiz-row" data-search="Git 버전 관리 기초 Git commit, branch, merge, push/pull 등 협업에 필수인 Git 기본 명령어를 테스트합니다.">
-                        <div class="quiz-row-copy">
-                            <div class="quiz-title-line">
-                                <h2>Git 버전 관리 기초</h2>
-                                <span class="quiz-difficulty easy">쉬움</span>
-                            </div>
-                            <p class="quiz-description">commit, branch, merge, push/pull 등 협업에 필수인 Git 기본 명령어를 테스트합니다.</p>
-                            <div class="quiz-meta">
-                                <span>5문제</span>
-                                <span>제한 시간 15분</span>
-                                <span class="quiz-lock">🔒 로그인 후 응시·기록 저장</span>
-                            </div>
-                        </div>
-                        <div class="quiz-accuracy">
-                            <span class="quiz-accuracy-label">전체 사용자 평균 정답률</span>
-                            <strong class="quiz-accuracy-value">-</strong>
-                            <div class="quiz-progress"><i class="orange"
-                                 style="width:0%"></i></div>
-                            <span class="quiz-accuracy-note">아직 응시 기록이 없어요</span>
-                            
-                        </div>
-                        
-                        <a href="../notice.html" class="quiz-action quiz-login">로그인하고 시작</a>
-                    </article>
-
-                    <article class="quiz-row" data-search="React 핵심 개념 React 컴포넌트, Hook(useState/useEffect), Virtual DOM 등 React의 핵심 개념을 테스트합니다.">
-                        <div class="quiz-row-copy">
-                            <div class="quiz-title-line">
-                                <h2>React 핵심 개념</h2>
-                                <span class="quiz-difficulty medium">보통</span>
-                            </div>
-                            <p class="quiz-description">컴포넌트, Hook(useState/useEffect), Virtual DOM 등 React의 핵심 개념을 테스트합니다.</p>
-                            <div class="quiz-meta">
-                                <span>5문제</span>
-                                <span>제한 시간 20분</span>
-                                <span class="quiz-lock">🔒 로그인 후 응시·기록 저장</span>
-                            </div>
-                        </div>
-                        <div class="quiz-accuracy">
-                            <span class="quiz-accuracy-label">전체 사용자 평균 정답률</span>
-                            <strong class="quiz-accuracy-value">-</strong>
-                            <div class="quiz-progress"><i class="orange"
-                                 style="width:0%"></i></div>
-                            <span class="quiz-accuracy-note">아직 응시 기록이 없어요</span>
-                            
-                        </div>
-                        
-                        <a href="../notice.html" class="quiz-action quiz-login">로그인하고 시작</a>
-                    </article>
-
-                    <article class="quiz-row" data-search="TypeScript 타입 시스템 TypeScript 정적 타입, 인터페이스, 제네릭 등 TypeScript만의 핵심 기능을 이해하는지 테스트합니다.">
-                        <div class="quiz-row-copy">
-                            <div class="quiz-title-line">
-                                <h2>TypeScript 타입 시스템</h2>
-                                <span class="quiz-difficulty medium">보통</span>
-                            </div>
-                            <p class="quiz-description">정적 타입, 인터페이스, 제네릭 등 TypeScript만의 핵심 기능을 이해하는지 테스트합니다.</p>
-                            <div class="quiz-meta">
-                                <span>5문제</span>
-                                <span>제한 시간 20분</span>
-                                <span class="quiz-lock">🔒 로그인 후 응시·기록 저장</span>
-                            </div>
-                        </div>
-                        <div class="quiz-accuracy">
-                            <span class="quiz-accuracy-label">전체 사용자 평균 정답률</span>
-                            <strong class="quiz-accuracy-value">-</strong>
-                            <div class="quiz-progress"><i class="orange"
-                                 style="width:0%"></i></div>
-                            <span class="quiz-accuracy-note">아직 응시 기록이 없어요</span>
-                            
-                        </div>
-                        
-                        <a href="../notice.html" class="quiz-action quiz-login">로그인하고 시작</a>
-                    </article>
-
-                    <article class="quiz-row" data-search="Spring Boot 심화 Spring Boot 의존성 주입(DI), AOP(관점 지향 프로그래밍), Spring Security 구조 등 심화 개념을 테스트합니다.">
-                        <div class="quiz-row-copy">
-                            <div class="quiz-title-line">
-                                <h2>Spring Boot 심화</h2>
-                                <span class="quiz-difficulty hard">어려움</span>
-                            </div>
-                            <p class="quiz-description">의존성 주입(DI), AOP(관점 지향 프로그래밍), Spring Security 구조 등 심화 개념을 테스트합니다.</p>
-                            <div class="quiz-meta">
-                                <span>5문제</span>
-                                <span>제한 시간 30분</span>
-                                <span class="quiz-lock">🔒 로그인 후 응시·기록 저장</span>
-                            </div>
-                        </div>
-                        <div class="quiz-accuracy">
-                            <span class="quiz-accuracy-label">전체 사용자 평균 정답률</span>
-                            <strong class="quiz-accuracy-value">-</strong>
-                            <div class="quiz-progress"><i class="orange"
-                                 style="width:0%"></i></div>
-                            <span class="quiz-accuracy-note">아직 응시 기록이 없어요</span>
-                            
-                        </div>
-                        
-                        <a href="../notice.html" class="quiz-action quiz-login">로그인하고 시작</a>
-                    </article>
-
-                    <article class="quiz-row" data-search="Python 자료구조와 함수 Python 리스트, 튜플, 딕셔너리와 같은 자료구조의 활용법 및 기본적인 함수 작성법을 테스트합니다.">
-                        <div class="quiz-row-copy">
-                            <div class="quiz-title-line">
-                                <h2>Python 자료구조와 함수</h2>
-                                <span class="quiz-difficulty easy">쉬움</span>
-                            </div>
-                            <p class="quiz-description">리스트, 튜플, 딕셔너리와 같은 자료구조의 활용법 및 기본적인 함수 작성법을 테스트합니다.</p>
-                            <div class="quiz-meta">
-                                <span>5문제</span>
-                                <span>제한 시간 15분</span>
-                                <span class="quiz-lock">🔒 로그인 후 응시·기록 저장</span>
-                            </div>
-                        </div>
-                        <div class="quiz-accuracy">
-                            <span class="quiz-accuracy-label">전체 사용자 평균 정답률</span>
-                            <strong class="quiz-accuracy-value">-</strong>
-                            <div class="quiz-progress"><i class="orange"
-                                 style="width:0%"></i></div>
-                            <span class="quiz-accuracy-note">아직 응시 기록이 없어요</span>
-                            
-                        </div>
-                        
-                        <a href="../notice.html" class="quiz-action quiz-login">로그인하고 시작</a>
-                    </article>
-
-                    <article class="quiz-row" data-search="HTML &amp; CSS 기초 HTML/CSS 시맨틱 태그, 선택자, 박스 모델(Margin/Padding), Flexbox 등 웹의 화면을 구성하는 기초를 테스트합니다.">
-                        <div class="quiz-row-copy">
-                            <div class="quiz-title-line">
-                                <h2>HTML &amp; CSS 기초</h2>
-                                <span class="quiz-difficulty easy">쉬움</span>
-                            </div>
-                            <p class="quiz-description">시맨틱 태그, 선택자, 박스 모델(Margin/Padding), Flexbox 등 웹의 화면을 구성하는 기초를 테스트합니다.</p>
-                            <div class="quiz-meta">
-                                <span>5문제</span>
-                                <span>제한 시간 15분</span>
-                                <span class="quiz-lock">🔒 로그인 후 응시·기록 저장</span>
-                            </div>
-                        </div>
-                        <div class="quiz-accuracy">
-                            <span class="quiz-accuracy-label">전체 사용자 평균 정답률</span>
-                            <strong class="quiz-accuracy-value">0%</strong>
-                            <div class="quiz-progress"><i class="orange"
-                                 style="width:0%"></i></div>
-                            
-                            
-                        </div>
-                        
-                        <a href="../notice.html" class="quiz-action quiz-login">로그인하고 시작</a>
-                    </article>
-
-                    <article class="quiz-row" data-search="SQL 쿼리 작성 SQL SELECT, JOIN, GROUP BY, HAVING 등 실무에서 자주 쓰이는 데이터베이스 쿼리 작성을 테스트합니다.">
-                        <div class="quiz-row-copy">
-                            <div class="quiz-title-line">
-                                <h2>SQL 쿼리 작성</h2>
-                                <span class="quiz-difficulty medium">보통</span>
-                            </div>
-                            <p class="quiz-description">SELECT, JOIN, GROUP BY, HAVING 등 실무에서 자주 쓰이는 데이터베이스 쿼리 작성을 테스트합니다.</p>
-                            <div class="quiz-meta">
-                                <span>5문제</span>
-                                <span>제한 시간 25분</span>
-                                <span class="quiz-lock">🔒 로그인 후 응시·기록 저장</span>
-                            </div>
-                        </div>
-                        <div class="quiz-accuracy">
-                            <span class="quiz-accuracy-label">전체 사용자 평균 정답률</span>
-                            <strong class="quiz-accuracy-value">-</strong>
-                            <div class="quiz-progress"><i class="orange"
-                                 style="width:0%"></i></div>
-                            <span class="quiz-accuracy-note">아직 응시 기록이 없어요</span>
-                            
-                        </div>
-                        
-                        <a href="../notice.html" class="quiz-action quiz-login">로그인하고 시작</a>
-                    </article>
-
-                    <article class="quiz-row" data-search="Java 객체지향 개념 Java 클래스, 상속, 다형성, 캡슐화 등 자바의 핵심인 객체지향(OOP) 개념을 테스트합니다.">
-                        <div class="quiz-row-copy">
-                            <div class="quiz-title-line">
-                                <h2>Java 객체지향 개념</h2>
-                                <span class="quiz-difficulty medium">보통</span>
-                            </div>
-                            <p class="quiz-description">클래스, 상속, 다형성, 캡슐화 등 자바의 핵심인 객체지향(OOP) 개념을 테스트합니다.</p>
-                            <div class="quiz-meta">
-                                <span>5문제</span>
-                                <span>제한 시간 20분</span>
-                                <span class="quiz-lock">🔒 로그인 후 응시·기록 저장</span>
-                            </div>
-                        </div>
-                        <div class="quiz-accuracy">
-                            <span class="quiz-accuracy-label">전체 사용자 평균 정답률</span>
-                            <strong class="quiz-accuracy-value">-</strong>
-                            <div class="quiz-progress"><i class="orange"
-                                 style="width:0%"></i></div>
-                            <span class="quiz-accuracy-note">아직 응시 기록이 없어요</span>
-                            
-                        </div>
-                        
-                        <a href="../notice.html" class="quiz-action quiz-login">로그인하고 시작</a>
-                    </article>
-
-                    <article class="quiz-row" data-search="JavaScript 기초 문법 JavaScript 변수 선언, 조건문(if-else), 반복문(for, while) 등 기초 문법을 확실히 익혔는지 테스트합니다.">
-                        <div class="quiz-row-copy">
-                            <div class="quiz-title-line">
-                                <h2>JavaScript 기초 문법</h2>
-                                <span class="quiz-difficulty easy">쉬움</span>
-                            </div>
-                            <p class="quiz-description">변수 선언, 조건문(if-else), 반복문(for, while) 등 기초 문법을 확실히 익혔는지 테스트합니다.</p>
-                            <div class="quiz-meta">
-                                <span>5문제</span>
-                                <span>제한 시간 15분</span>
-                                <span class="quiz-lock">🔒 로그인 후 응시·기록 저장</span>
-                            </div>
-                        </div>
-                        <div class="quiz-accuracy">
-                            <span class="quiz-accuracy-label">전체 사용자 평균 정답률</span>
-                            <strong class="quiz-accuracy-value">46%</strong>
-                            <div class="quiz-progress"><i class="orange"
-                                 style="width:46%"></i></div>
-                            
-                            
-                        </div>
-                        
-                        <a href="../notice.html" class="quiz-action quiz-login">로그인하고 시작</a>
-                    </article>
-                </section>
-            </div>
-
-            <aside class="quiz-aside" aria-label="퀴즈 사이드 정보">
-                <section class="quiz-panel">
-                    <div class="quiz-panel-head">
-                        <h2>나의 퀴즈 기록</h2>
-                    </div>
-                    
-                    
-                        <p class="quiz-login-copy">로그인하면 완료한 퀴즈, 정답률과<br>최근 활동을 확인할 수 있어요.</p>
-                        <a href="../notice.html" class="quiz-record-btn primary">로그인하고 기록 보기</a>
-                    
-                </section>
-
-                <section class="quiz-panel">
-                    <div class="quiz-panel-head">
-                        <h2>주간 랭킹</h2>
-                        <a href="../notice.html" class="quiz-panel-link">전체 랭킹 ›</a>
-                    </div>
-                    <div class="ranking-list">
-                        <div class="ranking-item">
-                            <strong>1</strong>
-                            <span class="rank-avatar">👤</span>
-                            <span class="rank-name">seho</span>
-                            <span class="rank-points">1200P</span>
-                        </div>
-                        <div class="ranking-item">
-                            <strong>2</strong>
-                            <span class="rank-avatar">👤</span>
-                            <span class="rank-name">관리자</span>
-                            <span class="rank-points">50P</span>
-                        </div>
-                        <div class="ranking-item">
-                            <strong>3</strong>
-                            <span class="rank-avatar">👤</span>
-                            <span class="rank-name">분탕용계정1</span>
-                            <span class="rank-points">25P</span>
-                        </div>
-                    </div>
-                    
-                </section>
-
-                
-            </aside>
-        </div>
-    </main>
-
-<script src="../js/nav.js"></script>
-<script>
-    // 퀴즈 제목·주제·설명으로 현재 목록을 바로 좁혀보기
-    (function () {
-        var input = document.getElementById('quizSearch');
-        var empty = document.getElementById('quizSearchEmpty');
-        var rows = document.querySelectorAll('.quiz-row');
-        if (!input || !rows.length) return;
-        input.addEventListener('input', function () {
-            var q = input.value.trim().toLowerCase();
-            var visible = 0;
-            rows.forEach(function (row) {
-                var show = !q || (row.getAttribute('data-search') || '').toLowerCase().indexOf(q) !== -1;
-                row.hidden = !show;
-                if (show) visible++;
-            });
-            empty.hidden = visible !== 0;
-        });
-    })();
-</script>
-</body>
-</html>
+</head>
+<body class="page-quiz-dashboard">
+
+<nav>
+  <a href="../index.html" class="logo">
+    <span class="brand-text"><b>Coding</b>Edu</span>
+  </a>
+
+  <div class="nav-links">
+    <a href="../index.html" data-tab="home">홈</a>
+    <a href="../learn/index.html" data-tab="learn">강의</a>
+    <a href="../quiz/index.html" data-tab="quiz">퀴즈</a>
+    <a href="../notice.html" data-tab="more">챌린지</a>
+    <a href="../notice.html" data-tab="more">커뮤니티</a>
+    <a href="../notice.html" data-tab="more">AI 도우미</a>
+    
+  </div>
+
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeToggle" title="테마 전환" aria-label="다크/라이트 모드 전환"></button>
+
+    <div class="nav-right-auth">
+      <a href="../me/quiz/index.html" class="btn-login ghost">로그인</a>
+      <a href="../me/quiz/index.html" class="btn-login">회원가입</a>
+    </div>
+
+    
+  </div>
+</nav>
+
+    <main class="quiz-main">
+        <div class="quiz-layout">
+            <div class="quiz-content">
+                <header class="quiz-heading">
+                    <div>
+                        <span class="quiz-kicker">QUIZ</span>
+                        <h1>퀴즈</h1>
+                        <p>배운 내용을 퀴즈로 확인하고 실력을 향상시켜보세요!</p>
+                    </div>
+                </header>
+
+                
+
+                <section class="quiz-practice-banner">
+                    <div class="practice-banner-copy">
+                        <h3>⚡ 바로 풀어보는 연습 퀴즈</h3>
+                        <p>로그인 없이도 프론트엔드 개념을 빠르게 복습할 수 있습니다.</p>
+                    </div>
+                    <a href="../quiz/practice/index.html" class="practice-banner-btn">지금 시작하기 ›</a>
+                </section>
+
+                <div class="quiz-list-head">
+                    <nav class="quiz-tabs" aria-label="퀴즈 주제">
+                        <a href="../quiz/index.html" class=" active">전체</a>
+                        <a href="../quiz/index.html">Git</a><a href="../quiz/index.html">HTML/CSS</a><a href="../quiz/index.html">Java</a><a href="../quiz/index.html">JavaScript</a><a href="../quiz/index.html">Python</a><a href="../quiz/index.html">React</a><a href="../quiz/index.html">SQL</a><a href="../quiz/index.html">Spring Boot</a><a href="../quiz/index.html">TypeScript</a><a href="../quiz/index.html">알고리즘</a>
+                    </nav>
+
+                    <label class="quiz-search">
+                        <span class="sr-only">퀴즈 검색</span>
+                        <input type="search" id="quizSearch" placeholder="퀴즈 검색" autocomplete="off">
+                    </label>
+                    <form class="quiz-controls" method="get" action="../quiz/index.html">
+                        <input type="hidden" name="topic" value="all">
+                        <select class="quiz-select" name="difficulty" aria-label="난이도" onchange="this.form.submit()">
+                            <option value="all" selected="selected">난이도 전체</option>
+                            <option value="easy">쉬움</option>
+                            <option value="medium">보통</option>
+                            <option value="hard">어려움</option>
+                        </select>
+                        <select class="quiz-select" name="sort" aria-label="정렬" onchange="this.form.submit()">
+                            <option value="latest" selected="selected">최신순</option>
+                            <option value="oldest">오래된순</option>
+                            <option value="difficulty">난이도순</option>
+                            <option value="accuracy">정답률순</option>
+                        </select>
+                    </form>
+                </div>
+
+                <section class="quiz-list" aria-label="퀴즈 목록">
+                    <div class="quiz-empty" id="quizSearchEmpty" role="status" hidden>
+                        <strong>검색어에 맞는 퀴즈가 없어요.</strong>
+                        <span>다른 검색어를 입력하거나 주제 탭에서 찾아보세요.</span>
+                    </div>
+                    
+
+                    <article class="quiz-row" data-search="알고리즘과 자료구조 알고리즘 시간 복잡도, 정렬 알고리즘, 스택/큐, 이진 탐색, 동적 프로그래밍 등 핵심 CS 개념을 테스트합니다.">
+                        <div class="quiz-row-copy">
+                            <div class="quiz-title-line">
+                                <h2>알고리즘과 자료구조</h2>
+                                <span class="quiz-difficulty hard">어려움</span>
+                            </div>
+                            <p class="quiz-description">시간 복잡도, 정렬 알고리즘, 스택/큐, 이진 탐색, 동적 프로그래밍 등 핵심 CS 개념을 테스트합니다.</p>
+                            <div class="quiz-meta">
+                                <span>5문제</span>
+                                <span>제한 시간 30분</span>
+                                <span class="quiz-lock">🔒 로그인 후 응시·기록 저장</span>
+                            </div>
+                        </div>
+                        <div class="quiz-accuracy">
+                            <span class="quiz-accuracy-label">전체 사용자 평균 정답률</span>
+                            <strong class="quiz-accuracy-value">-</strong>
+                            <div class="quiz-progress"><i class="orange"
+                                 style="width:0%"></i></div>
+                            <span class="quiz-accuracy-note">아직 응시 기록이 없어요</span>
+                            
+                        </div>
+                        
+                        <a href="../me/quiz/index.html" class="quiz-action quiz-login">로그인하고 시작</a>
+                    </article>
+
+                    <article class="quiz-row" data-search="Git 버전 관리 기초 Git commit, branch, merge, push/pull 등 협업에 필수인 Git 기본 명령어를 테스트합니다.">
+                        <div class="quiz-row-copy">
+                            <div class="quiz-title-line">
+                                <h2>Git 버전 관리 기초</h2>
+                                <span class="quiz-difficulty easy">쉬움</span>
+                            </div>
+                            <p class="quiz-description">commit, branch, merge, push/pull 등 협업에 필수인 Git 기본 명령어를 테스트합니다.</p>
+                            <div class="quiz-meta">
+                                <span>5문제</span>
+                                <span>제한 시간 15분</span>
+                                <span class="quiz-lock">🔒 로그인 후 응시·기록 저장</span>
+                            </div>
+                        </div>
+                        <div class="quiz-accuracy">
+                            <span class="quiz-accuracy-label">전체 사용자 평균 정답률</span>
+                            <strong class="quiz-accuracy-value">-</strong>
+                            <div class="quiz-progress"><i class="orange"
+                                 style="width:0%"></i></div>
+                            <span class="quiz-accuracy-note">아직 응시 기록이 없어요</span>
+                            
+                        </div>
+                        
+                        <a href="../me/quiz/index.html" class="quiz-action quiz-login">로그인하고 시작</a>
+                    </article>
+
+                    <article class="quiz-row" data-search="React 핵심 개념 React 컴포넌트, Hook(useState/useEffect), Virtual DOM 등 React의 핵심 개념을 테스트합니다.">
+                        <div class="quiz-row-copy">
+                            <div class="quiz-title-line">
+                                <h2>React 핵심 개념</h2>
+                                <span class="quiz-difficulty medium">보통</span>
+                            </div>
+                            <p class="quiz-description">컴포넌트, Hook(useState/useEffect), Virtual DOM 등 React의 핵심 개념을 테스트합니다.</p>
+                            <div class="quiz-meta">
+                                <span>5문제</span>
+                                <span>제한 시간 20분</span>
+                                <span class="quiz-lock">🔒 로그인 후 응시·기록 저장</span>
+                            </div>
+                        </div>
+                        <div class="quiz-accuracy">
+                            <span class="quiz-accuracy-label">전체 사용자 평균 정답률</span>
+                            <strong class="quiz-accuracy-value">-</strong>
+                            <div class="quiz-progress"><i class="orange"
+                                 style="width:0%"></i></div>
+                            <span class="quiz-accuracy-note">아직 응시 기록이 없어요</span>
+                            
+                        </div>
+                        
+                        <a href="../me/quiz/index.html" class="quiz-action quiz-login">로그인하고 시작</a>
+                    </article>
+
+                    <article class="quiz-row" data-search="TypeScript 타입 시스템 TypeScript 정적 타입, 인터페이스, 제네릭 등 TypeScript만의 핵심 기능을 이해하는지 테스트합니다.">
+                        <div class="quiz-row-copy">
+                            <div class="quiz-title-line">
+                                <h2>TypeScript 타입 시스템</h2>
+                                <span class="quiz-difficulty medium">보통</span>
+                            </div>
+                            <p class="quiz-description">정적 타입, 인터페이스, 제네릭 등 TypeScript만의 핵심 기능을 이해하는지 테스트합니다.</p>
+                            <div class="quiz-meta">
+                                <span>5문제</span>
+                                <span>제한 시간 20분</span>
+                                <span class="quiz-lock">🔒 로그인 후 응시·기록 저장</span>
+                            </div>
+                        </div>
+                        <div class="quiz-accuracy">
+                            <span class="quiz-accuracy-label">전체 사용자 평균 정답률</span>
+                            <strong class="quiz-accuracy-value">-</strong>
+                            <div class="quiz-progress"><i class="orange"
+                                 style="width:0%"></i></div>
+                            <span class="quiz-accuracy-note">아직 응시 기록이 없어요</span>
+                            
+                        </div>
+                        
+                        <a href="../me/quiz/index.html" class="quiz-action quiz-login">로그인하고 시작</a>
+                    </article>
+
+                    <article class="quiz-row" data-search="Spring Boot 심화 Spring Boot 의존성 주입(DI), AOP(관점 지향 프로그래밍), Spring Security 구조 등 심화 개념을 테스트합니다.">
+                        <div class="quiz-row-copy">
+                            <div class="quiz-title-line">
+                                <h2>Spring Boot 심화</h2>
+                                <span class="quiz-difficulty hard">어려움</span>
+                            </div>
+                            <p class="quiz-description">의존성 주입(DI), AOP(관점 지향 프로그래밍), Spring Security 구조 등 심화 개념을 테스트합니다.</p>
+                            <div class="quiz-meta">
+                                <span>5문제</span>
+                                <span>제한 시간 30분</span>
+                                <span class="quiz-lock">🔒 로그인 후 응시·기록 저장</span>
+                            </div>
+                        </div>
+                        <div class="quiz-accuracy">
+                            <span class="quiz-accuracy-label">전체 사용자 평균 정답률</span>
+                            <strong class="quiz-accuracy-value">-</strong>
+                            <div class="quiz-progress"><i class="orange"
+                                 style="width:0%"></i></div>
+                            <span class="quiz-accuracy-note">아직 응시 기록이 없어요</span>
+                            
+                        </div>
+                        
+                        <a href="../me/quiz/index.html" class="quiz-action quiz-login">로그인하고 시작</a>
+                    </article>
+
+                    <article class="quiz-row" data-search="Python 자료구조와 함수 Python 리스트, 튜플, 딕셔너리와 같은 자료구조의 활용법 및 기본적인 함수 작성법을 테스트합니다.">
+                        <div class="quiz-row-copy">
+                            <div class="quiz-title-line">
+                                <h2>Python 자료구조와 함수</h2>
+                                <span class="quiz-difficulty easy">쉬움</span>
+                            </div>
+                            <p class="quiz-description">리스트, 튜플, 딕셔너리와 같은 자료구조의 활용법 및 기본적인 함수 작성법을 테스트합니다.</p>
+                            <div class="quiz-meta">
+                                <span>5문제</span>
+                                <span>제한 시간 15분</span>
+                                <span class="quiz-lock">🔒 로그인 후 응시·기록 저장</span>
+                            </div>
+                        </div>
+                        <div class="quiz-accuracy">
+                            <span class="quiz-accuracy-label">전체 사용자 평균 정답률</span>
+                            <strong class="quiz-accuracy-value">-</strong>
+                            <div class="quiz-progress"><i class="orange"
+                                 style="width:0%"></i></div>
+                            <span class="quiz-accuracy-note">아직 응시 기록이 없어요</span>
+                            
+                        </div>
+                        
+                        <a href="../me/quiz/index.html" class="quiz-action quiz-login">로그인하고 시작</a>
+                    </article>
+
+                    <article class="quiz-row" data-search="HTML &amp; CSS 기초 HTML/CSS 시맨틱 태그, 선택자, 박스 모델(Margin/Padding), Flexbox 등 웹의 화면을 구성하는 기초를 테스트합니다.">
+                        <div class="quiz-row-copy">
+                            <div class="quiz-title-line">
+                                <h2>HTML &amp; CSS 기초</h2>
+                                <span class="quiz-difficulty easy">쉬움</span>
+                            </div>
+                            <p class="quiz-description">시맨틱 태그, 선택자, 박스 모델(Margin/Padding), Flexbox 등 웹의 화면을 구성하는 기초를 테스트합니다.</p>
+                            <div class="quiz-meta">
+                                <span>5문제</span>
+                                <span>제한 시간 15분</span>
+                                <span class="quiz-lock">🔒 로그인 후 응시·기록 저장</span>
+                            </div>
+                        </div>
+                        <div class="quiz-accuracy">
+                            <span class="quiz-accuracy-label">전체 사용자 평균 정답률</span>
+                            <strong class="quiz-accuracy-value">-</strong>
+                            <div class="quiz-progress"><i class="orange"
+                                 style="width:0%"></i></div>
+                            <span class="quiz-accuracy-note">아직 응시 기록이 없어요</span>
+                            
+                        </div>
+                        
+                        <a href="../me/quiz/index.html" class="quiz-action quiz-login">로그인하고 시작</a>
+                    </article>
+
+                    <article class="quiz-row" data-search="SQL 쿼리 작성 SQL SELECT, JOIN, GROUP BY, HAVING 등 실무에서 자주 쓰이는 데이터베이스 쿼리 작성을 테스트합니다.">
+                        <div class="quiz-row-copy">
+                            <div class="quiz-title-line">
+                                <h2>SQL 쿼리 작성</h2>
+                                <span class="quiz-difficulty medium">보통</span>
+                            </div>
+                            <p class="quiz-description">SELECT, JOIN, GROUP BY, HAVING 등 실무에서 자주 쓰이는 데이터베이스 쿼리 작성을 테스트합니다.</p>
+                            <div class="quiz-meta">
+                                <span>5문제</span>
+                                <span>제한 시간 25분</span>
+                                <span class="quiz-lock">🔒 로그인 후 응시·기록 저장</span>
+                            </div>
+                        </div>
+                        <div class="quiz-accuracy">
+                            <span class="quiz-accuracy-label">전체 사용자 평균 정답률</span>
+                            <strong class="quiz-accuracy-value">-</strong>
+                            <div class="quiz-progress"><i class="orange"
+                                 style="width:0%"></i></div>
+                            <span class="quiz-accuracy-note">아직 응시 기록이 없어요</span>
+                            
+                        </div>
+                        
+                        <a href="../me/quiz/index.html" class="quiz-action quiz-login">로그인하고 시작</a>
+                    </article>
+
+                    <article class="quiz-row" data-search="Java 객체지향 개념 Java 클래스, 상속, 다형성, 캡슐화 등 자바의 핵심인 객체지향(OOP) 개념을 테스트합니다.">
+                        <div class="quiz-row-copy">
+                            <div class="quiz-title-line">
+                                <h2>Java 객체지향 개념</h2>
+                                <span class="quiz-difficulty medium">보통</span>
+                            </div>
+                            <p class="quiz-description">클래스, 상속, 다형성, 캡슐화 등 자바의 핵심인 객체지향(OOP) 개념을 테스트합니다.</p>
+                            <div class="quiz-meta">
+                                <span>5문제</span>
+                                <span>제한 시간 20분</span>
+                                <span class="quiz-lock">🔒 로그인 후 응시·기록 저장</span>
+                            </div>
+                        </div>
+                        <div class="quiz-accuracy">
+                            <span class="quiz-accuracy-label">전체 사용자 평균 정답률</span>
+                            <strong class="quiz-accuracy-value">-</strong>
+                            <div class="quiz-progress"><i class="orange"
+                                 style="width:0%"></i></div>
+                            <span class="quiz-accuracy-note">아직 응시 기록이 없어요</span>
+                            
+                        </div>
+                        
+                        <a href="../me/quiz/index.html" class="quiz-action quiz-login">로그인하고 시작</a>
+                    </article>
+
+                    <article class="quiz-row" data-search="JavaScript 기초 문법 JavaScript 변수 선언, 조건문(if-else), 반복문(for, while) 등 기초 문법을 확실히 익혔는지 테스트합니다.">
+                        <div class="quiz-row-copy">
+                            <div class="quiz-title-line">
+                                <h2>JavaScript 기초 문법</h2>
+                                <span class="quiz-difficulty easy">쉬움</span>
+                            </div>
+                            <p class="quiz-description">변수 선언, 조건문(if-else), 반복문(for, while) 등 기초 문법을 확실히 익혔는지 테스트합니다.</p>
+                            <div class="quiz-meta">
+                                <span>5문제</span>
+                                <span>제한 시간 15분</span>
+                                <span class="quiz-lock">🔒 로그인 후 응시·기록 저장</span>
+                            </div>
+                        </div>
+                        <div class="quiz-accuracy">
+                            <span class="quiz-accuracy-label">전체 사용자 평균 정답률</span>
+                            <strong class="quiz-accuracy-value">-</strong>
+                            <div class="quiz-progress"><i class="orange"
+                                 style="width:0%"></i></div>
+                            <span class="quiz-accuracy-note">아직 응시 기록이 없어요</span>
+                            
+                        </div>
+                        
+                        <a href="../me/quiz/index.html" class="quiz-action quiz-login">로그인하고 시작</a>
+                    </article>
+                </section>
+            </div>
+
+            <aside class="quiz-aside" aria-label="퀴즈 사이드 정보">
+                <section class="quiz-panel">
+                    <div class="quiz-panel-head">
+                        <h2>나의 퀴즈 기록</h2>
+                    </div>
+                    
+                    
+                        <p class="quiz-login-copy">로그인하면 완료한 퀴즈, 정답률과<br>최근 활동을 확인할 수 있어요.</p>
+                        <a href="../me/quiz/index.html" class="quiz-record-btn primary">로그인하고 기록 보기</a>
+                    
+                </section>
+
+                <section class="quiz-panel">
+                    <div class="quiz-panel-head">
+                        <h2>주간 랭킹</h2>
+                        <a href="../notice.html" class="quiz-panel-link">전체 랭킹 ›</a>
+                    </div>
+                    
+                    <p class="panel-empty">아직 랭킹 데이터가 없습니다. 첫 퀴즈를 완료하면 순위가 만들어져요.</p>
+                </section>
+
+                
+            </aside>
+        </div>
+    </main>
+
+<script src="../js/nav.js"></script>
+<script>
+    // 퀴즈 제목·주제·설명으로 현재 목록을 바로 좁혀보기
+    (function () {
+        var input = document.getElementById('quizSearch');
+        var empty = document.getElementById('quizSearchEmpty');
+        var rows = document.querySelectorAll('.quiz-row');
+        if (!input || !rows.length) return;
+        input.addEventListener('input', function () {
+            var q = input.value.trim().toLowerCase();
+            var visible = 0;
+            rows.forEach(function (row) {
+                var show = !q || (row.getAttribute('data-search') || '').toLowerCase().indexOf(q) !== -1;
+                row.hidden = !show;
+                if (show) visible++;
+            });
+            empty.hidden = visible !== 0;
+        });
+    })();
+</script>
+</body>
+</html>

@@ -2,7 +2,7 @@
 <html lang="ko" data-theme="light">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>CodeEdu - 코딩은 즐거워요!</title>
 <!-- Prevent flash of wrong theme -->
 <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
@@ -88,12 +88,14 @@
       <!-- 데스크톱: 분야(큰 노드)와 강의(작은 노드)를 학습 순서 화살표로 잇는 지도 -->
       <div class="rm-graph" data-rm-graph>
         <svg class="rm-graph-svg" data-rm-graph-svg viewBox="0 0 1200 540" role="group" aria-label="학습 분야와 강의 연결 지도"></svg>
+        <!-- 좁은 화면: 탭한 노드의 선수·다음 강의와 이동 버튼 -->
+        <div class="rm-ginfo" data-rm-ginfo aria-live="polite"></div>
         <ul class="rm-legend" aria-hidden="true">
           <li><i class="rm-legend-field"></i>분야</li>
           <li><i class="rm-legend-course"></i>강의</li>
           <li><i class="rm-legend-prev"></i>선수 강의</li>
           <li><i class="rm-legend-arrow"></i>학습 순서</li>
-          <li class="rm-legend-hint">노드에 마우스를 올리면 연결된 강의가 강조돼요</li>
+          <li class="rm-legend-hint">노드에 마우스를 올리거나 탭하면 연결된 강의가 강조돼요</li>
         </ul>
       </div>
 

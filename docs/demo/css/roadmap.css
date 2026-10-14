@@ -73,7 +73,9 @@
   background-size: 18px 18px;
   border: 1px solid var(--rm-border); border-radius: var(--rm-radius-lg);
 }
-.rm-tree { display: none; }
+.roadmap.has-graph .rm-tree { display: none; }
+.roadmap:not(.has-graph) .rm-graph { display: none; }
+.roadmap:not(.has-graph) .rm-tree { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px 16px; }
 
 /* Graph (데스크톱) */
 .rm-graph-svg { display: block; width: 100%; height: auto; overflow: visible; font-family: inherit; }
@@ -137,6 +139,42 @@
 .rm-legend-arrow { width: 18px; height: 0; border-radius: 0 !important; border-top: 1.5px solid var(--rm-route); position: relative; }
 .rm-legend-arrow::after { content: ''; position: absolute; right: -1px; top: -4.5px; border: 4px solid transparent; border-left: 6px solid var(--rm-route); border-right: 0; }
 .rm-legend-hint { margin-left: auto; }
+
+/* Compact graph (좁은 화면 세로 배치) */
+.rm-gbg { fill: transparent; }
+.rm-gnode, .rm-ghit { -webkit-tap-highlight-color: transparent; }
+.rm-graph.is-compact .rm-graph-svg { max-width: 440px; margin: 0 auto; }
+.rm-graph-svg.is-compact .rm-glabel { font-size: 14px; }
+.rm-graph-svg.is-compact .rm-gnode.is-field .rm-glabel { font-size: 16px; }
+.rm-graph-svg.is-compact .rm-gmeta { font-size: 12px; }
+.rm-graph-svg.is-compact .rm-gcaption { display: none; } /* 좁은 화면은 정보 카드로 대신 표시 */
+.rm-graph-svg.is-compact .rm-gnode.is-hot .rm-glabel { transform: translateY(-4px) scale(1.12); }
+.rm-graph.is-compact .rm-legend-hint { display: none; }
+.rm-ginfo { display: none; }
+/* 지도를 보는 동안 화면 하단(탭바 위)에 붙어 있어, 위쪽 노드를 탭해도 바로 보임 */
+.rm-graph.is-compact .rm-ginfo {
+  position: sticky; bottom: 16px; z-index: 5;
+  display: block; max-width: 440px; min-height: 56px; margin: 8px auto 12px; padding: 14px 16px;
+  background: var(--rm-surface); border: 1px solid var(--rm-border); border-radius: var(--rm-radius);
+  box-shadow: 0 10px 30px rgba(28, 39, 68, .14);
+}
+@media (max-width: 640px) { .rm-graph.is-compact .rm-ginfo { bottom: calc(76px + env(safe-area-inset-bottom)); } } /* 하단 탭바 위 */
+.rm-ginfo-hint { margin: 0; color: var(--rm-ink-3); font-size: .86rem; line-height: 1.6; text-align: center; }
+.rm-ginfo-head { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
+.rm-ginfo-head strong { color: var(--rm-ink-1); font-size: 1.05rem; }
+.rm-ginfo-kind { padding: 2px 8px; border-radius: 999px; background: var(--rm-primary-soft); color: var(--rm-primary); font-size: .72rem; font-weight: 750; }
+.rm-ginfo-done { margin-left: auto; color: var(--rm-done); font-size: .78rem; font-weight: 750; }
+.rm-ginfo-meta { margin: 0 0 6px; color: var(--rm-ink-3); font-size: .8rem; font-weight: 600; }
+.rm-ginfo-text { margin: 0 0 12px; color: var(--rm-ink-2); font-size: .88rem; line-height: 1.55; }
+.rm-ginfo-actions { display: flex; gap: 8px; }
+.rm-ginfo-btn {
+  flex: 1; min-height: 44px; display: inline-flex; align-items: center; justify-content: center;
+  padding: 0 12px; border: 1px solid var(--rm-border); border-radius: var(--rm-radius-sm);
+  background: var(--rm-surface); color: var(--rm-ink-1); font: inherit; font-size: .88rem; font-weight: 700;
+  text-decoration: none; cursor: pointer;
+}
+.rm-ginfo-btn.is-primary { background: var(--rm-primary); border-color: var(--rm-primary); color: #fff; }
+.rm-ginfo-btn:active { transform: scale(.97); }
 
 /* Hub = 나의 시작점 */
 .rm-hub {
@@ -328,8 +366,6 @@
 /* ── Tablet ─────────────────────────────────────────────────── */
 @media (max-width: 1100px) {
   .rm-map { padding: 24px; }
-  .rm-graph { display: none; }
-  .rm-tree { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px 16px; }
   .rm-panel { padding: 24px; }
   .rm-panel-head { flex-direction: column; align-items: flex-start; }
   .rm-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
@@ -343,7 +379,7 @@
   .rm-head h2 { font-size: 1.4rem; }
   .rm-head p { font-size: .92rem; }
   .rm-map { padding: 16px; }
-  .rm-tree { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .roadmap:not(.has-graph) .rm-tree { grid-template-columns: minmax(0, 1fr); gap: 20px; }
   .rm-dest:hover { transform: none; }
   .rm-dest-summary { min-height: 0; }
   .rm-panel { padding: 20px 16px; }

@@ -1,29 +1,49 @@
 // 홈 학습 로드맵
-// 1단계: 분야(큰 노드)와 강의(작은 노드)를 학습 순서 화살표로 잇는 지도 (태블릿·모바일은 목록형 트리)
+// 1단계: 분야(큰 노드)와 강의(작은 노드)를 학습 순서 화살표로 잇는 지도
+//        넓은 화면은 가로 배치 + 마우스 오버, 좁은 화면은 세로 배치 + 탭(정보 카드)
 // 2단계: 선택한 분야의 순서형 경로 패널
 (function () {
   var root = document.getElementById('learningRoadmap');
   if (!root) return;
 
   var SVG_NS = 'http://www.w3.org/2000/svg';
+  var graph = root.querySelector('[data-rm-graph]');
   var svg = root.querySelector('[data-rm-graph-svg]');
+  var info = root.querySelector('[data-rm-ginfo]');
   var branches = Array.prototype.slice.call(root.querySelectorAll('.rm-branch'));
   var panels = Array.prototype.slice.call(root.querySelectorAll('.rm-panel'));
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   var selected = root.getAttribute('data-initial-track');
   var targetTimer = null;
+  var focusedId = null;
+  var lastPointer = 'mouse';
+  var mode = null;
 
-  // ── 지도 배치 (viewBox 1200×540). 분야는 가장자리, 공유 강의(JavaScript·Git)는 두 분야 사이에 둡니다.
-  var FIELD_POS = {
-    web: [110, 150], frontend: [640, 82], python: [1090, 140], backend: [1090, 430], database: [110, 410]
+  // ── 배치. 분야는 가장자리, 공유 강의(JavaScript·Git)는 두 분야 사이에 둡니다.
+  //    label: 라벨 위치(above/below/left/right). 지정하지 않으면 분야는 아래, 강의는 위.
+  var LAYOUTS = {
+    wide: {
+      width: 1200, height: 540, fieldR: 22, courseR: 7,
+      field: { web: [110, 150], frontend: [640, 82], python: [1090, 140], backend: [1090, 430], database: [110, 410] },
+      course: {
+        html: [255, 95], css: [395, 150], javascript: [535, 220], project: [415, 322],
+        react: [695, 275], nextjs: [825, 172], python: [955, 200], git: [860, 342],
+        php: [720, 430], java: [565, 478], mysql: [255, 462], sqljoin: [390, 410]
+      },
+      label: { 'f:frontend': 'above' }
+    },
+    // 세로 3열(60·180·300) 배치: 웹·프론트엔드 → 백엔드·Python → 데이터베이스 순으로 위에서 아래로
+    compact: {
+      width: 360, height: 670, fieldR: 17, courseR: 6,
+      field: { web: [60, 60], frontend: [300, 160], python: [60, 360], backend: [300, 470], database: [60, 590] },
+      course: {
+        html: [180, 60], css: [300, 60], javascript: [180, 160], project: [60, 160],
+        react: [180, 260], nextjs: [300, 260], python: [180, 360], git: [300, 360],
+        php: [180, 470], java: [60, 470], mysql: [180, 590], sqljoin: [300, 590]
+      },
+      label: { 'c:javascript': 'left-above', 'c:project': 'below', 'c:react': 'left', 'c:php': 'below', 'c:java': 'below' }
+    }
   };
-  var COURSE_POS = {
-    html: [255, 95], css: [395, 150], javascript: [535, 220], project: [415, 322],
-    react: [695, 275], nextjs: [825, 172], python: [955, 200], git: [860, 342],
-    php: [720, 430], java: [565, 478], mysql: [255, 462], sqljoin: [390, 410]
-  };
-  var FIELD_R = 22;
-  var COURSE_R = 7;
 
   // ── 데이터: 서버가 렌더링한 목록형 트리에서 분야·강의·진행 상태를 읽어옵니다.
   var tracks = branches.map(function (branch) {
@@ -43,14 +63,14 @@
       })
     };
   });
+  var trackByKey = {};
+  tracks.forEach(function (t) { trackByKey[t.key] = t; });
 
-  var nodes = {};   // id → { id, kind, name, x, y, r, tracks: {key: stepNumber}, el }
-  var edges = [];   // { from, to, tracks: {key: true}, el }
+  var nodes = {};   // id → { id, kind, key, name, tracks: {trackKey: stepNumber}, el, x, y, r }
+  var edges = [];   // { from, to, tracks: {trackKey: true}, el }
 
-  function addNode(id, kind, name, pos, extra) {
-    if (!nodes[id]) {
-      nodes[id] = { id: id, kind: kind, name: name, x: pos[0], y: pos[1], r: kind === 'field' ? FIELD_R : COURSE_R, tracks: {} };
-    }
+  function addNode(id, kind, key, name, extra) {
+    if (!nodes[id]) nodes[id] = { id: id, kind: kind, key: key, name: name, tracks: {} };
     for (var k in extra) nodes[id][k] = extra[k];
     return nodes[id];
   }
@@ -69,11 +89,11 @@
 
   tracks.forEach(function (track) {
     var fieldId = 'f:' + track.key;
-    addNode(fieldId, 'field', track.name, FIELD_POS[track.key] || [600, 270], { track: track.key, meta: track.meta, summary: track.summary.trim() });
+    addNode(fieldId, 'field', track.key, track.name, { track: track.key, meta: track.meta, summary: track.summary.trim() });
     var prev = fieldId;
     track.steps.forEach(function (step) {
       var id = 'c:' + step.lang;
-      var node = addNode(id, 'course', step.name, COURSE_POS[step.lang] || [600, 270], {});
+      var node = addNode(id, 'course', step.lang, step.name, {});
       node.tracks[track.key] = step.number;
       if (!node.status || step.status === 'done' || step.status === 'upcoming') node.status = step.status;
       addEdge(prev, id, track.key);
@@ -81,7 +101,7 @@
     });
   });
 
-  // ── 그리기
+  // ── 공통 계산
   function el(name, attrs, parent) {
     var e = document.createElementNS(SVG_NS, name);
     for (var a in attrs) e.setAttribute(a, attrs[a]);
@@ -98,8 +118,7 @@
     return { prev: prev, next: next };
   }
 
-  function captionFor(node) {
-    if (node.kind === 'field') return '클릭해서 학습 순서 보기';
+  function relationText(node) {
     var n = neighbours(node.id);
     var prevCourses = n.prev.filter(function (p) { return p.kind === 'course'; }).map(function (p) { return p.name; });
     var nextCourses = n.next.map(function (p) { return p.name; });
@@ -109,13 +128,52 @@
     return text;
   }
 
+  function captionFor(node) {
+    return node.kind === 'field' ? '클릭해서 학습 순서 보기' : relationText(node);
+  }
+
+  // 이미 선택한 분야에 포함된 강의면 그 분야를, 아니면 이 강의가 속한 첫 분야
+  function trackFor(node) {
+    if (node.kind === 'field') return node.track;
+    return node.tracks[selected] ? selected : Object.keys(node.tracks)[0];
+  }
+
+  function labelPos(side, r, kind) {
+    switch (side) {
+      case 'above': return kind === 'field' ? { x: 0, y: -r - 30, meta: -r - 12, anchor: 'middle' } : { x: 0, y: -r - 9, anchor: 'middle' };
+      case 'left': return { x: -r - 8, y: 5, anchor: 'end' };
+      case 'left-above': return { x: -r - 6, y: -r - 6, anchor: 'end' };
+      case 'right': return { x: r + 8, y: 5, anchor: 'start' };
+      default: return kind === 'field' ? { x: 0, y: r + 22, meta: r + 39, anchor: 'middle' } : { x: 0, y: r + 20, anchor: 'middle' }; // below
+    }
+  }
+
+  // ── 그리기 (화면 폭이 바뀌어 배치가 달라지면 다시 그림)
   function drawGraph() {
     if (!svg) return;
+    var layout = LAYOUTS[mode];
+    clearFocus();
+    svg.textContent = '';
+    svg.setAttribute('viewBox', '0 0 ' + layout.width + ' ' + layout.height);
+    svg.classList.toggle('is-compact', mode === 'compact');
+
+    Object.keys(nodes).forEach(function (id) {
+      var n = nodes[id];
+      var pos = (n.kind === 'field' ? layout.field : layout.course)[n.key] || [layout.width / 2, layout.height / 2];
+      n.x = pos[0];
+      n.y = pos[1];
+      n.r = n.kind === 'field' ? layout.fieldR : layout.courseR;
+    });
+
     var defs = el('defs', {}, svg);
     [['rm-arrow', 'rm-arrowhead'], ['rm-arrow-on', 'rm-arrowhead is-on'], ['rm-arrow-prev', 'rm-arrowhead is-prev']].forEach(function (m) {
       var marker = el('marker', { id: m[0], viewBox: '0 0 10 10', refX: '9', refY: '5', markerWidth: '7', markerHeight: '7', orient: 'auto-start-reverse' }, defs);
       el('path', { d: 'M0 1 L10 5 L0 9 z', 'class': m[1] }, marker);
     });
+
+    // 빈 곳을 탭하면 선택 해제
+    el('rect', { 'class': 'rm-gbg', x: 0, y: 0, width: layout.width, height: layout.height }, svg)
+      .addEventListener('click', function () { clearFocus(); showInfo(null); });
 
     var edgeLayer = el('g', { 'class': 'rm-edges' }, svg);
     var nodeLayer = el('g', { 'class': 'rm-gnodes' }, svg);
@@ -134,40 +192,33 @@
       var cls = 'rm-gnode is-' + n.kind + (n.status === 'done' || n.status === 'upcoming' ? ' is-' + n.status : '');
       var label = n.kind === 'field'
         ? n.name + ' 분야, ' + n.meta + '. ' + n.summary
-        : n.name + ' 강의' + (n.status === 'done' ? ', 완료' : '') + '. ' + captionFor(n);
+        : n.name + ' 강의' + (n.status === 'done' ? ', 완료' : '') + '. ' + relationText(n);
       var g = el('g', { 'class': cls, transform: 'translate(' + n.x + ' ' + n.y + ')', tabindex: '0', role: 'button', 'aria-label': label, 'data-id': id }, nodeLayer);
       el('circle', { 'class': 'rm-gring', r: n.r + 7 }, g);
       el('circle', { 'class': 'rm-gdot', r: n.r }, g);
       if (n.status === 'done') el('path', { 'class': 'rm-gcheck', d: n.kind === 'field' ? 'M-6 0 l4 4 l8 -8' : 'M-3 0 l2 2 l4 -4' }, g);
 
-      var labelY, metaY, captionY;
-      if (n.kind === 'field') {
-        var above = n.y < 120;
-        labelY = above ? -n.r - 30 : n.r + 24;
-        metaY = above ? -n.r - 12 : n.r + 42;
-        captionY = above ? n.r + 22 : n.r + 60;
-      } else {
-        labelY = -n.r - 9;
-        captionY = n.r + 20;
-      }
-      var t = el('text', { 'class': 'rm-glabel', 'text-anchor': 'middle', y: labelY }, g);
+      var lp = labelPos(layout.label[id] || (n.kind === 'field' ? 'below' : 'above'), n.r, n.kind);
+      var t = el('text', { 'class': 'rm-glabel', 'text-anchor': lp.anchor, x: lp.x, y: lp.y }, g);
       t.textContent = n.name;
       if (n.kind === 'field') {
-        var m = el('text', { 'class': 'rm-gmeta', 'text-anchor': 'middle', y: metaY }, g);
+        var m = el('text', { 'class': 'rm-gmeta', 'text-anchor': lp.anchor, x: lp.x, y: lp.meta }, g);
         m.textContent = n.meta;
       }
+      var captionY = n.kind === 'field' ? (lp.meta > 0 ? lp.meta + 20 : n.r + 22) : n.r + 20;
       var c = el('text', { 'class': 'rm-gcaption', 'text-anchor': 'middle', y: captionY }, g);
       c.textContent = captionFor(n);
-      // 마우스 판정은 크기가 변하지 않는 이 원 하나로만 합니다. (커진 점·라벨·숨은 캡션은 판정에서 제외)
-      var hit = el('circle', { 'class': 'rm-ghit', r: n.r + (n.kind === 'field' ? 4 : 7) }, g);
+      // 판정은 크기가 변하지 않는 원 하나로만 (좁은 화면은 손가락 크기에 맞춰 넉넉하게)
+      var hitR = n.r + (mode === 'compact' ? (n.kind === 'field' ? 8 : 14) : (n.kind === 'field' ? 4 : 7));
+      var hit = el('circle', { 'class': 'rm-ghit', r: hitR }, g);
       n.el = g;
 
-      hit.addEventListener('pointerenter', function () { focusNode(id); });
-      hit.addEventListener('pointerleave', clearFocus);
+      hit.addEventListener('pointerenter', function (ev) { if (ev.pointerType === 'mouse') focusNode(id); });
+      hit.addEventListener('pointerleave', function (ev) { if (ev.pointerType === 'mouse') clearFocus(); });
       // 키보드로 이동했을 때만 포커스 강조 (클릭 후 남는 포커스로 강조가 유지되지 않게)
-      g.addEventListener('focus', function () { if (g.matches(':focus-visible')) focusNode(id); });
-      g.addEventListener('blur', clearFocus);
-      g.addEventListener('click', function () { activate(id); });
+      g.addEventListener('focus', function () { if (g.matches(':focus-visible')) { focusNode(id); showInfo(id); } });
+      g.addEventListener('blur', function () { if (lastPointer === 'mouse') clearFocus(); });
+      g.addEventListener('click', function () { onNodeClick(id); });
       g.addEventListener('keydown', function (ev) {
         if (ev.key === 'Enter' || ev.key === ' ') {
           ev.preventDefault();
@@ -175,13 +226,29 @@
         }
       });
     });
+    showInfo(null);
   }
 
-  // 올린 노드만 커지고, 선수 강의(앰버)·다음 강의(파란 테두리)와 그 연결선만 남깁니다.
+  // 마우스: 클릭하면 바로 학습 순서로 이동 / 터치: 첫 탭은 강조 + 정보 카드, 같은 노드를 다시 탭하면 이동
+  function onNodeClick(id) {
+    if (lastPointer === 'mouse') {
+      activate(id);
+      return;
+    }
+    if (focusedId === id) {
+      activate(id);
+      return;
+    }
+    focusNode(id);
+    showInfo(id);
+  }
+
+  // 올린(탭한) 노드만 커지고, 선수 강의(앰버)·다음 강의(파란 테두리)와 그 연결선만 남깁니다.
   // 분야 노드는 그 분야의 학습 경로 전체를 강조합니다.
   function focusNode(id) {
     clearFocus();
     var n = nodes[id];
+    focusedId = id;
     svg.classList.add('is-hovering');
     n.el.classList.add('is-hot');
 
@@ -213,21 +280,54 @@
 
   function clearFocus() {
     if (!svg) return;
+    focusedId = null;
     svg.classList.remove('is-hovering');
     Array.prototype.forEach.call(svg.querySelectorAll('.is-hot, .is-hl-prev, .is-hl-next, .is-from-prev'), function (e) {
       e.classList.remove('is-hot', 'is-hl-prev', 'is-hl-next', 'is-from-prev');
     });
   }
 
-  function activate(id) {
-    var n = nodes[id];
-    if (n.kind === 'field') {
-      select(n.track, true);
+  // ── 탭 정보 카드 (좁은 화면)
+  function courseLink(node, trackKey) {
+    var cta = root.querySelector('#rm-panel-' + trackKey + ' .rm-step[data-step="' + node.tracks[trackKey] + '"] a.rm-step-cta');
+    return cta ? cta.getAttribute('href') : null;
+  }
+
+  function showInfo(id) {
+    if (!info) return;
+    if (!id) {
+      info.innerHTML = '<p class="rm-ginfo-hint">노드를 탭하면 연결된 강의와 학습 순서를 볼 수 있어요.</p>';
       return;
     }
-    // 이미 선택한 분야에 포함된 강의면 그 분야를, 아니면 이 강의가 속한 첫 분야를 엽니다.
-    var key = n.tracks[selected] ? selected : Object.keys(n.tracks)[0];
-    select(key, true, n.tracks[key]);
+    var n = nodes[id];
+    var key = trackFor(n);
+    var html;
+    if (n.kind === 'field') {
+      html = '<div class="rm-ginfo-head"><span class="rm-ginfo-kind">분야</span><strong>' + n.name + '</strong></div>'
+        + '<p class="rm-ginfo-meta">' + n.meta + '</p>'
+        + '<p class="rm-ginfo-text">' + n.summary + '</p>'
+        + '<div class="rm-ginfo-actions"><button type="button" class="rm-ginfo-btn is-primary" data-act="path">학습 순서 보기</button></div>';
+    } else {
+      var steps = Object.keys(n.tracks).map(function (k) { return trackByKey[k].name + ' ' + n.tracks[k] + '단계'; }).join(' · ');
+      var link = courseLink(n, key);
+      html = '<div class="rm-ginfo-head"><span class="rm-ginfo-kind">강의</span><strong>' + n.name + '</strong>'
+        + (n.status === 'done' ? '<span class="rm-ginfo-done">✓ 완료</span>' : '') + '</div>'
+        + '<p class="rm-ginfo-meta">' + steps + '</p>'
+        + '<p class="rm-ginfo-text">' + relationText(n) + '</p>'
+        + '<div class="rm-ginfo-actions">'
+        + '<button type="button" class="rm-ginfo-btn" data-act="path">학습 순서 보기</button>'
+        + (link ? '<a class="rm-ginfo-btn is-primary" href="' + link + '">강의 보기</a>' : '')
+        + '</div>';
+    }
+    info.innerHTML = html;
+    var pathBtn = info.querySelector('[data-act="path"]');
+    if (pathBtn) pathBtn.addEventListener('click', function () { activate(id); });
+  }
+
+  function activate(id) {
+    var n = nodes[id];
+    var key = trackFor(n);
+    select(key, true, n.kind === 'field' ? null : n.tracks[key]);
   }
 
   // ── 선택 상태 (지도·트리·경로 패널 공통)
@@ -298,6 +398,22 @@
     });
   });
 
-  drawGraph();
+  // 지도 폭에 맞춰 배치 선택 (좁으면 세로 배치)
+  function updateMode() {
+    var next = graph.clientWidth < 860 ? 'compact' : 'wide';
+    if (next !== mode) {
+      mode = next;
+      graph.classList.toggle('is-compact', mode === 'compact');
+      drawGraph();
+    }
+  }
+
+  if (svg && graph) {
+    root.classList.add('has-graph');
+    document.addEventListener('pointerdown', function (ev) { lastPointer = ev.pointerType || 'mouse'; }, true);
+    updateMode();
+    if ('ResizeObserver' in window) new ResizeObserver(updateMode).observe(graph);
+    else window.addEventListener('resize', updateMode);
+  }
   select(selected, false);
 })();

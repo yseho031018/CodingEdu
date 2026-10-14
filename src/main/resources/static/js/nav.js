@@ -64,6 +64,12 @@
     if (source.classList.contains('active')) {
       a.classList.add('active');
       a.setAttribute('aria-current', 'page');
+      // 지금 보고 있는 탭을 다시 누르면 맨 위로 (모바일 앱 관습)
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      });
     }
     bar.appendChild(a);
   }

@@ -973,3 +973,56 @@ footer { padding: 28px max(4%, calc((100% - 1400px) / 2)); }
   opacity: 1 !important;
   filter: brightness(0) invert(1) !important;
 }
+
+/* Course listing — heuristic fixes (상단 내비 통일 · 학습 순서 · 검색 · 비로그인 상태) */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.page-courses .course-page-main { max-width: 1240px; margin: 0 auto; padding: 36px 0 56px; }
+.course-progress-panel { top: 88px; }
+.course-roadmap-bar {
+  max-width: 1240px; margin: 0 auto 24px; padding: 14px 20px;
+  display: flex; align-items: center; gap: 12px 24px; flex-wrap: wrap;
+  background: var(--accent-soft); border: 1px solid #d8dcff; border-radius: 10px;
+  color: var(--ink-1); text-decoration: none; transition: border-color .2s ease, box-shadow .2s ease;
+}
+.course-roadmap-bar:hover { border-color: var(--accent); box-shadow: var(--shadow-sm); }
+.course-roadmap-label { color: var(--accent); font-size: .82rem; font-weight: 800; }
+.course-roadmap-steps { list-style: none; margin: 0; padding: 0; display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; }
+.course-roadmap-steps li { display: inline-flex; align-items: center; gap: 7px; font-size: .92rem; font-weight: 700; }
+.course-roadmap-steps li + li::before { content: '→'; margin-right: 3px; color: var(--ink-3); font-weight: 500; }
+.course-roadmap-steps b { width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; background: var(--bg-surface); border: 1px solid #d8dcff; color: var(--accent); font-size: .72rem; }
+.course-roadmap-link { margin-left: auto; color: var(--accent); font-size: .85rem; font-weight: 750; }
+.course-toolbar { margin-bottom: 24px; display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--border); }
+.course-toolbar .course-tabs { margin-bottom: 0; border-bottom: 0; flex-wrap: wrap; gap: 0 26px; }
+.course-search { flex: 0 1 260px; margin-bottom: 8px; }
+.course-search input {
+  width: 100%; height: 38px; padding: 0 12px; border: 1px solid var(--border-card); border-radius: 8px;
+  background: var(--bg-surface); color: var(--ink-1); font: inherit; font-size: .88rem;
+}
+.course-search input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+.course-card-body .course-step-label { display: block; margin-bottom: 4px; color: var(--accent); font-size: .78rem; font-weight: 750; }
+.course-card-body p.course-meta-line { min-height: 0; margin-bottom: 2px; color: var(--ink-1); font-size: .84rem; font-weight: 650; }
+.course-card-body p.course-prereq { min-height: 0; margin-bottom: 13px; color: var(--ink-3); font-size: .8rem; }
+.course-login-copy { margin: 0 0 18px; color: var(--ink-2); font-size: .92rem; line-height: 1.7; }
+.course-record-button.primary { background: var(--accent); color: #fff; }
+.course-record-button.primary:hover { filter: brightness(1.06); }
+@media (max-width: 1300px) { .page-courses .course-page-main { padding-inline: 28px; } }
+@media (max-width: 820px) {
+  .page-courses .course-page-main { padding: 24px 16px 42px; }
+  .course-toolbar { flex-direction: column; align-items: stretch; border-bottom: 0; }
+  .course-toolbar .course-tabs { border-bottom: 1px solid var(--border); flex-wrap: nowrap; overflow-x: auto; }
+  .course-search { flex-basis: auto; margin: 0; }
+  .course-roadmap-link { margin-left: 0; }
+}
+
+/* Home — heuristic fixes (H8: 소개 영역 축소, 통계는 하단으로 / H2: 쉬운 강의명) */
+.page-index .home-hero { min-height: 0; padding: 36px 0 8px; gap: 32px; }
+.home-hero-copy h1 { font-size: clamp(2rem, 3.2vw, 2.85rem); }
+.home-hero-copy p { margin-bottom: 22px; font-size: 1.05rem; }
+.home-hero-art img { max-height: 280px; }
+.page-index .home-frame .home-metrics { padding: 36px 0 0; }
+.course-info .course-step-label { display: block; margin-bottom: 4px; color: #4f55e7; font-size: .78rem; font-weight: 750; }
+[data-theme="dark"] .course-info .course-step-label { color: #8b8fff; }
+@media (max-width: 720px) {
+  .page-index .home-hero { padding: 24px 0 4px; }
+  .home-hero-art img { max-height: 180px; }
+}

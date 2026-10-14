@@ -15,6 +15,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 강의 본문(레슨·코드 예제)은 classpath:data/lesson-courses.json 에 두고,
@@ -83,6 +85,53 @@ public class LessonContentService {
             }
         }
         return videoIds;
+    }
+
+    /**
+     * 레슨 points의 "영상 길이 m:ss" 값을 합산한 코스별 총 영상 길이(분)를 반환합니다.
+     * 영상 길이가 빠진 레슨이 하나라도 있는 코스는 추정치를 만들지 않도록 제외합니다.
+     */
+    public Map<String, Integer> getCourseDurationMinutes() {
+        Map<String, Object> root = loadCoursesRoot();
+        Map<String, Integer> minutes = new LinkedHashMap<>();
+        for (Map.Entry<String, Object> entry : root.entrySet()) {
+            if (!(entry.getValue() instanceof Map<?, ?> course)
+                    || !(course.get("lessons") instanceof List<?> lessons) || lessons.isEmpty()) {
+                continue;
+            }
+            int totalSeconds = 0;
+            boolean complete = true;
+            for (Object lesson : lessons) {
+                int seconds = lesson instanceof Map<?, ?> l ? parseVideoSeconds(l.get("points")) : -1;
+                if (seconds < 0) {
+                    complete = false;
+                    break;
+                }
+                totalSeconds += seconds;
+            }
+            if (complete) {
+                minutes.put(entry.getKey(), Math.round(totalSeconds / 60f));
+            }
+        }
+        return minutes;
+    }
+
+    private static final Pattern VIDEO_LENGTH = Pattern.compile("영상 길이 (?:(\\d+):)?(\\d+):(\\d{2})");
+
+    private int parseVideoSeconds(Object points) {
+        if (!(points instanceof List<?> list)) {
+            return -1;
+        }
+        for (Object point : list) {
+            if (point instanceof String text) {
+                Matcher m = VIDEO_LENGTH.matcher(text);
+                if (m.find()) {
+                    int hours = m.group(1) != null ? Integer.parseInt(m.group(1)) : 0;
+                    return hours * 3600 + Integer.parseInt(m.group(2)) * 60 + Integer.parseInt(m.group(3));
+                }
+            }
+        }
+        return -1;
     }
 
     private Map<String, Object> loadCoursesRoot() {

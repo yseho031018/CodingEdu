@@ -173,7 +173,8 @@ public class QuizController {
                             int completedQuizzes, int fullMarkQuizzes, long availableQuizzes,
                             int progressPercent) {}
     public record QuizCard(Quiz quiz, String mark, String theme, String difficultyLabel,
-                           String difficultyTone, int accuracy, String progressTone) {}
+                           String difficultyTone, Integer averageAccuracy, Integer myBestAccuracy,
+                           String progressTone) {}
     public record QuizActivity(String title, int percentage, String whenLabel, String tone) {}
 
     private void sortQuizzes(List<Quiz> quizzes, String sort, Map<Long, Integer> userBestPercentages, Map<Long, Integer> globalAveragePercentages) {
@@ -187,13 +188,10 @@ public class QuizController {
             return;
         }
         if ("accuracy".equals(sort)) {
-            quizzes.sort((q1, q2) -> {
-                int a1 = userBestPercentages.getOrDefault(q1.getId(),
-                        globalAveragePercentages.getOrDefault(q1.getId(), defaultAccuracy(q1.getDifficulty())));
-                int a2 = userBestPercentages.getOrDefault(q2.getId(),
-                        globalAveragePercentages.getOrDefault(q2.getId(), defaultAccuracy(q2.getDifficulty())));
-                return Integer.compare(a2, a1);
-            });
+            // 카드에 표시하는 "전체 사용자 평균 정답률" 기준. 응시 기록이 없는 퀴즈는 뒤로 보냅니다.
+            quizzes.sort((q1, q2) -> Integer.compare(
+                    globalAveragePercentages.getOrDefault(q2.getId(), -1),
+                    globalAveragePercentages.getOrDefault(q1.getId(), -1)));
             return;
         }
         quizzes.sort(Comparator.comparing(Quiz::getCreatedAt,
@@ -292,26 +290,18 @@ public class QuizController {
 
     private QuizCard toQuizCard(Quiz quiz, Map<Long, Integer> userBestPercentages,
                                Map<Long, Integer> globalAveragePercentages) {
-        int accuracy = userBestPercentages.getOrDefault(quiz.getId(),
-                globalAveragePercentages.getOrDefault(quiz.getId(), defaultAccuracy(quiz.getDifficulty())));
+        // 전체 사용자 평균과 내 최고 기록을 섞지 않고 각각 전달합니다. 기록이 없으면 null (임의 값으로 채우지 않음).
+        Integer average = globalAveragePercentages.get(quiz.getId());
         return new QuizCard(
                 quiz,
                 markFor(quiz),
                 themeFor(quiz),
                 difficultyLabel(quiz.getDifficulty()),
                 quiz.getDifficulty(),
-                accuracy,
-                progressTone(accuracy)
+                average,
+                userBestPercentages.get(quiz.getId()),
+                progressTone(average != null ? average : 0)
         );
-    }
-
-    private int defaultAccuracy(String difficulty) {
-        return switch (difficulty) {
-            case "easy" -> 90;
-            case "medium" -> 75;
-            case "hard" -> 60;
-            default -> 70;
-        };
     }
 
     private String difficultyLabel(String difficulty) {

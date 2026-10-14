@@ -3,6 +3,7 @@ package com.codingedu.controller;
 import com.codingedu.entity.User;
 import com.codingedu.security.CustomUserDetails;
 import com.codingedu.security.CustomUserDetailsService;
+import com.codingedu.service.LearningRoadmapService;
 import com.codingedu.service.LessonContentService;
 import com.codingedu.service.LessonService;
 import com.codingedu.service.PostService;
@@ -30,19 +31,22 @@ public class HomeController {
     private final LessonService lessonService;
     private final QuizService quizService;
     private final PostService postService;
+    private final LearningRoadmapService learningRoadmapService;
 
     public HomeController(UserService userService,
                           CustomUserDetailsService customUserDetailsService,
                           LessonContentService lessonContentService,
                           LessonService lessonService,
                           QuizService quizService,
-                          PostService postService) {
+                          PostService postService,
+                          LearningRoadmapService learningRoadmapService) {
         this.userService = userService;
         this.customUserDetailsService = customUserDetailsService;
         this.lessonContentService = lessonContentService;
         this.lessonService = lessonService;
         this.quizService = quizService;
         this.postService = postService;
+        this.learningRoadmapService = learningRoadmapService;
     }
 
     @GetMapping("/")
@@ -57,6 +61,7 @@ public class HomeController {
         var courseVideoIds = lessonContentService.getCourseVideoIds();
         model.addAttribute("courseVideoIds", courseVideoIds != null ? courseVideoIds : java.util.Map.of());
 
+        java.util.Map<String, Integer> progressByLang = null;
         if (userDetails != null) {
             User user = userService.findByUsername(userDetails.getUsername());
             var allCourses = lessonService.getAllCourses();
@@ -86,7 +91,14 @@ public class HomeController {
             model.addAttribute("bestGrade", bestGrade);
             model.addAttribute("recentPosts", postService.getRecentPostsByUser(user));
             model.addAttribute("langProgressMap", langProgressMap);
+            progressByLang = langProgressMap;
         }
+
+        var roadmapTracks = learningRoadmapService.buildTracks(progressByLang);
+        model.addAttribute("roadmapTracks", roadmapTracks);
+        model.addAttribute("roadmapInitialTrack", learningRoadmapService.initialTrack(roadmapTracks));
+        model.addAttribute("courseGuides", learningRoadmapService.courseGuides());
+        model.addAttribute("continueLang", learningRoadmapService.continueLang(progressByLang));
         return "index";
     }
 

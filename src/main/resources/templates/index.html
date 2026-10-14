@@ -13,6 +13,8 @@
 <link rel="stylesheet" href="/css/tailwind.css">
 <link rel="stylesheet" href="/css/landing.css">
 <link rel="stylesheet" href="/css/design-refresh.css">
+<link rel="stylesheet" href="/css/roadmap.css">
+<link rel="stylesheet" href="/css/site-nav.css">
 </head>
 <body class="page-index">
 
@@ -70,12 +72,200 @@
       <p>다양한 강의와 퀴즈, 챌린지로<br>나만의 성장을 기록해보세요.</p>
       <div class="home-hero-actions">
         <a href="/learn" class="home-primary-btn" sec:authorize="isAnonymous()">강의 시작하기</a>
-        <a href="/learn" class="home-primary-btn" sec:authorize="isAuthenticated()">학습 이어하기</a>
-        <a href="#recommendedCourses" class="home-secondary-btn">둘러보기</a>
+        <a sec:authorize="isAuthenticated()" class="home-primary-btn"
+           th:with="cg=${continueLang != null ? courseGuides[continueLang] : null}"
+           th:href="${continueLang != null} ? @{/learn/{lang}(lang=${continueLang})} : '#learningRoadmap'"
+           th:text="${cg != null} ? '이어서 학습: ' + ${cg.name} : '학습 시작하기'">이어서 학습</a>
+        <a href="#learningRoadmap" class="home-secondary-btn">학습 지도 보기</a>
       </div>
     </div>
     <div class="home-hero-art">
       <img src="/images/coding-hero-transparent.png" alt="노트북으로 코딩을 공부하는 학습자">
+    </div>
+  </section>
+
+  <!-- ══════ LEARNING ROADMAP: 분야 선택 지도 → 분야별 학습 순서 ══════ -->
+  <section class="roadmap" id="learningRoadmap" aria-labelledby="roadmapTitle"
+           th:with="loggedIn=${langProgressMap != null}"
+           th:attr="data-initial-track=${roadmapInitialTrack}">
+    <svg class="rm-sprite" aria-hidden="true" focusable="false">
+      <symbol id="rm-i-pin" viewBox="0 0 24 24"><path d="M12 2.5a7.5 7.5 0 0 0-7.5 7.5c0 5.3 6.2 10.9 6.9 11.5a.9.9 0 0 0 1.2 0c.7-.6 6.9-6.2 6.9-11.5A7.5 7.5 0 0 0 12 2.5Zm0 10.3a2.8 2.8 0 1 1 0-5.6 2.8 2.8 0 0 1 0 5.6Z"/></symbol>
+      <symbol id="rm-i-check" viewBox="0 0 24 24"><path d="M9.6 16.2 5.4 12l-1.4 1.4 5.6 5.6 10.4-10.4L18.6 7.2z"/></symbol>
+      <symbol id="rm-i-flag" viewBox="0 0 24 24"><path d="M5 21V4h9.2l.5 2H20v9h-6.8l-.5-2H7v8z"/></symbol>
+      <symbol id="rm-i-arrow" viewBox="0 0 24 24"><path d="M13.2 5.3 19.9 12l-6.7 6.7-1.4-1.4 4.3-4.3H4v-2h12.1l-4.3-4.3z"/></symbol>
+      <symbol id="rm-i-clock" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm.8-13h-1.6v5.8l4.6 2.8.8-1.3-3.8-2.3z"/></symbol>
+      <symbol id="rm-i-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/></symbol>
+    </svg>
+
+    <header class="rm-head">
+      <span class="rm-eyebrow">CHOOSE YOUR START</span>
+      <h2 id="roadmapTitle">어떤 분야로 출발할까요?</h2>
+      <p>관심 있는 학습 분야를 선택해 시작해보세요. 각 분야는 독립적으로 학습할 수 있어요.</p>
+    </header>
+
+    <!-- 1단계: 전체 분야 선택 지도 -->
+    <div class="rm-map" data-rm-map>
+      <!-- 데스크톱: 분야(큰 노드)와 강의(작은 노드)를 학습 순서 화살표로 잇는 지도 -->
+      <div class="rm-graph" data-rm-graph>
+        <svg class="rm-graph-svg" data-rm-graph-svg viewBox="0 0 1200 540" role="group" aria-label="학습 분야와 강의 연결 지도"></svg>
+        <ul class="rm-legend" aria-hidden="true">
+          <li><i class="rm-legend-field"></i>분야</li>
+          <li><i class="rm-legend-course"></i>강의</li>
+          <li><i class="rm-legend-prev"></i>선수 강의</li>
+          <li><i class="rm-legend-arrow"></i>학습 순서</li>
+          <li class="rm-legend-hint">노드에 마우스를 올리면 연결된 강의가 강조돼요</li>
+        </ul>
+      </div>
+
+      <!-- 태블릿·모바일: 분야 카드 아래로 강의가 이어지는 목록형 지도 -->
+      <div class="rm-tree">
+      <div class="rm-hub" data-rm-hub>
+        <span class="rm-hub-mark" aria-hidden="true"><i></i></span>
+        <strong>나의 시작점</strong>
+      </div>
+
+      <div th:each="t : ${roadmapTracks}"
+           class="rm-branch"
+           th:classappend="${t.key == roadmapInitialTrack} ? ' is-selected' : ''"
+           th:data-track="${t.key}">
+        <article class="rm-dest">
+          <div class="rm-dest-top">
+            <span class="rm-pin" aria-hidden="true"><svg><use href="#rm-i-pin"/></svg></span>
+            <h3 th:text="${t.name}">웹 개발 입문</h3>
+            <span class="rm-dest-state"><svg aria-hidden="true"><use href="#rm-i-check"/></svg>선택됨</span>
+          </div>
+          <p class="rm-dest-summary" th:text="${t.summary}">HTML·CSS·JavaScript로 웹의 기초 다지기</p>
+          <div class="rm-dest-foot">
+            <span class="rm-dest-meta">
+              <span th:text="${t.courseCount} + '개 강의 · ' + ${t.level}">3개 강의 · 입문</span>
+              <span class="rm-dest-progress" th:if="${loggedIn and t.progress > 0}"
+                    th:text="'진도 ' + ${t.progress} + '%'">진도 40%</span>
+            </span>
+            <button type="button" class="rm-dest-btn"
+                    th:attr="aria-pressed=${t.key == roadmapInitialTrack},aria-controls='rm-panel-' + ${t.key}"
+                    th:aria-label="${t.name} + ' 과정 보기'">과정 보기<svg aria-hidden="true"><use href="#rm-i-arrow"/></svg></button>
+          </div>
+        </article>
+
+        <!-- 분야 안의 강의가 뿌리처럼 순서대로 뻗어 내려감 -->
+        <ol class="rm-roots" th:aria-label="${t.name} + ' 학습 순서'">
+          <li th:each="s : ${t.steps}">
+            <button type="button" class="rm-node"
+                    th:classappend="' is-' + ${s.status}"
+                    th:data-step="${s.number}"
+                    th:data-lang="${s.lang}"
+                    th:aria-label="${t.name} + ' ' + ${s.number} + '단계 ' + ${s.name} + (${s.done} ? ', 완료' : (${s.available} ? '' : ', 준비 중')) + ' 자세히 보기'">
+              <span class="rm-node-no" aria-hidden="true">
+                <svg th:if="${s.done}"><use href="#rm-i-check"/></svg>
+                <th:block th:unless="${s.done}" th:text="${s.number}">1</th:block>
+              </span>
+              <span class="rm-node-name" th:text="${s.name}">HTML &amp; Internet</span>
+              <span class="rm-node-tag" th:unless="${s.available}" aria-hidden="true">준비 중</span>
+            </button>
+          </li>
+        </ol>
+      </div>
+      </div>
+    </div>
+
+    <!-- 2단계: 선택한 분야 안의 순서형 학습 경로 -->
+    <div class="rm-path" id="roadmapPath">
+      <div th:each="t : ${roadmapTracks}"
+               class="rm-panel" role="region"
+               th:id="'rm-panel-' + ${t.key}"
+               th:data-panel="${t.key}"
+               th:hidden="${t.key != roadmapInitialTrack}"
+               th:aria-labelledby="'rm-panel-title-' + ${t.key}">
+        <div class="rm-panel-head">
+          <div class="rm-panel-copy">
+            <span class="rm-eyebrow">YOUR LEARNING PATH</span>
+            <h3 th:id="'rm-panel-title-' + ${t.key}" th:text="${t.name} + ' 학습 순서'">웹 개발 입문 학습 순서</h3>
+          </div>
+          <dl class="rm-panel-goal">
+            <div><dt>목표</dt><dd th:text="${t.goal}">나만의 웹 페이지 만들기</dd></div>
+            <div><dt>추천</dt><dd th:text="${t.audience}">웹사이트 제작을 처음 배우는 학습자</dd></div>
+          </dl>
+        </div>
+
+        <ol class="rm-steps" th:style="'--rm-steps:' + ${#lists.size(t.steps)}">
+          <li th:each="s : ${t.steps}"
+              class="rm-step"
+              th:classappend="' is-' + ${s.status}"
+              th:data-step="${s.number}"
+              th:style="'--rm-i:' + ${s.number - 1}"
+              th:attr="aria-current=${s.current} ? 'step' : null">
+            <div class="rm-step-marker" aria-hidden="true">
+              <span th:if="${s.done}"><svg><use href="#rm-i-check"/></svg></span>
+              <span th:unless="${s.done}" th:text="${s.number}">1</span>
+            </div>
+            <div class="rm-step-card">
+              <div class="rm-step-top">
+                <span class="rm-step-status" th:switch="${s.status}">
+                  <th:block th:case="'done'"><svg aria-hidden="true"><use href="#rm-i-check"/></svg>완료</th:block>
+                  <th:block th:case="'current'"><svg aria-hidden="true"><use href="#rm-i-flag"/></svg><th:block th:text="${!loggedIn ? '여기서 시작' : (s.progress > 0 ? '학습 중 · ' + s.progress + '%' : '현재 단계')}">여기서 시작</th:block></th:block>
+                  <th:block th:case="'next'"><svg aria-hidden="true"><use href="#rm-i-dot"/></svg>다음 단계</th:block>
+                  <th:block th:case="'later'"><svg aria-hidden="true"><use href="#rm-i-dot"/></svg>이후 단계</th:block>
+                  <th:block th:case="*"><svg aria-hidden="true"><use href="#rm-i-clock"/></svg>준비 중</th:block>
+                </span>
+              </div>
+              <h4><span class="rm-sr" th:text="${s.number} + '단계 '">1단계 </span><th:block th:text="${s.name}">HTML &amp; Internet</th:block></h4>
+              <p class="rm-step-summary" th:text="${s.summary}">웹 페이지의 기본 구조 배우기</p>
+              <ul class="rm-step-meta">
+                <li th:text="${s.level} + (${s.duration != null} ? ' · ' + ${s.duration} : '')">입문 · 약 3시간 30분</li>
+                <li th:if="${s.available}" th:text="'레슨 ' + ${s.lessonCount} + '개'">레슨 28개</li>
+              </ul>
+              <p class="rm-step-prereq" th:text="${s.prerequisite}">선수 강의 없음</p>
+              <a th:if="${s.available}" class="rm-step-cta" th:href="@{/learn/{lang}(lang=${s.lang})}"
+                 th:aria-label="${s.name} + ' ' + (${s.done} ? '복습하기' : (${s.current and s.progress > 0} ? '이어서 학습' : '학습 시작'))">
+                <span th:text="${s.done} ? '복습하기' : (${s.current and s.progress > 0} ? '이어서 학습' : '학습 시작')">학습 시작</span><svg aria-hidden="true"><use href="#rm-i-arrow"/></svg>
+              </a>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="recommended-section" id="recommendedCourses">
+    <div class="recommended-heading">
+      <h2>추천 강의</h2>
+      <a href="/learn">전체 보기 <span>›</span></a>
+    </div>
+    <div class="recommended-grid">
+      <a th:each="c : ${courses}"
+         th:href="@{/learn/{lang}(lang=${c.lang})}"
+         class="course-card"
+         th:classappend="' course-' + ${c.lang}">
+        <div class="course-cover course-youtube-thumbnail"
+             th:with="courseVideoId=${courseVideoIds[c.lang]}"
+             th:classappend="${courseVideoId == null or #strings.isEmpty(courseVideoId)} ? ' course-thumbnail-fallback' : ''">
+          <img th:if="${courseVideoId != null and not #strings.isEmpty(courseVideoId)}"
+               th:src="|https://i.ytimg.com/vi/${courseVideoId}/hqdefault.jpg|"
+               th:alt="${c.title} + ' 유튜브 썸네일'"
+               loading="lazy">
+          <span class="course-play-badge"
+                th:if="${courseVideoId != null and not #strings.isEmpty(courseVideoId)}"
+                aria-hidden="true"></span>
+          <span class="course-logo"
+                th:if="${courseVideoId == null or #strings.isEmpty(courseVideoId)}"
+                th:text="${c.lang == 'javascript' ? 'JS' : #strings.toUpperCase(c.lang)}">HTML</span>
+          <span class="cover-code"
+                th:if="${courseVideoId == null or #strings.isEmpty(courseVideoId)}"
+                th:text="${c.lang == 'html' ? '< / >' : c.lang == 'css' ? '{ }' : '( ) =>'}">&lt; / &gt;</span>
+        </div>
+        <div class="course-info"
+             th:with="pct=${langProgressMap != null and langProgressMap[c.lang] != null ? langProgressMap[c.lang] : 0}, g=${courseGuides[c.lang]}">
+          <span class="course-step-label" th:if="${g != null}" th:text="${g.stepLabel()}">웹 개발 입문 · 1단계</span>
+          <h3 th:text="${g != null ? g.name : c.title}">HTML &amp; Internet</h3>
+          <p th:text="${g != null ? g.summary : c.description}">웹의 기본 구조부터 차근차근</p>
+          <th:block th:if="${langProgressMap != null}">
+            <span class="course-progress-label">내 진도율 <b th:text="${pct} + '%'">0%</b></span>
+            <span class="course-progress"><i th:style="'width:' + ${pct} + '%'"></i></span>
+          </th:block>
+          <span class="course-progress-label" th:if="${langProgressMap == null and g != null}"
+                th:text="${g.level} + ' · 레슨 ' + ${g.lessonCount} + '개'">입문 · 레슨 28개</span>
+        </div>
+      </a>
     </div>
   </section>
 
@@ -101,44 +291,6 @@
       <img class="metric-icon" src="/images/metrics/metric-learners.png" alt="" aria-hidden="true">
     </a>
   </section>
-
-  <section class="recommended-section" id="recommendedCourses">
-    <div class="recommended-heading">
-      <h2>추천 강의</h2>
-      <a href="/learn">전체 보기 <span>›</span></a>
-    </div>
-    <div class="recommended-grid">
-      <a th:each="c : ${courses}"
-         th:href="@{/learn/{lang}(lang=${c.lang})}"
-         class="course-card"
-         th:classappend="' course-' + ${c.lang}">
-        <div class="course-cover course-youtube-thumbnail"
-             th:with="courseVideoId=${courseVideoIds[c.lang]}"
-             th:classappend="${courseVideoId == null or #strings.isEmpty(courseVideoId)} ? ' course-thumbnail-fallback' : ''">
-          <img th:if="${courseVideoId != null and not #strings.isEmpty(courseVideoId)}"
-               th:src="|https://i.ytimg.com/vi/${courseVideoId}/maxresdefault.jpg|"
-               th:attr="data-fallback-src=|https://i.ytimg.com/vi/${courseVideoId}/hqdefault.jpg|"
-               th:alt="${c.title} + ' 유튜브 썸네일'"
-               loading="lazy">
-          <span class="course-play-badge"
-                th:if="${courseVideoId != null and not #strings.isEmpty(courseVideoId)}"
-                aria-hidden="true"></span>
-          <span class="course-logo"
-                th:if="${courseVideoId == null or #strings.isEmpty(courseVideoId)}"
-                th:text="${c.lang == 'javascript' ? 'JS' : #strings.toUpperCase(c.lang)}">HTML</span>
-          <span class="cover-code"
-                th:if="${courseVideoId == null or #strings.isEmpty(courseVideoId)}"
-                th:text="${c.lang == 'html' ? '< / >' : c.lang == 'css' ? '{ }' : '( ) =>'}">&lt; / &gt;</span>
-        </div>
-        <div class="course-info" th:with="pct=${langProgressMap != null and langProgressMap[c.lang] != null ? langProgressMap[c.lang] : 0}">
-          <h3 th:text="${c.title}">WEB1 - HTML &amp; Internet</h3>
-          <p th:text="${c.description}">웹의 기본 구조부터 차근차근</p>
-          <span class="course-progress-label">진도율 <b th:text="${pct} + '%'">0%</b></span>
-          <span class="course-progress"><i th:style="'width:' + ${pct} + '%'"></i></span>
-        </div>
-      </a>
-    </div>
-  </section>
 </main>
 
 <!-- ══════ FOOTER ══════ -->
@@ -159,6 +311,7 @@
 </footer>
 <script src="/js/nav.js"></script>
 </th:block>
+<script src="/js/roadmap.js"></script>
 
 <script>
   /* ── Number Count Up FX ── */

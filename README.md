@@ -102,6 +102,8 @@ src/
 
 `src/main/resources/application-local.properties.example`을 참고하여 Git에 포함되지 않는
 `src/main/resources/application-local.properties`를 생성합니다.
+기본 실행 시 이 설정을 불러오려면 `src/main/resources/application.properties`에
+`spring.profiles.default=local`을 추가합니다. 두 파일 모두 Git에서 제외됩니다.
 
 ```properties
 spring.datasource.url=jdbc:mysql://localhost:3306/codingedu

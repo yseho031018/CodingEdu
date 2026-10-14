@@ -13,70 +13,66 @@
     <link rel="stylesheet" href="/css/common.css">
     <link rel="stylesheet" href="/css/tailwind.css">
     <link rel="stylesheet" href="/css/design-refresh.css">
+    <link rel="stylesheet" href="/css/site-nav.css">
 </head>
 <body class="page-courses">
-<div class="course-app-shell">
-    <aside class="course-sidebar">
-        <a href="/" class="course-side-logo">
-            <span class="brand-text"><b>Coding</b>Edu</span>
-        </a>
+<nav th:replace="~{index :: nav}"></nav>
 
-        <nav class="course-side-nav" aria-label="주요 메뉴">
-            <a href="/"><img src="/images/course-menu/home.png" alt="" aria-hidden="true">홈</a>
-            <a href="/learn" class="active"><img src="/images/course-menu/courses.png" alt="" aria-hidden="true">강의</a>
-            <a href="/quiz"><img src="/images/course-menu/quiz.png" alt="" aria-hidden="true">퀴즈</a>
-            <a href="/challenge"><img src="/images/course-menu/challenge.png" alt="" aria-hidden="true">챌린지</a>
-            <a href="/community"><img src="/images/course-menu/community.png" alt="" aria-hidden="true">커뮤니티</a>
-            <a href="/ai"><img src="/images/course-menu/ai.svg" alt="" aria-hidden="true">AI 도우미</a>
-            <a href="/mypage"><img src="/images/course-menu/mypage.png" alt="" aria-hidden="true">마이페이지</a>
-            <a href="/settings"><img src="/images/course-menu/settings.png" alt="" aria-hidden="true">설정</a>
-        </nav>
-
-        <div class="course-side-account">
-            <a href="/login" sec:authorize="isAnonymous()">로그인</a>
-            <a href="/register" sec:authorize="isAnonymous()" class="primary">회원가입</a>
-            <a href="/mypage" sec:authorize="isAuthenticated()" class="primary">내 학습 기록</a>
-        </div>
-    </aside>
-
-    <main class="course-page-main">
+<main class="course-page-main">
         <header class="course-page-heading">
             <div>
                 <span class="course-page-kicker">COURSES</span>
                 <h1>강의</h1>
                 <p>생활코딩 강의로 웹 개발의 기초부터 차근차근 배워보세요.</p>
             </div>
-            <button class="course-theme-button" id="themeToggle" title="테마 전환" aria-label="다크/라이트 모드 전환"></button>
         </header>
+
+        <!-- H6: 처음 온 사용자가 순서를 기억하지 않아도 되도록 추천 순서를 목록 위에 보여줌 -->
+        <a class="course-roadmap-bar" href="/#learningRoadmap">
+            <span class="course-roadmap-label">처음이라면 이 순서로</span>
+            <ol class="course-roadmap-steps">
+                <th:block th:each="g : ${courseGuides.values()}" th:if="${g.trackName == '웹 개발 입문'}">
+                    <li><b th:text="${g.stepNumber}">1</b><span th:text="${g.name}">HTML &amp; Internet</span></li>
+                </th:block>
+            </ol>
+            <span class="course-roadmap-link">전체 학습 지도 보기 ›</span>
+        </a>
 
         <div class="course-page-grid">
             <section class="course-catalog-v2">
-                <div class="course-tabs" role="tablist" aria-label="강의 필터">
-                    <button class="course-tab active" data-filter="all">전체</button>
-                    <button class="course-tab" data-filter="html,css,javascript">웹 기초</button>
-                    <button class="course-tab" data-filter="react,nextjs">프론트엔드</button>
-                    <button class="course-tab" data-filter="java,php,python">프로그래밍</button>
-                    <button class="course-tab" data-filter="mysql,sqljoin">데이터베이스</button>
-                    <button class="course-tab" data-filter="git">개발 도구</button>
+                <div class="course-toolbar">
+                    <div class="course-tabs" role="tablist" aria-label="강의 필터">
+                        <button class="course-tab active" data-filter="all">전체</button>
+                        <button class="course-tab" data-filter="html,css,javascript">웹 기초</button>
+                        <button class="course-tab" data-filter="react,nextjs">프론트엔드</button>
+                        <button class="course-tab" data-filter="java,php,python">프로그래밍</button>
+                        <button class="course-tab" data-filter="mysql,sqljoin">데이터베이스</button>
+                        <button class="course-tab" data-filter="git">개발 도구</button>
+                    </div>
+                    <label class="course-search">
+                        <span class="sr-only">강의 검색</span>
+                        <input type="search" id="courseSearch" placeholder="강의 검색 (예: CSS, 데이터베이스)" autocomplete="off">
+                    </label>
                 </div>
 
                 <div class="course-grid-v2">
                     <a th:each="c : ${courses}"
+                       th:with="g=${courseGuides[c.lang]}"
                        th:href="@{/learn/{lang}(lang=${c.lang})}"
                        class="course-card-v2"
                        th:classappend="' course-' + ${c.lang}"
-                       th:attr="data-course-type=${c.lang}">
-                        <button class="course-favorite"
-                                th:attr="data-lang=${c.lang}"
+                       th:attr="data-course-type=${c.lang},data-search=${c.title + ' ' + (g != null ? g.name + ' ' + g.trackName + ' ' + g.summary : c.description)}">
+                        <button sec:authorize="isAuthenticated()"
+                                class="course-favorite"
+                                th:attr="data-lang=${c.lang},aria-pressed=${favoriteLangs.contains(c.lang)}"
                                 th:text="${favoriteLangs.contains(c.lang) ? '♥' : '♡'}"
                                 onclick="event.preventDefault(); event.stopPropagation(); toggleFavorite(this);"
-                                title="즐겨찾기"></button>
+                                title="즐겨찾기" aria-label="즐겨찾기"></button>
                         <div class="course-thumbnail course-youtube-thumbnail"
                              th:with="courseVideoId=${courseVideoIds[c.lang]}"
                              th:classappend="${courseVideoId == null or #strings.isEmpty(courseVideoId)} ? ' course-thumbnail-fallback' : ''">
                             <img th:if="${courseVideoId != null and not #strings.isEmpty(courseVideoId)}"
-                                 th:src="|https://i.ytimg.com/vi/${courseVideoId}/maxresdefault.jpg|"
-                                 th:attr="data-fallback-src=|https://i.ytimg.com/vi/${courseVideoId}/hqdefault.jpg|"
+                                 th:src="|https://i.ytimg.com/vi/${courseVideoId}/hqdefault.jpg|"
                                  th:alt="${c.title} + ' 유튜브 썸네일'"
                                  loading="lazy">
                             <span class="course-play-badge"
@@ -90,40 +86,53 @@
                                   th:text="${c.lang == 'html' ? '< / >' : c.lang == 'css' ? '{ }' : '( ) =>'}">&lt; / &gt;</span>
                         </div>
                         <div class="course-card-body" th:with="done=${completedCounts[c.lang] ?: 0}, percent=${c.lessonCount > 0 ? done * 100 / c.lessonCount : 0}">
-                            <h2 th:text="${c.title}">강의명</h2>
-                            <p th:text="${c.description}">강의 설명</p>
-                            <div class="course-progress-copy">
-                                <span>진도율</span>
-                                <strong th:text="${percent} + '%'">0%</strong>
-                            </div>
-                            <div class="course-progress-track"><i th:style="'width:' + ${percent} + '%'"></i></div>
+                            <!-- H2: WEB1·DATABASE2 같은 원래 강의명 대신 분야·단계와 쉬운 이름을 표시 -->
+                            <span class="course-step-label" th:if="${g != null}" th:text="${g.stepLabel()}">웹 개발 입문 · 1단계</span>
+                            <h2 th:text="${g != null ? g.name : c.title}">HTML &amp; Internet</h2>
+                            <p class="course-meta-line" th:if="${g != null}"
+                               th:text="${g.level} + (${g.duration != null} ? ' · ' + ${g.duration} : '') + ' · 레슨 ' + ${g.lessonCount} + '개'">입문 · 약 3시간 30분 · 레슨 28개</p>
+                            <p class="course-prereq" th:if="${g != null}" th:text="${g.prerequisite}">선수 강의 없음</p>
+                            <p th:if="${g == null}" th:text="${c.description}">강의 설명</p>
+                            <!-- H1: 진도율은 로그인한 사용자에게만 표시 -->
+                            <th:block th:if="${isLoggedIn}">
+                                <div class="course-progress-copy">
+                                    <span>내 진도율</span>
+                                    <strong th:text="${percent} + '%'">0%</strong>
+                                </div>
+                                <div class="course-progress-track"><i th:style="'width:' + ${percent} + '%'"></i></div>
+                            </th:block>
                         </div>
                     </a>
                 </div>
 
-                <div class="course-empty" id="courseEmpty">
-                    <strong>해당 강의가 아직 준비 중입니다.</strong>
-                    <span>다른 카테고리의 강의를 먼저 둘러보세요.</span>
+                <div class="course-empty" id="courseEmpty" role="status">
+                    <strong id="courseEmptyTitle">해당 강의가 아직 준비 중입니다.</strong>
+                    <span id="courseEmptyHint">다른 카테고리의 강의를 먼저 둘러보세요.</span>
                 </div>
             </section>
 
             <aside class="course-progress-panel">
                 <span class="course-page-kicker">MY LEARNING</span>
-                <h2>학습 현황</h2>
-                <div class="course-progress-ring" th:style="'--progress:' + ${progressPercent} + '%'">
-                    <div><span>전체 진도율</span><strong th:text="${progressPercent} + '%'">0%</strong></div>
-                </div>
-                <dl>
-                    <div><dt>전체 강의</dt><dd th:text="${courses.size()} + '개'">3개</dd></div>
-                    <div><dt>수강 중 강의</dt><dd th:text="${activeCourseCount} + '개'">0개</dd></div>
-                    <div><dt>완료한 강의</dt><dd th:text="${completedCourseCount} + '개'">0개</dd></div>
-                    <div><dt>완료한 수업</dt><dd th:text="${completedLessons} + '/' + ${totalLessons}">0/0</dd></div>
-                </dl>
-                <a href="/mypage" class="course-record-button">학습 기록 보기</a>
+                <h2>나의 학습 현황</h2>
+                <th:block th:if="${isLoggedIn}">
+                    <div class="course-progress-ring" th:style="'--progress:' + ${progressPercent} + '%'">
+                        <div><span>전체 진도율</span><strong th:text="${progressPercent} + '%'">0%</strong></div>
+                    </div>
+                    <dl>
+                        <div><dt>전체 강의</dt><dd th:text="${courses.size()} + '개'">3개</dd></div>
+                        <div><dt>수강 중 강의</dt><dd th:text="${activeCourseCount} + '개'">0개</dd></div>
+                        <div><dt>완료한 강의</dt><dd th:text="${completedCourseCount} + '개'">0개</dd></div>
+                        <div><dt>완료한 수업</dt><dd th:text="${completedLessons} + '/' + ${totalLessons}">0/0</dd></div>
+                    </dl>
+                    <a href="/mypage" class="course-record-button">학습 기록 보기</a>
+                </th:block>
+                <th:block th:unless="${isLoggedIn}">
+                    <p class="course-login-copy">로그인하면 학습 진도와<br>수강 기록을 확인할 수 있어요.</p>
+                    <a href="/login" class="course-record-button primary">로그인하고 학습 시작하기</a>
+                </th:block>
             </aside>
         </div>
-    </main>
-</div>
+</main>
 
 <script src="/js/nav.js"></script>
 <script>
@@ -138,21 +147,41 @@
         });
     });
 
+    const courseSearch = document.getElementById('courseSearch');
+    const emptyTitle = document.getElementById('courseEmptyTitle');
+    const emptyHint = document.getElementById('courseEmptyHint');
+
+    // 카테고리 탭과 검색어를 함께 적용
+    function applyCourseFilter() {
+        const active = document.querySelector('.course-tab.active');
+        const filter = active ? active.dataset.filter : 'all';
+        const filterTypes = filter === 'all' ? [] : filter.split(',').map(type => type.trim());
+        const query = courseSearch.value.trim().toLowerCase();
+        let visible = 0;
+        courseCards.forEach(card => {
+            const inTab = filter === 'all' || filterTypes.includes(card.dataset.courseType);
+            const inSearch = !query || (card.dataset.search || '').toLowerCase().includes(query);
+            card.hidden = !(inTab && inSearch);
+            if (!card.hidden) visible++;
+        });
+        if (query) {
+            emptyTitle.textContent = "'" + courseSearch.value.trim() + "'에 맞는 강의가 없어요.";
+            emptyHint.textContent = '다른 검색어를 입력하거나 전체 탭에서 찾아보세요.';
+        } else {
+            emptyTitle.textContent = '해당 강의가 아직 준비 중입니다.';
+            emptyHint.textContent = '다른 카테고리의 강의를 먼저 둘러보세요.';
+        }
+        courseEmpty.classList.toggle('visible', visible === 0);
+    }
+
     courseTabs.forEach(tab => {
         tab.addEventListener('click', function () {
             courseTabs.forEach(item => item.classList.remove('active'));
             this.classList.add('active');
-            const filter = this.dataset.filter;
-            const filterTypes = filter === 'all' ? [] : filter.split(',').map(type => type.trim());
-            let visible = 0;
-            courseCards.forEach(card => {
-                const show = filter === 'all' || filterTypes.includes(card.dataset.courseType);
-                card.hidden = !show;
-                if (show) visible++;
-            });
-            courseEmpty.classList.toggle('visible', visible === 0);
+            applyCourseFilter();
         });
     });
+    courseSearch.addEventListener('input', applyCourseFilter);
 
     async function toggleFavorite(btn) {
         const csrfToken = document.querySelector('meta[name="_csrf"]')?.content || '';
@@ -167,7 +196,10 @@
                 return;
             }
             const data = await res.json();
-            if (data.success) btn.textContent = data.favorite ? '♥' : '♡';
+            if (data.success) {
+                btn.textContent = data.favorite ? '♥' : '♡';
+                btn.setAttribute('aria-pressed', data.favorite ? 'true' : 'false');
+            }
         } catch (error) {
             console.error(error);
         }

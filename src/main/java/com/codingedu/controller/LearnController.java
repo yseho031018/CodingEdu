@@ -6,6 +6,7 @@ import com.codingedu.entity.User;
 import com.codingedu.repository.LessonCourseFavoriteRepository;
 import com.codingedu.repository.LessonNoteRepository;
 import com.codingedu.security.CustomUserDetails;
+import com.codingedu.service.LearningRoadmapService;
 import com.codingedu.service.LessonContentService;
 import com.codingedu.service.LessonService;
 import com.codingedu.service.UserService;
@@ -23,7 +24,7 @@ import java.util.Set;
 public class LearnController {
 
     private static final java.util.Set<String> VALID_LANGS = java.util.Set.of(
-        "html", "css", "javascript", "mysql", "sqljoin", "python", "react", "nextjs", "git",
+        "html", "css", "javascript", "php", "mysql", "sqljoin", "python", "react", "nextjs", "git",
         "typescript", "java", "kotlin", "c", "cpp", "swift"
     );
 
@@ -31,15 +32,18 @@ public class LearnController {
     private final LessonContentService lessonContentService;
     private final UserService userService;
     private final LessonNoteRepository noteRepository;
+    private final LearningRoadmapService learningRoadmapService;
 
     public LearnController(LessonService lessonService,
                            LessonContentService lessonContentService,
                            UserService userService,
-                           LessonNoteRepository noteRepository) {
+                           LessonNoteRepository noteRepository,
+                           LearningRoadmapService learningRoadmapService) {
         this.lessonService = lessonService;
         this.lessonContentService = lessonContentService;
         this.userService = userService;
         this.noteRepository = noteRepository;
+        this.learningRoadmapService = learningRoadmapService;
     }
 
     // 학습 목록 페이지
@@ -71,6 +75,8 @@ public class LearnController {
                         && progressCounts.getOrDefault(course.getLang(), 0) >= course.getLessonCount())
                 .count();
 
+        model.addAttribute("isLoggedIn", userDetails != null);
+        model.addAttribute("courseGuides", learningRoadmapService.courseGuides());
         model.addAttribute("completedCounts", completedCounts);
         model.addAttribute("favoriteLangs", favoriteLangs);
         model.addAttribute("totalLessons", totalLessons);

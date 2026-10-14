@@ -15,6 +15,23 @@
   els.forEach(function (el) { obs.observe(el); });
 })();
 
+// 상단 내비게이션 현재 위치 표시
+// 실제 주소(a.pathname)로 비교해 서버(/learn)와 정적 목업(learn/index.html) 모두에서 동작
+(function () {
+  function clean(p) { return p.replace(/index\.html$/, '').replace(/\/$/, '') || '/'; }
+  var path = clean(location.pathname);
+  var logo = document.querySelector('nav .logo');
+  var home = logo ? clean(logo.pathname) : '/';
+  document.querySelectorAll('nav .nav-links a').forEach(function (a) {
+    var target = clean(a.pathname);
+    var on = target === home ? path === home : (path === target || path.indexOf(target + '/') === 0);
+    if (on) {
+      a.classList.add('active');
+      a.setAttribute('aria-current', 'page');
+    }
+  });
+})();
+
 // 다크모드 토글
 (function () {
   var html = document.documentElement;

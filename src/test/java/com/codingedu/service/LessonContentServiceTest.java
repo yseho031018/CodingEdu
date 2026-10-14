@@ -65,5 +65,14 @@ class LessonContentServiceTest {
                 .containsEntry("css", "Ok0bBJPtgJI")
                 .containsEntry("javascript", "dPRtcRwKo-Y");
     }
+
+    @Test
+    void sumsVideoLengthsOnlyForCoursesWithEveryDuration() {
+        LessonContentService svc = new LessonContentService(new ObjectMapper(), new DefaultResourceLoader());
+        Map<String, Integer> minutes = svc.getCourseDurationMinutes();
+
+        assertThat(minutes.get("html")).isBetween(180, 240);
+        assertThat(minutes).doesNotContainKeys("css", "javascript");
+    }
 }
 

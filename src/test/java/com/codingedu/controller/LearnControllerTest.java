@@ -1,6 +1,7 @@
 package com.codingedu.controller;
 
 import com.codingedu.repository.LessonNoteRepository;
+import com.codingedu.service.LearningRoadmapService;
 import com.codingedu.service.LessonContentService;
 import com.codingedu.service.LessonService;
 import com.codingedu.service.NotificationService;
@@ -38,6 +39,8 @@ class LearnControllerTest {
     private LessonNoteRepository lessonNoteRepository;
     @MockitoBean
     private NotificationService notificationService;
+    @MockitoBean
+    private LearningRoadmapService learningRoadmapService;
 
     @Test
     void learnListOk() throws Exception {

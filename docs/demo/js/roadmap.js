@@ -1,6 +1,7 @@
 // 홈 학습 로드맵
 // 1단계: 분야(큰 노드)와 강의(작은 노드)를 학습 순서 화살표로 잇는 지도
-//        넓은 화면은 가로 배치 + 마우스 오버, 좁은 화면은 세로 배치 + 탭(정보 카드)
+//        화면 크기와 관계없이 같은 배치를 유지하고, 좁은 화면은 확대/축소·이동(핀치·버튼·드래그)으로 봅니다.
+//        마우스는 오버로 강조, 터치는 탭으로 강조 + 정보 카드
 // 2단계: 선택한 분야의 순서형 경로 패널
 (function () {
   var root = document.getElementById('learningRoadmap');
@@ -17,32 +18,23 @@
   var targetTimer = null;
   var focusedId = null;
   var lastPointer = 'mouse';
-  var mode = null;
+  var viewport = root.querySelector('[data-rm-viewport]');
+  var zoomLabel = root.querySelector('[data-zoom-level]');
+  var ZOOM_MIN = 1;
+  var ZOOM_MAX = 4;
+  var zoom = 1;
 
   // ── 배치. 분야는 가장자리, 공유 강의(JavaScript·Git)는 두 분야 사이에 둡니다.
   //    label: 라벨 위치(above/below/left/right). 지정하지 않으면 분야는 아래, 강의는 위.
-  var LAYOUTS = {
-    wide: {
-      width: 1200, height: 540, fieldR: 22, courseR: 7,
-      field: { web: [110, 150], frontend: [640, 82], python: [1090, 140], backend: [1090, 430], database: [110, 410] },
-      course: {
-        html: [255, 95], css: [395, 150], javascript: [535, 220], project: [415, 322],
-        react: [695, 275], nextjs: [825, 172], python: [955, 200], git: [860, 342],
-        php: [720, 430], java: [565, 478], mysql: [255, 462], sqljoin: [390, 410]
-      },
-      label: { 'f:frontend': 'above' }
+  var LAYOUT = {
+    width: 1200, height: 540, fieldR: 22, courseR: 7,
+    field: { web: [110, 150], frontend: [640, 82], python: [1090, 140], backend: [1090, 430], database: [110, 410] },
+    course: {
+      html: [255, 95], css: [395, 150], javascript: [535, 220], project: [415, 322],
+      react: [695, 275], nextjs: [825, 172], python: [955, 200], git: [860, 342],
+      php: [720, 430], java: [565, 478], mysql: [255, 462], sqljoin: [390, 410]
     },
-    // 세로 3열(60·180·300) 배치: 웹·프론트엔드 → 백엔드·Python → 데이터베이스 순으로 위에서 아래로
-    compact: {
-      width: 360, height: 670, fieldR: 17, courseR: 6,
-      field: { web: [60, 60], frontend: [300, 160], python: [60, 360], backend: [300, 470], database: [60, 590] },
-      course: {
-        html: [180, 60], css: [300, 60], javascript: [180, 160], project: [60, 160],
-        react: [180, 260], nextjs: [300, 260], python: [180, 360], git: [300, 360],
-        php: [180, 470], java: [60, 470], mysql: [180, 590], sqljoin: [300, 590]
-      },
-      label: { 'c:javascript': 'left-above', 'c:project': 'below', 'c:react': 'left', 'c:php': 'below', 'c:java': 'below' }
-    }
+    label: { 'f:frontend': 'above' }
   };
 
   // ── 데이터: 서버가 렌더링한 목록형 트리에서 분야·강의·진행 상태를 읽어옵니다.
@@ -148,14 +140,13 @@
     }
   }
 
-  // ── 그리기 (화면 폭이 바뀌어 배치가 달라지면 다시 그림)
+  // ── 그리기
   function drawGraph() {
     if (!svg) return;
-    var layout = LAYOUTS[mode];
+    var layout = LAYOUT;
     clearFocus();
     svg.textContent = '';
     svg.setAttribute('viewBox', '0 0 ' + layout.width + ' ' + layout.height);
-    svg.classList.toggle('is-compact', mode === 'compact');
 
     Object.keys(nodes).forEach(function (id) {
       var n = nodes[id];
@@ -208,10 +199,10 @@
       var captionY = n.kind === 'field' ? (lp.meta > 0 ? lp.meta + 20 : n.r + 22) : n.r + 20;
       var c = el('text', { 'class': 'rm-gcaption', 'text-anchor': 'middle', y: captionY }, g);
       c.textContent = captionFor(n);
-      // 판정은 크기가 변하지 않는 원 하나로만 (좁은 화면은 손가락 크기에 맞춰 넉넉하게)
-      var hitR = n.r + (mode === 'compact' ? (n.kind === 'field' ? 8 : 14) : (n.kind === 'field' ? 4 : 7));
-      var hit = el('circle', { 'class': 'rm-ghit', r: hitR }, g);
+      // 판정은 강조로 커지는 점과 무관한 원 하나로만. 반지름은 확대 배율에 맞춰 updateHitAreas()에서 조정
+      var hit = el('circle', { 'class': 'rm-ghit', r: n.r + (n.kind === 'field' ? 4 : 7) }, g);
       n.el = g;
+      n.hit = hit;
 
       hit.addEventListener('pointerenter', function (ev) { if (ev.pointerType === 'mouse') focusNode(id); });
       hit.addEventListener('pointerleave', function (ev) { if (ev.pointerType === 'mouse') clearFocus(); });
@@ -296,7 +287,7 @@
   function showInfo(id) {
     if (!info) return;
     if (!id) {
-      info.innerHTML = '<p class="rm-ginfo-hint">노드를 탭하면 연결된 강의와 학습 순서를 볼 수 있어요.</p>';
+      info.innerHTML = '<p class="rm-ginfo-hint">두 손가락으로 지도를 확대하고, 노드를 탭하면 연결된 강의와 학습 순서를 볼 수 있어요.</p>';
       return;
     }
     var n = nodes[id];
@@ -398,22 +389,130 @@
     });
   });
 
-  // 지도 폭에 맞춰 배치 선택 (좁으면 세로 배치)
-  function updateMode() {
-    var next = graph.clientWidth < 860 ? 'compact' : 'wide';
-    if (next !== mode) {
-      mode = next;
-      graph.classList.toggle('is-compact', mode === 'compact');
-      drawGraph();
-    }
+  // ── 확대/축소: 배치(구조)는 그대로 두고 지도 크기만 바꿔, 넘치는 부분은 지도 안에서 이동
+  var coarse = window.matchMedia('(pointer: coarse)');
+
+  function fitWidth() { return graph.clientWidth; }
+
+  // 화면에서 손가락(약 44px)·마우스로 누르기 쉬운 크기가 되도록 판정 원 크기를 배율에 맞춤
+  function updateHitAreas() {
+    var scale = fitWidth() * zoom / LAYOUT.width;
+    var target = coarse.matches ? 22 : 10;
+    Object.keys(nodes).forEach(function (id) {
+      var n = nodes[id];
+      if (!n.hit) return;
+      var base = n.r + (n.kind === 'field' ? 4 : 7);
+      n.hit.setAttribute('r', Math.min(55, Math.max(base, target / scale)).toFixed(1));
+    });
   }
 
-  if (svg && graph) {
+  // px, py: 확대 기준점(지도 영역 안 좌표). 그 지점이 제자리에 있도록 스크롤을 맞춤
+  function applyZoom(next, px, py) {
+    next = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, next));
+    var ratio = LAYOUT.height / LAYOUT.width;
+    var prevW = parseFloat(svg.style.width) || fitWidth();
+    if (px == null) px = viewport.clientWidth / 2;
+    if (py == null) py = viewport.clientHeight / 2;
+    var cx = (viewport.scrollLeft + px) / prevW;
+    var cy = (viewport.scrollTop + py) / (prevW * ratio);
+
+    zoom = next;
+    var w = fitWidth() * zoom;
+    var h = w * ratio;
+    svg.style.width = w + 'px';
+    svg.style.height = h + 'px';
+    // 확대할수록 보이는 높이도 늘리되 화면 높이의 65%까지만, 그 이상은 지도 안에서 스크롤
+    viewport.style.height = Math.round(Math.min(h, Math.max(fitWidth() * ratio, window.innerHeight * 0.65))) + 'px';
+    graph.classList.toggle('is-zoomed', zoom > 1.001);
+    viewport.scrollLeft = cx * w - px;
+    viewport.scrollTop = cy * h - py;
+    if (zoomLabel) zoomLabel.textContent = Math.round(zoom * 100) + '%';
+    root.querySelectorAll('[data-zoom="out"], [data-zoom="fit"]').forEach(function (b) { b.disabled = zoom <= ZOOM_MIN + 0.001; });
+    root.querySelectorAll('[data-zoom="in"]').forEach(function (b) { b.disabled = zoom >= ZOOM_MAX - 0.001; });
+    updateHitAreas();
+  }
+
+  function setupZoom() {
+    root.querySelectorAll('[data-zoom]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var k = btn.getAttribute('data-zoom');
+        applyZoom(k === 'in' ? zoom * 1.5 : k === 'out' ? zoom / 1.5 : 1);
+      });
+    });
+
+    // 두 손가락 핀치: 지도만 확대 (한 손가락은 기본 스크롤로 지도 이동)
+    var pinch = null;
+    function touchDist(t) { return Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY); }
+    viewport.addEventListener('touchstart', function (e) {
+      if (e.touches.length === 2) pinch = { dist: touchDist(e.touches), zoom: zoom };
+    }, { passive: true });
+    viewport.addEventListener('touchmove', function (e) {
+      if (!pinch || e.touches.length !== 2) return;
+      e.preventDefault();
+      var rect = viewport.getBoundingClientRect();
+      applyZoom(pinch.zoom * touchDist(e.touches) / pinch.dist,
+        (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left,
+        (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top);
+    }, { passive: false });
+    viewport.addEventListener('touchend', function (e) { if (e.touches.length < 2) pinch = null; });
+
+    // PC: Ctrl+휠(트랙패드 핀치)로 확대. 일반 휠은 페이지 스크롤 그대로
+    viewport.addEventListener('wheel', function (e) {
+      if (!e.ctrlKey) return;
+      e.preventDefault();
+      var rect = viewport.getBoundingClientRect();
+      // 마우스 휠 한 칸(약 100)은 1.28배, 트랙패드 핀치의 작은 값은 부드럽게
+      var delta = Math.max(-25, Math.min(25, e.deltaY));
+      applyZoom(zoom * Math.exp(-delta * 0.01), e.clientX - rect.left, e.clientY - rect.top);
+    }, { passive: false });
+
+    // PC: 확대한 상태에서 마우스로 끌어 이동 (끌었을 때는 노드 클릭으로 처리하지 않음)
+    var drag = null;
+    var justDragged = false;
+    viewport.addEventListener('pointerdown', function (e) {
+      if (e.pointerType !== 'mouse' || e.button !== 0 || zoom <= 1.001) return;
+      drag = { x: e.clientX, y: e.clientY, left: viewport.scrollLeft, top: viewport.scrollTop, moved: false };
+    });
+    window.addEventListener('pointermove', function (e) {
+      if (!drag) return;
+      var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      if (!drag.moved && Math.abs(dx) + Math.abs(dy) < 5) return;
+      drag.moved = true;
+      graph.classList.add('is-dragging');
+      viewport.scrollLeft = drag.left - dx;
+      viewport.scrollTop = drag.top - dy;
+    });
+    window.addEventListener('pointerup', function () {
+      if (drag && drag.moved) {
+        justDragged = true;
+        setTimeout(function () { justDragged = false; }, 0);
+      }
+      drag = null;
+      graph.classList.remove('is-dragging');
+    });
+    viewport.addEventListener('click', function (e) {
+      if (justDragged) { e.stopPropagation(); e.preventDefault(); }
+    }, true);
+
+    // 화면 폭이 바뀌면 같은 배율로 다시 맞춤 (구조는 그대로)
+    var lastW = 0;
+    function onResize() {
+      var w = fitWidth();
+      if (Math.abs(w - lastW) < 1) return;
+      lastW = w;
+      graph.classList.toggle('is-narrow', w < 860);
+      applyZoom(zoom);
+    }
+    onResize();
+    if ('ResizeObserver' in window) new ResizeObserver(onResize).observe(graph);
+    else window.addEventListener('resize', onResize);
+  }
+
+  if (svg && graph && viewport) {
     root.classList.add('has-graph');
     document.addEventListener('pointerdown', function (ev) { lastPointer = ev.pointerType || 'mouse'; }, true);
-    updateMode();
-    if ('ResizeObserver' in window) new ResizeObserver(updateMode).observe(graph);
-    else window.addEventListener('resize', updateMode);
+    drawGraph();
+    setupZoom();
   }
   select(selected, false);
 })();

@@ -78,7 +78,33 @@
 .roadmap:not(.has-graph) .rm-tree { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px 16px; }
 
 /* Graph (데스크톱) */
-.rm-graph-svg { display: block; width: 100%; height: auto; overflow: visible; font-family: inherit; }
+.rm-graph { position: relative; }
+.rm-graph-viewport {
+  position: relative; overflow: hidden; border-radius: var(--rm-radius);
+  overscroll-behavior: contain; touch-action: pan-x pan-y; /* 핀치는 지도만 확대(페이지 확대 방지) */
+}
+.rm-graph.is-zoomed .rm-graph-viewport { overflow: auto; cursor: grab; box-shadow: inset 0 0 0 1px var(--rm-border); }
+.rm-graph.is-dragging .rm-graph-viewport { cursor: grabbing; user-select: none; }
+.rm-graph-svg { display: block; width: 100%; height: auto; max-width: none; overflow: visible; font-family: inherit; }
+
+/* 확대·축소 버튼 (지도 오른쪽 위) */
+.rm-zoom {
+  position: absolute; top: 6px; right: 6px; z-index: 4;
+  display: flex; align-items: center; gap: 2px; padding: 3px;
+  background: var(--rm-surface); border: 1px solid var(--rm-border); border-radius: 10px; box-shadow: var(--rm-shadow-sm);
+}
+.rm-zoom button {
+  min-width: 36px; height: 36px; padding: 0; border: 0; border-radius: 8px; background: transparent;
+  color: var(--rm-ink-1); font: inherit; font-size: 1.15rem; font-weight: 700; cursor: pointer;
+}
+.rm-zoom button:hover:not(:disabled) { background: var(--rm-primary-soft); color: var(--rm-primary); }
+.rm-zoom button:disabled { color: var(--rm-ink-3); opacity: .45; cursor: default; }
+.rm-zoom button:focus-visible { outline: 2px solid var(--rm-primary); outline-offset: 1px; }
+.rm-zoom .rm-zoom-fit { padding: 0 10px; font-size: .78rem; }
+.rm-zoom-level { min-width: 42px; text-align: center; color: var(--rm-ink-3); font-size: .76rem; font-weight: 700; }
+/* 좁은 화면: 지도를 가리지 않도록 버튼을 지도 위 한 줄로 */
+.rm-graph.is-narrow .rm-zoom { position: static; width: fit-content; margin: 0 0 8px auto; }
+.rm-graph.is-narrow .rm-zoom button { min-width: 40px; height: 40px; }
 .rm-edge {
   fill: none; stroke: var(--rm-route); stroke-width: 1.5; marker-end: url(#rm-arrow);
   transition: stroke var(--rm-fast) var(--rm-ease), opacity var(--rm-fast) var(--rm-ease), stroke-width var(--rm-fast) var(--rm-ease);
@@ -143,22 +169,17 @@
 /* Compact graph (좁은 화면 세로 배치) */
 .rm-gbg { fill: transparent; }
 .rm-gnode, .rm-ghit { -webkit-tap-highlight-color: transparent; }
-.rm-graph.is-compact .rm-graph-svg { max-width: 440px; margin: 0 auto; }
-.rm-graph-svg.is-compact .rm-glabel { font-size: 14px; }
-.rm-graph-svg.is-compact .rm-gnode.is-field .rm-glabel { font-size: 16px; }
-.rm-graph-svg.is-compact .rm-gmeta { font-size: 12px; }
-.rm-graph-svg.is-compact .rm-gcaption { display: none; } /* 좁은 화면은 정보 카드로 대신 표시 */
-.rm-graph-svg.is-compact .rm-gnode.is-hot .rm-glabel { transform: translateY(-4px) scale(1.12); }
-.rm-graph.is-compact .rm-legend-hint { display: none; }
+.rm-graph.is-narrow .rm-gcaption { display: none; } /* 좁은 화면은 정보 카드로 대신 표시 */
+.rm-graph.is-narrow .rm-legend-hint { display: none; }
 .rm-ginfo { display: none; }
 /* 지도를 보는 동안 화면 하단(탭바 위)에 붙어 있어, 위쪽 노드를 탭해도 바로 보임 */
-.rm-graph.is-compact .rm-ginfo {
+.rm-graph.is-narrow .rm-ginfo {
   position: sticky; bottom: 16px; z-index: 5;
   display: block; max-width: 440px; min-height: 56px; margin: 8px auto 12px; padding: 14px 16px;
   background: var(--rm-surface); border: 1px solid var(--rm-border); border-radius: var(--rm-radius);
   box-shadow: 0 10px 30px rgba(28, 39, 68, .14);
 }
-@media (max-width: 640px) { .rm-graph.is-compact .rm-ginfo { bottom: calc(76px + env(safe-area-inset-bottom)); } } /* 하단 탭바 위 */
+@media (max-width: 640px) { .rm-graph.is-narrow .rm-ginfo { bottom: calc(76px + env(safe-area-inset-bottom)); } } /* 하단 탭바 위 */
 .rm-ginfo-hint { margin: 0; color: var(--rm-ink-3); font-size: .86rem; line-height: 1.6; text-align: center; }
 .rm-ginfo-head { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
 .rm-ginfo-head strong { color: var(--rm-ink-1); font-size: 1.05rem; }

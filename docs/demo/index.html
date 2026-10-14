@@ -87,7 +87,16 @@
     <div class="rm-map" data-rm-map>
       <!-- 데스크톱: 분야(큰 노드)와 강의(작은 노드)를 학습 순서 화살표로 잇는 지도 -->
       <div class="rm-graph" data-rm-graph>
-        <svg class="rm-graph-svg" data-rm-graph-svg viewBox="0 0 1200 540" role="group" aria-label="학습 분야와 강의 연결 지도"></svg>
+        <!-- 화면 크기와 관계없이 같은 구조. 좁은 화면은 확대/축소 후 지도 안에서 이동 -->
+        <div class="rm-zoom" role="group" aria-label="지도 확대·축소">
+          <button type="button" data-zoom="out" aria-label="축소">−</button>
+          <span class="rm-zoom-level" data-zoom-level aria-live="polite">100%</span>
+          <button type="button" data-zoom="in" aria-label="확대">+</button>
+          <button type="button" data-zoom="fit" class="rm-zoom-fit">전체 보기</button>
+        </div>
+        <div class="rm-graph-viewport" data-rm-viewport>
+          <svg class="rm-graph-svg" data-rm-graph-svg viewBox="0 0 1200 540" role="group" aria-label="학습 분야와 강의 연결 지도"></svg>
+        </div>
         <!-- 좁은 화면: 탭한 노드의 선수·다음 강의와 이동 버튼 -->
         <div class="rm-ginfo" data-rm-ginfo aria-live="polite"></div>
         <ul class="rm-legend" aria-hidden="true">
@@ -95,7 +104,7 @@
           <li><i class="rm-legend-course"></i>강의</li>
           <li><i class="rm-legend-prev"></i>선수 강의</li>
           <li><i class="rm-legend-arrow"></i>학습 순서</li>
-          <li class="rm-legend-hint">노드에 마우스를 올리거나 탭하면 연결된 강의가 강조돼요</li>
+          <li class="rm-legend-hint">노드에 마우스를 올리면 연결된 강의가 강조돼요 · Ctrl+휠로 확대</li>
         </ul>
       </div>
 

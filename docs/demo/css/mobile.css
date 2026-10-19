@@ -65,9 +65,12 @@
   .mobile-sheet-list span { color: var(--ink-3); font-size: 1.2rem; }
   .mobile-sheet-list [data-logout] { color: #dc2626; }
 
-  /* 탭바가 있는 화면에서는 떠 있는 AI 도우미 버튼을 숨김 (더보기 → AI 도우미로 이동 가능)
-     강의 상세처럼 탭바가 없는 화면은 그대로 유지 */
-  body.has-mobile-tabbar .ai-buddy { display: none !important; }
+  /* AI 도우미: 하단 탭바 바로 위 오른쪽에 작게. 대화창은 상단바를 가리지 않는 높이까지 */
+  body.has-mobile-tabbar .ai-buddy { right: 12px !important; bottom: calc(72px + env(safe-area-inset-bottom)) !important; }
+  body.has-mobile-tabbar .ai-buddy-panel { max-height: calc(100vh - 150px); max-height: calc(100dvh - 150px); }
+  .ai-buddy-input { font-size: 16px; } /* iOS 입력 확대 방지 */
+  /* 로드맵 정보 카드는 오른쪽을 비워 AI 도우미 버튼과 겹치지 않게 */
+  body.has-mobile-tabbar .rm-graph.is-narrow .rm-ginfo { margin-left: 0; margin-right: 58px; }
 
   /* iOS 입력 확대 방지(16px) + 충분한 터치 높이 */
   .course-search input, .quiz-search input, .quiz-select { height: 44px; font-size: 16px; }

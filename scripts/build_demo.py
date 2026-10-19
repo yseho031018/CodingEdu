@@ -313,8 +313,7 @@ def main():
     for folder in ('css', 'js', 'images'):
         shutil.copytree(os.path.join(STATIC, folder), os.path.join(OUT, folder))
     with open(os.path.join(OUT, 'demo.css'), 'w', encoding='utf-8') as f:
-        f.write('/* 목업 전용: 서버가 필요한 AI 도우미는 숨김 */\n'
-                '#ai-buddy, .ai-buddy, .ai-buddy-panel { display: none !important; }\n')
+        f.write('/* 목업 전용 스타일 (AI 도우미는 demo.js의 데모 답변으로 동작하므로 숨기지 않음) */\n')
     with open(os.path.join(OUT, 'notice.html'), 'w', encoding='utf-8') as f:
         f.write(NOTICE)
     shutil.copy(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'demo.js'), os.path.join(OUT, 'demo.js'))

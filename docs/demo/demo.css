@@ -1,2 +1,1 @@
-/* 목업 전용: 서버가 필요한 AI 도우미는 숨김 */
-#ai-buddy, .ai-buddy, .ai-buddy-panel { display: none !important; }
+/* 목업 전용 스타일 (AI 도우미는 demo.js의 데모 답변으로 동작하므로 숨기지 않음) */

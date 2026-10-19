@@ -61,7 +61,8 @@
     var a = document.createElement('a');
     a.href = source.getAttribute('href');
     a.innerHTML = icon(name) + '<span>' + label + '</span>';
-    if (source.classList.contains('active')) {
+    var here = function (p) { return p.replace(/index\.html$/, '').replace(/\/$/, ''); };
+    if (source.classList.contains('active') || (name === 'my' && here(source.pathname) === here(location.pathname))) {
       a.classList.add('active');
       a.setAttribute('aria-current', 'page');
       // 지금 보고 있는 탭을 다시 누르면 맨 위로 (모바일 앱 관습)
@@ -76,9 +77,10 @@
   addTab('home', '홈', linkFor('home'));
   addTab('learn', '강의', linkFor('learn'));
   addTab('quiz', '퀴즈', linkFor('quiz'));
-  // 로그인 상태면 마이페이지, 아니면 로그인
-  var mySource = linkFor('my') || document.querySelector('nav .nav-right a.btn-login.ghost');
-  addTab('my', linkFor('my') ? 'MY' : '로그인', mySource);
+  // 로그인 상태면 오른쪽의 사용자 이름(마이페이지) 링크, 아니면 로그인 버튼
+  var userLink = document.querySelector('nav .nav-right a.nav-user');
+  var mySource = userLink || document.querySelector('nav .nav-right a.btn-login.ghost');
+  addTab('my', userLink ? 'MY' : '로그인', mySource);
 
   var moreBtn = document.createElement('button');
   moreBtn.type = 'button';

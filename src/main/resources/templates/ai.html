@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta th:name="_csrf" th:content="${_csrf != null ? _csrf.token : ''}"/>
     <meta th:name="_csrf_header" th:content="${_csrf != null ? _csrf.headerName : 'X-CSRF-TOKEN'}"/>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="/css/common.css">
     <link rel="stylesheet" href="/css/tailwind.css">
     <link rel="stylesheet" href="/css/design-refresh.css">
+    <link rel="stylesheet" href="/css/site-nav.css">
+    <link rel="stylesheet" href="/css/mobile.css">
     <style>
         .page-ai .course-page-main {
             min-height: 100vh;
@@ -320,29 +322,8 @@
     </style>
 </head>
 <body class="page-courses page-ai">
-<div class="course-app-shell">
-    <aside class="course-sidebar">
-        <a href="/" class="course-side-logo">
-            <span class="brand-text"><b>Coding</b>Edu</span>
-        </a>
+<nav th:replace="~{index :: nav}"></nav>
 
-        <nav class="course-side-nav" aria-label="주요 메뉴">
-            <a href="/"><img src="/images/course-menu/home.png" alt="" aria-hidden="true">홈</a>
-            <a href="/learn"><img src="/images/course-menu/courses.png" alt="" aria-hidden="true">강의</a>
-            <a href="/quiz"><img src="/images/course-menu/quiz.png" alt="" aria-hidden="true">퀴즈</a>
-            <a href="/challenge"><img src="/images/course-menu/challenge.png" alt="" aria-hidden="true">챌린지</a>
-            <a href="/community"><img src="/images/course-menu/community.png" alt="" aria-hidden="true">커뮤니티</a>
-            <a href="/ai" class="active"><img src="/images/course-menu/ai.svg" alt="" aria-hidden="true">AI 도우미</a>
-            <a href="/mypage"><img src="/images/course-menu/mypage.png" alt="" aria-hidden="true">마이페이지</a>
-            <a href="/settings"><img src="/images/course-menu/settings.png" alt="" aria-hidden="true">설정</a>
-        </nav>
-
-        <div class="course-side-account">
-            <a href="/login" sec:authorize="isAnonymous()">로그인</a>
-            <a href="/register" sec:authorize="isAnonymous()" class="primary">회원가입</a>
-            <a href="/mypage" sec:authorize="isAuthenticated()" class="primary">내 학습 기록</a>
-        </div>
-    </aside>
 
     <main class="course-page-main">
         <header class="course-page-heading">
@@ -351,7 +332,6 @@
                 <h1>AI 도우미</h1>
                 <p>퀴즈 오답, 다음 강의, 질문 정리를 넓은 화면에서 편하게 확인하세요.</p>
             </div>
-            <button class="course-theme-button" id="themeToggle" title="테마 전환" aria-label="다크/라이트 모드 전환"></button>
         </header>
 
         <div class="ai-page-grid">
@@ -403,7 +383,6 @@
             </aside>
         </div>
     </main>
-</div>
 
 <script src="/js/nav.js"></script>
 <script>

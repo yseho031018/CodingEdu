@@ -86,6 +86,8 @@
   moreBtn.setAttribute('aria-haspopup', 'dialog');
   moreBtn.setAttribute('aria-expanded', 'false');
   moreBtn.setAttribute('aria-controls', 'mobileMoreSheet');
+  // 챌린지·커뮤니티·AI 도우미처럼 더보기 안의 화면에 있을 때는 더보기 탭을 현재 위치로 표시
+  if (topNav.querySelector('a[data-tab="more"].active')) moreBtn.classList.add('active');
   bar.appendChild(moreBtn);
 
   // 더보기 시트: 나머지 메뉴 + 계정 메뉴

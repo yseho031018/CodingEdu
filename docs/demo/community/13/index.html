@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>개발자 면접 후기 - 신입 기술면접에서 자주 나오는 질문 - CodeEdu</title>
+    <link rel="stylesheet" href="../../css/common.css">
+    <link rel="stylesheet" href="../../css/tailwind.css">
+    <link rel="stylesheet" href="../../css/design-refresh.css">
+    <link rel="stylesheet" href="../../css/site-nav.css">
+    <link rel="stylesheet" href="../../css/mobile.css">
+    <style>
+        .course-page-heading { max-width: 800px; }
+        .detail-container {
+            max-width: 800px; margin: 0 auto; background: var(--bg-surface);
+            border-radius: 8px; padding: 40px; box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-card);
+        }
+        .detail-header { border-bottom: 2px dashed var(--border-card); padding-bottom: 24px; margin-bottom: 32px; }
+        .post-category {
+            display: inline-block; padding: 5px 10px; border-radius: 4px; font-size: .75rem; font-weight: 800; margin-bottom: 14px;
+            background: var(--border-card); color: var(--ink-2); text-transform: uppercase;
+        }
+        .post-category.qna { background: var(--accent-soft); color: var(--accent); }
+        .post-category.tips { background: var(--amber-soft); color: var(--warning); }
+        .post-category.study { background: var(--success-soft); color: var(--success); }
+        .post-category.free { background: var(--accent-soft); color: var(--accent); }
+        
+        .detail-header h2 { font-size: 1.85rem; font-weight: 900; color: var(--ink-1); margin-bottom: 18px; line-height: 1.35; letter-spacing: -0.02em; }
+        .detail-meta { display: flex; align-items: center; justify-content: space-between; font-size: .9rem; color: var(--ink-2); }
+        .meta-left { display: flex; align-items: center; gap: 12px; }
+        .meta-author { font-weight: 800; color: var(--ink-1); }
+        .meta-right { display: flex; align-items: center; gap: 14px; }
+        
+        .detail-content { line-height: 1.8; font-size: 1.05rem; color: var(--ink-1); min-height: 300px; white-space: pre-wrap; }
+        
+        .btn-back-group { margin-top: 48px; display: flex; justify-content: space-between; align-items: center; padding-top: 24px; border-top: 1px solid var(--border); }
+        .btn-back {
+            background: var(--bg-surface); color: var(--ink-1); padding: 10px 22px; border-radius: 6px;
+            font-weight: 750; text-decoration: none; transition: all .2s; border: 1px solid var(--border-card); cursor: pointer;
+        }
+        .btn-back:hover { background: var(--bg-section); border-color: var(--ink-3); }
+        .post-actions { display: flex; gap: 10px; }
+        .btn-edit {
+            background: var(--bg-surface); color: var(--ink-2); padding: 9px 18px; border-radius: 6px;
+            font-weight: 700; text-decoration: none; transition: all .2s; border: 1px solid var(--border-card); font-size: .88rem;
+        }
+        .btn-edit:hover { background: var(--bg-section); border-color: var(--ink-3); color: var(--ink-1); }
+        .btn-delete {
+            background: var(--bg-surface); color: var(--danger); padding: 9px 18px; border-radius: 6px;
+            font-weight: 700; border: 1px solid var(--danger-soft); cursor: pointer; font-size: .88rem; transition: all .2s;
+        }
+        .btn-delete:hover { background: var(--danger-soft); border-color: var(--danger); }
+        .btn-comment-delete {
+            background: none; border: none; color: var(--ink-3); font-size: .8rem; cursor: pointer;
+            padding: 4px 8px; border-radius: 6px; transition: all .2s;
+        }
+        .btn-comment-delete:hover { color: var(--danger); background: var(--danger-soft); }
+
+        .reaction-group { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
+        .reaction-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 9px 20px; border-radius: 6px; border: 1px solid var(--border-card);
+            background: var(--bg-surface); cursor: pointer; font-size: .9rem; font-weight: 700;
+            color: var(--ink-3); transition: all .2s;
+        }
+        .reaction-btn:hover { border-color: var(--ink-3); color: var(--ink-1); transform: translateY(-1px); }
+        .reaction-btn .reaction-icon { font-size: 1.1rem; transition: transform .2s; }
+        .reaction-btn:hover .reaction-icon, .reaction-btn.active .reaction-icon { transform: scale(1.1); }
+        .reaction-btn.like:hover, .reaction-btn.like.active {
+            border-color: var(--danger); color: var(--danger); background: var(--danger-soft);
+        }
+        .reaction-btn.disappointed:hover, .reaction-btn.disappointed.active {
+            border-color: var(--warning); color: var(--warning); background: var(--amber-soft);
+        }
+    </style>
+<link rel="stylesheet" href="../../demo.css">
+</head>
+<body class="page-courses">
+<nav>
+  <a href="../../index.html" class="logo">
+    <span class="brand-text"><b>Coding</b>Edu</span>
+  </a>
+
+  <div class="nav-links">
+    <a href="../../index.html" data-tab="home">홈</a>
+    <a href="../../learn/index.html" data-tab="learn">강의</a>
+    <a href="../../quiz/index.html" data-tab="quiz">퀴즈</a>
+    <a href="../../challenge/index.html" data-tab="more">챌린지</a>
+    <a href="../../community/index.html" data-tab="more">커뮤니티</a>
+    <a href="../../ai/index.html" data-tab="more">AI 도우미</a>
+    
+  </div>
+
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeToggle" title="테마 전환" aria-label="다크/라이트 모드 전환"></button>
+
+    <div class="nav-right-auth">
+      <a href="../../me/community/13/index.html" class="btn-login ghost">로그인</a>
+      <a href="../../me/community/13/index.html" class="btn-login">회원가입</a>
+    </div>
+
+    
+  </div>
+</nav>
+
+
+    <main class="course-page-main">
+        <header class="course-page-heading">
+            <div>
+                <span class="course-page-kicker">COMMUNITY</span>
+                <h1>커뮤니티 글</h1>
+                <p>질문과 경험을 나누며 함께 성장하는 개발자 공간입니다.</p>
+            </div>
+        </header>
+
+        <div class="detail-container">
+    <div class="detail-header">
+        <div class="post-category free">☕ 자유</div>
+        <h2>개발자 면접 후기 - 신입 기술면접에서 자주 나오는 질문</h2>
+        <div class="detail-meta">
+            <div class="meta-left">
+                <a class="meta-author" href="../../notice.html"
+                   style="text-decoration:none; color:inherit;">스터디장</a>
+                <span class="meta-date">2026-10-16 14:04</span>
+            </div>
+            <div class="meta-right">
+                <span>👁️ 289</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 내용 영역: white-space: pre-wrap 으로 엔터 유지 -->
+    <div class="detail-content">최근 스타트업 3군데 면접을 보고 왔습니다. 공부하시는 분들께 도움 되시길!
+
+**백엔드 (Java/Spring)**
+- JVM 메모리 구조 설명해보세요
+- 스프링 빈 생명주기는?
+- @Transactional 동작 원리
+- 인덱스는 언제 쓰나요?
+- REST와 RESTful의 차이
+
+**CS 기초**
+- 프로세스 vs 스레드
+- HTTP vs HTTPS
+- TCP 3-way handshake
+- 데이터베이스 정규화
+
+면접관분들이 답을 외웠냐보다 &#39;왜 그런지 이해하고 있냐&#39;를 더 중요하게 보시더라고요. 두루뭉술하게 알기보다 하나를 제대로 설명할 수 있는 게 나은 것 같았습니다!
+
+다들 좋은 결과 있으시길 바라요 🙏</div>
+
+    <!-- 반응 버튼 -->
+    <div style="margin-top: 30px; padding-top: 24px; border-top: 1px solid var(--border-card);">
+        
+        <div style="display:inline-block; margin-top:12px; color:var(--ink-3); font-size:.9rem;">
+            <span>🤍 <strong>76</strong> 좋아요</span>
+            <span style="margin-left: 12px;">💭 <strong>0</strong> 아쉬워요</span>
+        </div>
+    </div>
+
+    <!-- 댓글 영역 -->
+    <div class="comments-section" style="margin-top: 50px; border-top: 2px solid var(--border-card); padding-top: 30px;">
+        <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--ink-1); margin-bottom: 24px;">
+            💬 댓글 <span style="color: var(--accent);">0</span>개
+        </h3>
+
+        <!-- 댓글 목록 -->
+        <div class="comment-list" style="margin-bottom: 30px;">
+            
+            
+            <div style="font-size: .95rem; color: var(--ink-3); text-align: center; padding: 40px 0;">
+                아직 작성된 댓글이 없습니다. 첫 번째 댓글을 남겨보세요! ✨
+            </div>
+        </div>
+
+        <!-- 댓글 작성 폼 -->
+        
+        
+        <div style="background: var(--bg-section); padding: 30px; border-radius: 16px; text-align: center; color: var(--ink-2); border: 1px dashed var(--border-card);">
+            댓글을 작성하려면 <a href="../../me/community/13/index.html" style="color: var(--accent); font-weight: 800; text-decoration: underline;">로그인</a>이 필요합니다.
+        </div>
+    </div>
+
+    <div class="btn-back-group">
+        <a href="../../community/index.html" class="btn-back">목록으로 돌아가기</a>
+        
+    </div>
+        </div>
+    </main>
+
+<script src="../../js/nav.js"></script>
+
+<script>
+    const reactionBtns = document.querySelectorAll('.reaction-btn');
+    reactionBtns.forEach((btn) => {
+        btn.addEventListener('click', function () {
+            const postId = this.dataset.postId;
+            const reactionType = this.dataset.reactionType;
+            const csrfToken = document.cookie.split(';')
+                .map(c => c.trim())
+                .find(c => c.startsWith('XSRF-TOKEN='));
+            const token = csrfToken ? decodeURIComponent(csrfToken.split('=')[1]) : '';
+
+            fetch(`/community/${postId}/reaction?type=${encodeURIComponent(reactionType)}`, {
+                method: 'POST',
+                headers: { 'X-XSRF-TOKEN': token }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) { alert(data.error); return; }
+                updateReactionUi(data);
+            });
+        });
+    });
+
+    function updateReactionUi(data) {
+        document.getElementById('likeCount').textContent = data.likeCount;
+        document.getElementById('disappointedCount').textContent = data.disappointedCount;
+
+        reactionBtns.forEach((btn) => {
+            const type = btn.dataset.reactionType;
+            const icon = btn.querySelector('.reaction-icon');
+            const active = data.active && data.reactionType === type;
+            btn.classList.toggle('active', active);
+            if (type === 'LIKE') icon.textContent = active ? '❤️' : '🤍';
+            if (type === 'DISAPPOINTED') icon.textContent = active ? '💛' : '💭';
+        });
+    }
+</script>
+<script src="../../demo.js"></script>
+</body>
+</html>

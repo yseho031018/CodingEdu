@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>챌린지 - CodingEdu</title>
+    <link rel="stylesheet" href="../../css/common.css">
+    <link rel="stylesheet" href="../../css/tailwind.css">
+    <link rel="stylesheet" href="../../css/design-refresh.css">
+    <link rel="stylesheet" href="../../css/site-nav.css">
+    <link rel="stylesheet" href="../../css/mobile.css">
+    <style>
+        .challenge-content { max-width: 1240px; margin: 0 auto; word-break: keep-all; line-break: strict; }
+        .challenge-content > section { padding: 0; }
+        .challenge-hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1.55fr) minmax(300px, .9fr);
+            gap: 22px;
+            align-items: stretch;
+            margin-bottom: 38px;
+        }
+        .routine-spotlight,
+        .routine-summary,
+        .routine-card,
+        .upcoming-routine {
+            background: color-mix(in srgb, var(--bg-surface) 96%, #f5f7ff);
+            border: 1px solid color-mix(in srgb, var(--border-card) 82%, var(--accent));
+            box-shadow: 0 18px 46px rgba(30, 42, 82, .08);
+        }
+        .routine-spotlight {
+            min-height: 292px;
+            border-radius: 8px;
+            padding: 34px;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 230px;
+            gap: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+        .routine-spotlight::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(115deg, rgba(79,85,231,.08), transparent 42%),
+                radial-gradient(circle at 90% 12%, rgba(39,200,137,.14), transparent 30%);
+            pointer-events: none;
+        }
+        .spotlight-copy { position: relative; z-index: 1; max-width: 690px; }
+        .spotlight-label {
+            display: inline-flex;
+            align-items: center;
+            padding: 7px 11px;
+            border-radius: 6px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-size: .78rem;
+            font-weight: 900;
+            margin-bottom: 18px;
+        }
+        .spotlight-copy h2 {
+            font-size: clamp(2.1rem, 3vw, 3.35rem);
+            line-height: 1.16;
+            letter-spacing: 0;
+            font-weight: 900;
+            color: var(--ink-1);
+            margin: 0 0 16px;
+        }
+        .spotlight-copy h2 strong { color: var(--accent); }
+        .spotlight-copy p {
+            max-width: 580px;
+            font-size: 1.08rem;
+            line-height: 1.75;
+            color: var(--ink-2);
+            margin: 0 0 26px;
+        }
+        .spotlight-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .spotlight-visual {
+            position: relative;
+            z-index: 1;
+            align-self: stretch;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: rgba(255,255,255,.72);
+            border: 1px solid rgba(255,255,255,.8);
+            box-shadow: inset 0 0 0 1px rgba(79,85,231,.08);
+        }
+        [data-theme="dark"] .spotlight-visual { background: rgba(255,255,255,.04); border-color: var(--border-card); }
+        .streak-badge {
+            width: 68px;
+            height: 68px;
+            border-radius: 7px;
+            background: #242944;
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-size: 1rem;
+            font-weight: 900;
+            box-shadow: 0 16px 32px rgba(31, 37, 68, .2);
+        }
+        .streak-dots {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 7px;
+            margin: 20px 0 12px;
+        }
+        .streak-dots i {
+            height: 8px;
+            border-radius: 99px;
+            background: var(--accent);
+            display: block;
+        }
+        .streak-dots i.off { background: rgba(79,85,231,.18); }
+        .spotlight-visual b { color: var(--ink-1); font-size: 1rem; font-weight: 900; }
+        .spotlight-visual small { color: var(--ink-3); font-size: .82rem; line-height: 1.45; }
+        .spotlight-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 22px;
+        }
+        .spotlight-metrics div {
+            border-radius: 7px;
+            border: 1px solid var(--border-card);
+            background: var(--bg-surface);
+            padding: 13px 14px;
+        }
+        .spotlight-metrics b { display: block; color: var(--accent); font-size: 1.35rem; line-height: 1; font-weight: 900; }
+        .spotlight-metrics span { display: block; margin-top: 6px; color: var(--ink-3); font-size: .8rem; font-weight: 800; }
+
+        .routine-summary {
+            border-radius: 8px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 13px;
+        }
+        .summary-title { font-size: 1.25rem; font-weight: 900; color: var(--ink-1); margin-bottom: 4px; }
+        .summary-item {
+            display: grid;
+            grid-template-columns: 42px 1fr;
+            align-items: center;
+            gap: 13px;
+            padding: 14px;
+            border-radius: 7px;
+            background: var(--bg-section);
+            border: 1px solid var(--border-card);
+        }
+        .summary-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 7px;
+            display: grid;
+            place-items: center;
+            background: #eef0ff;
+            color: var(--accent);
+            font-weight: 900;
+            font-size: .96rem;
+        }
+        .summary-item b { display: block; color: var(--ink-1); font-size: 1rem; margin-bottom: 3px; }
+        .summary-item span { color: var(--ink-2); font-size: .88rem; line-height: 1.5; }
+
+        .section-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            gap: 18px;
+            margin: 46px 0 18px;
+        }
+        .section-row h2 { font-size: 1.65rem; font-weight: 900; color: var(--ink-1); margin: 0; }
+        .section-row p { color: var(--ink-2); font-weight: 700; margin: 6px 0 0; }
+        .routine-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(292px, 1fr));
+            gap: 18px;
+        }
+        .routine-card {
+            position: relative;
+            border-radius: 8px;
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            min-height: 338px;
+            overflow: hidden;
+            transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+        }
+        .routine-card::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--mint));
+        }
+        .routine-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(79,85,231,.42);
+            box-shadow: 0 22px 44px rgba(29,44,89,.12);
+        }
+        .routine-card.joined { border-color: rgba(16,185,129,.55); }
+        .routine-card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .routine-icon {
+            width: 58px;
+            height: 58px;
+            border-radius: 7px;
+            background: #eef0ff;
+            color: var(--accent);
+            display: grid;
+            place-items: center;
+            font-size: 1rem;
+            font-weight: 900;
+        }
+        .routine-badge {
+            border-radius: 6px;
+            padding: 7px 10px;
+            background: var(--bg-section);
+            color: var(--ink-2);
+            font-size: .78rem;
+            font-weight: 900;
+        }
+        .routine-badge.joined { background: var(--success-soft); color: var(--success); }
+        .routine-card h3 {
+            color: var(--ink-1);
+            font-size: 1.22rem;
+            line-height: 1.35;
+            font-weight: 900;
+            margin: 0 0 10px;
+        }
+        .routine-card p {
+            color: var(--ink-2);
+            font-size: .95rem;
+            line-height: 1.65;
+            margin: 0 0 18px;
+            flex: 1;
+        }
+        .mission-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+        .mission-list span {
+            border-radius: 6px;
+            padding: 6px 9px;
+            background: rgba(79,85,231,.08);
+            color: var(--accent);
+            font-size: .76rem;
+            font-weight: 900;
+        }
+        .routine-meta {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .routine-meta div {
+            border-radius: 7px;
+            background: var(--bg-section);
+            border: 1px solid var(--border-card);
+            padding: 11px 10px;
+        }
+        .routine-meta b { display: block; color: var(--ink-1); font-size: 1.06rem; font-weight: 900; }
+        .routine-meta span { color: var(--ink-3); font-size: .78rem; font-weight: 800; }
+        .routine-progress { height: 6px; border-radius: 999px; background: var(--border); overflow: hidden; margin-bottom: 8px; }
+        .routine-progress div { height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--accent), var(--success)); }
+        .routine-progress-label { display: flex; justify-content: space-between; color: var(--ink-3); font-size: .82rem; font-weight: 800; margin-bottom: 16px; }
+        .routine-actions { display: flex; gap: 10px; }
+        .routine-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px;
+            border-radius: 7px;
+            border: 1px solid var(--border-card);
+            padding: 0 16px;
+            font-size: .9rem;
+            font-weight: 900;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform .18s ease, background .18s ease;
+        }
+        .routine-button.primary { flex: 1; background: var(--accent); color: #fff; border-color: var(--accent); }
+        .routine-button.secondary { color: var(--accent); background: var(--bg-surface); }
+        .routine-button:hover { transform: translateY(-2px); }
+        .routine-button.full { width: 100%; }
+
+        .upcoming-list { display: grid; gap: 14px; }
+        .upcoming-routine {
+            border-radius: 8px;
+            padding: 18px 20px;
+            display: grid;
+            grid-template-columns: 76px 1fr auto;
+            align-items: center;
+            gap: 18px;
+        }
+        .upcoming-date {
+            width: 76px;
+            height: 76px;
+            border-radius: 7px;
+            display: grid;
+            place-items: center;
+            background: var(--accent-soft);
+            color: var(--accent);
+            text-align: center;
+            font-weight: 900;
+        }
+        .upcoming-date span { display: block; font-size: .8rem; }
+        .upcoming-date b { display: block; font-size: 1.35rem; }
+        .upcoming-copy h3 { margin: 0 0 6px; color: var(--ink-1); font-size: 1.12rem; font-weight: 900; }
+        .upcoming-copy p { margin: 0; color: var(--ink-2); font-size: .96rem; line-height: 1.5; }
+        .empty-state {
+            border: 1px dashed var(--border-card);
+            border-radius: 8px;
+            padding: 32px;
+            color: var(--ink-2);
+            font-weight: 800;
+            text-align: center;
+            background: var(--bg-surface);
+        }
+
+        @media (max-width: 980px) {
+            .challenge-hero { grid-template-columns: 1fr; }
+            .routine-spotlight { grid-template-columns: 1fr; }
+            .spotlight-visual { min-height: 168px; }
+        }
+        @media (max-width: 720px) {
+            .routine-spotlight { padding: 24px; }
+            .spotlight-metrics { grid-template-columns: 1fr; }
+            .routine-meta { grid-template-columns: 1fr; }
+            .routine-actions { flex-direction: column; }
+            .upcoming-routine { grid-template-columns: 1fr; }
+        }
+    </style>
+<link rel="stylesheet" href="../../demo.css">
+</head>
+<body class="page-courses">
+<nav>
+  <a href="../../me/index.html" class="logo">
+    <span class="brand-text"><b>Coding</b>Edu</span>
+  </a>
+
+  <div class="nav-links">
+    <a href="../../me/index.html" data-tab="home">홈</a>
+    <a href="../../me/learn/index.html" data-tab="learn">강의</a>
+    <a href="../../me/quiz/index.html" data-tab="quiz">퀴즈</a>
+    <a href="../../me/challenge/index.html" data-tab="more">챌린지</a>
+    <a href="../../me/community/index.html" data-tab="more">커뮤니티</a>
+    <a href="../../me/ai/index.html" data-tab="more">AI 도우미</a>
+    <a href="../../me/mypage/index.html" data-tab="my">마이페이지</a>
+  </div>
+
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeToggle" title="테마 전환" aria-label="다크/라이트 모드 전환"></button>
+
+    
+
+    <div class="nav-right-auth">
+      <a href="../../me/mypage/index.html" class="nav-user">
+        👤 <span class="nav-user-name">데모학습자</span><span class="nav-user-suffix">님</span>
+      </a>
+      <a href="../../notice.html" class="nav-notify" style="position:relative; text-decoration:none; font-size:1.2rem;" title="알림">
+        🔔
+        
+      </a>
+      <a href="../../notice.html" class="nav-icon-btn nav-mobile-only" title="설정" aria-label="설정">⚙️</a>
+      <a href="../../notice.html" class="btn-login ghost nav-mobile-hide">⚙️ 설정</a>
+      <form data-demo-post="/logout" action="../../challenge/index.html" method="get" style="margin:0;">
+        <button type="submit" class="nav-icon-btn nav-icon-btn-logout nav-mobile-only" title="로그아웃" aria-label="로그아웃">🚪</button>
+        <button type="submit" class="btn-login ghost nav-mobile-hide">로그아웃</button>
+      </form>
+    </div>
+  </div>
+</nav>
+
+
+    <main class="course-page-main">
+        <header class="course-page-heading">
+            <div>
+                <span class="course-page-kicker">CHALLENGE</span>
+                <h1>챌린지</h1>
+                <p>강의 시청, 퀴즈, 노트 정리를 하나의 루틴으로 묶어 매일 이어갈 수 있게 도와줍니다.</p>
+            </div>
+        </header>
+
+        <div class="challenge-content">
+            <section class="challenge-hero">
+                <article class="routine-spotlight">
+                    <div class="spotlight-copy">
+                        <span class="spotlight-label">오늘의 학습 루틴</span>
+                        <h2>작게 시작하고<br><strong>매일 이어가세요.</strong></h2>
+                        <p>챌린지는 단순 참여 이벤트가 아니라 강의 한 편, 퀴즈 몇 문제, 짧은 기록을 묶어 학습 습관을 만드는 기능입니다.</p>
+                        <div class="spotlight-actions">
+                            <a href="#routine-list" class="routine-button primary">루틴 선택하기</a>
+                            <a href="../../me/learn/index.html" class="routine-button secondary">강의 먼저 보기</a>
+                        </div>
+                        <div class="spotlight-metrics">
+                            <div>
+                                <b>4</b>
+                                <span>진행 중 루틴</span>
+                            </div>
+                            <div>
+                                <b>3</b>
+                                <span>오늘 기본 미션</span>
+                            </div>
+                            <div>
+                                <b>2</b>
+                                <span>오픈 예정</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="spotlight-visual" aria-hidden="true">
+                        <div>
+                            <div class="streak-badge">DAY</div>
+                        </div>
+                        <div class="streak-dots"><i></i><i></i><i></i><i></i><i class="off"></i></div>
+                        <div>
+                            <b>꾸준함이 쌓여요</b>
+                            <small>강의, 퀴즈, 기록을 같은 흐름으로 이어갑니다.</small>
+                        </div>
+                    </div>
+                </article>
+
+                <aside class="routine-summary">
+                    <div class="summary-title">오늘 완료하면 좋은 흐름</div>
+                    <div class="summary-item">
+                        <div class="summary-icon">1</div>
+                        <div><b>강의 1개 시청</b><span>진행 중인 강의에서 다음 수업을 끝까지 봅니다.</span></div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-icon">2</div>
+                        <div><b>퀴즈 3문제 풀이</b><span>배운 내용을 바로 확인하고 오답을 남깁니다.</span></div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-icon">3</div>
+                        <div><b>노트 또는 질문 정리</b><span>헷갈린 개념을 한 문장으로 기록합니다.</span></div>
+                    </div>
+                </aside>
+            </section>
+
+            <section id="routine-list">
+                <div class="section-row">
+                    <div>
+                        <h2>진행 중인 학습 루틴</h2>
+                        <p>현재 참여 가능한 루틴 4개</p>
+                    </div>
+                </div>
+
+                <div class="routine-grid">
+                    <article class="routine-card joined">
+                        <div class="routine-card-top">
+                            <div class="routine-icon">CSS</div>
+                            <span class="routine-badge joined">참여중</span>
+                            
+                        </div>
+
+                        <h3>WEB2 CSS 7일 완주 루틴</h3>
+                        <p>생활코딩 CSS 강의를 매일 한 묶음씩 듣고, 바로 퀴즈와 노트로 복습하는 짧은 완주 루틴입니다.</p>
+
+                        <div class="mission-list">
+                            <span>CSS 강의 시청</span><span>퀴즈 3문제</span><span>코드 따라치기</span><span>노트 정리</span>
+                        </div>
+
+                        <div class="routine-meta">
+                            <div><b>129</b><span>참여자</span></div>
+                            <div><b>5</b><span>남은 일수</span></div>
+                            <div><b>7</b><span>총 미션</span></div>
+                        </div>
+
+                        <div class="routine-progress" aria-hidden="true">
+                            <div style="width:28%"></div>
+                        </div>
+                        <div class="routine-progress-label">
+                            <span>기간 진행률</span>
+                            <span>28%</span>
+                        </div>
+
+                        <div class="routine-actions">
+                            <a href="../../me/challenge/1/index.html"
+                               class="routine-button primary">오늘 미션 보기</a>
+                            
+                            <a href="../../me/challenge/1/index.html" class="routine-button secondary">상세</a>
+                        </div>
+                        
+                    </article>
+                    <article class="routine-card joined">
+                        <div class="routine-card-top">
+                            <div class="routine-icon">JS</div>
+                            <span class="routine-badge joined">참여중</span>
+                            
+                        </div>
+
+                        <h3>JavaScript 기초 5일 복습 루틴</h3>
+                        <p>JavaScript 핵심 강의를 보고 개념 퀴즈, 오답 해설, 짧은 실습까지 한 흐름으로 복습합니다.</p>
+
+                        <div class="mission-list">
+                            <span>JS 강의 시청</span><span>개념 퀴즈</span><span>오답 노트</span><span>짧은 실습</span>
+                        </div>
+
+                        <div class="routine-meta">
+                            <div><b>97</b><span>참여자</span></div>
+                            <div><b>4</b><span>남은 일수</span></div>
+                            <div><b>5</b><span>총 미션</span></div>
+                        </div>
+
+                        <div class="routine-progress" aria-hidden="true">
+                            <div style="width:20%"></div>
+                        </div>
+                        <div class="routine-progress-label">
+                            <span>기간 진행률</span>
+                            <span>20%</span>
+                        </div>
+
+                        <div class="routine-actions">
+                            <a href="../../me/challenge/2/index.html"
+                               class="routine-button primary">오늘 미션 보기</a>
+                            
+                            <a href="../../me/challenge/2/index.html" class="routine-button secondary">상세</a>
+                        </div>
+                        
+                    </article>
+                    <article class="routine-card joined">
+                        <div class="routine-card-top">
+                            <div class="routine-icon">PHP</div>
+                            <span class="routine-badge joined">참여중</span>
+                            
+                        </div>
+
+                        <h3>PHP 웹앱 입문 루틴</h3>
+                        <p>생활코딩 WEB2-PHP 강의를 따라가며 폼 처리와 웹 애플리케이션 흐름을 단계적으로 익힙니다.</p>
+
+                        <div class="mission-list">
+                            <span>PHP 강의 시청</span><span>폼 처리 실습</span><span>핵심 3줄 기록</span>
+                        </div>
+
+                        <div class="routine-meta">
+                            <div><b>73</b><span>참여자</span></div>
+                            <div><b>11</b><span>남은 일수</span></div>
+                            <div><b>14</b><span>총 미션</span></div>
+                        </div>
+
+                        <div class="routine-progress" aria-hidden="true">
+                            <div style="width:21%"></div>
+                        </div>
+                        <div class="routine-progress-label">
+                            <span>기간 진행률</span>
+                            <span>21%</span>
+                        </div>
+
+                        <div class="routine-actions">
+                            <a href="../../me/challenge/3/index.html"
+                               class="routine-button primary">오늘 미션 보기</a>
+                            
+                            <a href="../../me/challenge/3/index.html" class="routine-button secondary">상세</a>
+                        </div>
+                        
+                    </article>
+                    <article class="routine-card joined">
+                        <div class="routine-card-top">
+                            <div class="routine-icon">✓</div>
+                            <span class="routine-badge joined">참여중</span>
+                            
+                        </div>
+
+                        <h3>매일 퀴즈 3문제 챌린지</h3>
+                        <p>하루 3문제씩 풀고 AI 오답 해설로 부족한 개념을 바로 확인하는 문제 풀이 루틴입니다.</p>
+
+                        <div class="mission-list">
+                            <span>퀴즈 3문제</span><span>AI 오답 해설</span><span>취약 개념 체크</span>
+                        </div>
+
+                        <div class="routine-meta">
+                            <div><b>155</b><span>참여자</span></div>
+                            <div><b>10</b><span>남은 일수</span></div>
+                            <div><b>14</b><span>총 미션</span></div>
+                        </div>
+
+                        <div class="routine-progress" aria-hidden="true">
+                            <div style="width:28%"></div>
+                        </div>
+                        <div class="routine-progress-label">
+                            <span>기간 진행률</span>
+                            <span>28%</span>
+                        </div>
+
+                        <div class="routine-actions">
+                            <a href="../../me/challenge/4/index.html"
+                               class="routine-button primary">오늘 미션 보기</a>
+                            
+                            <a href="../../me/challenge/4/index.html" class="routine-button secondary">상세</a>
+                        </div>
+                        
+                    </article>
+                </div>
+
+                
+            </section>
+
+            <section>
+                <div class="section-row">
+                    <div>
+                        <h2>오픈 예정 루틴</h2>
+                        <p>다음에 이어서 도전할 학습 흐름입니다.</p>
+                    </div>
+                </div>
+
+                <div class="upcoming-list">
+                    <article class="upcoming-routine">
+                        <div class="upcoming-date">
+                            <div>
+                                <span>10월</span>
+                                <b>31</b>
+                            </div>
+                        </div>
+                        <div class="upcoming-copy">
+                            <h3>JAVA Java 객체지향 7일 루틴</h3>
+                            <p>생활코딩 Java 강의를 기반으로 클래스, 상속, 인터페이스를 순서대로 익히는 백엔드 준비 루틴입니다.</p>
+                        </div>
+                        <a href="../../me/challenge/5/index.html" class="routine-button secondary">자세히</a>
+                    </article>
+                    <article class="upcoming-routine">
+                        <div class="upcoming-date">
+                            <div>
+                                <span>11월</span>
+                                <b>8</b>
+                            </div>
+                        </div>
+                        <div class="upcoming-copy">
+                            <h3>Q 질문 정리 습관 만들기</h3>
+                            <p>막힌 내용을 커뮤니티 질문으로 정리하고, 답변을 받기 쉬운 글쓰기 흐름을 연습합니다.</p>
+                        </div>
+                        <a href="../../me/challenge/6/index.html" class="routine-button secondary">자세히</a>
+                    </article>
+                </div>
+
+                
+            </section>
+        </div>
+    </main>
+
+<script src="../../js/nav.js"></script>
+<script src="../../demo.js"></script>
+</body>
+</html>

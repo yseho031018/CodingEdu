@@ -897,9 +897,9 @@
     <a href="../../me/index.html" data-tab="home">홈</a>
     <a href="../../me/learn/index.html" data-tab="learn">강의</a>
     <a href="../../me/quiz/index.html" data-tab="quiz">퀴즈</a>
-    <a href="../../notice.html" data-tab="more">챌린지</a>
-    <a href="../../notice.html" data-tab="more">커뮤니티</a>
-    <a href="../../notice.html" data-tab="more">AI 도우미</a>
+    <a href="../../me/challenge/index.html" data-tab="more">챌린지</a>
+    <a href="../../me/community/index.html" data-tab="more">커뮤니티</a>
+    <a href="../../me/ai/index.html" data-tab="more">AI 도우미</a>
     <a href="../../me/mypage/index.html" data-tab="my">마이페이지</a>
   </div>
 
@@ -918,7 +918,7 @@
       </a>
       <a href="../../notice.html" class="nav-icon-btn nav-mobile-only" title="설정" aria-label="설정">⚙️</a>
       <a href="../../notice.html" class="btn-login ghost nav-mobile-hide">⚙️ 설정</a>
-      <form action="../../quiz/index.html" method="get" style="margin:0;">
+      <form data-demo-post="/logout" action="../../quiz/index.html" method="get" style="margin:0;">
         <button type="submit" class="nav-icon-btn nav-icon-btn-logout nav-mobile-only" title="로그아웃" aria-label="로그아웃">🚪</button>
         <button type="submit" class="btn-login ghost nav-mobile-hide">로그아웃</button>
       </form>
@@ -1297,7 +1297,7 @@
                 <section class="quiz-panel">
                     <div class="quiz-panel-head">
                         <h2>주간 랭킹</h2>
-                        <a href="../../notice.html" class="quiz-panel-link">전체 랭킹 ›</a>
+                        <a href="../../me/community/index.html" class="quiz-panel-link">전체 랭킹 ›</a>
                     </div>
                     <div class="ranking-list">
                         <div class="ranking-item">
@@ -1372,5 +1372,6 @@
         });
     })();
 </script>
+<script src="../../demo.js"></script>
 </body>
 </html>

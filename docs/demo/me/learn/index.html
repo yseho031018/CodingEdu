@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="_csrf" content="78b9a083-0178-4ebf-a3aa-0d119a11f757"/>
+    <meta name="_csrf" content="d1ea68b4-69eb-4d2a-b858-04044f74d766"/>
     <meta name="_csrf_header" content="X-XSRF-TOKEN"/>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,9 +27,9 @@
     <a href="../../me/index.html" data-tab="home">홈</a>
     <a href="../../me/learn/index.html" data-tab="learn">강의</a>
     <a href="../../me/quiz/index.html" data-tab="quiz">퀴즈</a>
-    <a href="../../notice.html" data-tab="more">챌린지</a>
-    <a href="../../notice.html" data-tab="more">커뮤니티</a>
-    <a href="../../notice.html" data-tab="more">AI 도우미</a>
+    <a href="../../me/challenge/index.html" data-tab="more">챌린지</a>
+    <a href="../../me/community/index.html" data-tab="more">커뮤니티</a>
+    <a href="../../me/ai/index.html" data-tab="more">AI 도우미</a>
     <a href="../../me/mypage/index.html" data-tab="my">마이페이지</a>
   </div>
 
@@ -48,7 +48,7 @@
       </a>
       <a href="../../notice.html" class="nav-icon-btn nav-mobile-only" title="설정" aria-label="설정">⚙️</a>
       <a href="../../notice.html" class="btn-login ghost nav-mobile-hide">⚙️ 설정</a>
-      <form action="../../learn/index.html" method="get" style="margin:0;">
+      <form data-demo-post="/logout" action="../../learn/index.html" method="get" style="margin:0;">
         <button type="submit" class="nav-icon-btn nav-icon-btn-logout nav-mobile-only" title="로그아웃" aria-label="로그아웃">🚪</button>
         <button type="submit" class="btn-login ghost nav-mobile-hide">로그아웃</button>
       </form>
@@ -539,5 +539,6 @@
         }
     }
 </script>
+<script src="../../demo.js"></script>
 </body>
 </html>

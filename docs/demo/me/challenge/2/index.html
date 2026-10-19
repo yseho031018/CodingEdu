@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>JavaScript 기초 5일 복습 루틴 - CodingEdu</title>
+    <link rel="stylesheet" href="../../../css/common.css">
+    <link rel="stylesheet" href="../../../css/tailwind.css">
+    <link rel="stylesheet" href="../../../css/design-refresh.css">
+    <link rel="stylesheet" href="../../../css/site-nav.css">
+    <link rel="stylesheet" href="../../../css/mobile.css">
+    <style>
+        .challenge-detail { max-width: 1240px; margin: 0 auto; }
+        .routine-detail-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 360px;
+            gap: 26px;
+            align-items: start;
+        }
+        .routine-panel,
+        .routine-side-panel {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-card);
+            box-shadow: 0 18px 42px rgba(29, 44, 89, .08);
+        }
+        .routine-panel { border-radius: 28px; overflow: hidden; }
+        .routine-hero {
+            padding: 34px;
+            background: linear-gradient(135deg, rgba(79,85,231,.10), rgba(16,185,129,.10));
+            display: grid;
+            grid-template-columns: 92px 1fr;
+            gap: 22px;
+            align-items: center;
+        }
+        .routine-hero-icon {
+            width: 92px;
+            height: 92px;
+            border-radius: 26px;
+            display: grid;
+            place-items: center;
+            background: var(--accent);
+            color: #fff;
+            font-size: 1.45rem;
+            font-weight: 900;
+            box-shadow: 0 16px 30px rgba(79,85,231,.22);
+        }
+        .routine-hero h2 {
+            margin: 0 0 10px;
+            color: var(--ink-1);
+            font-size: clamp(2rem, 3vw, 3.2rem);
+            line-height: 1.12;
+            letter-spacing: 0;
+            font-weight: 900;
+        }
+        .routine-hero p {
+            margin: 0;
+            color: var(--ink-2);
+            font-size: 1.1rem;
+            line-height: 1.65;
+            max-width: 760px;
+        }
+        .routine-body { padding: 32px 34px 36px; }
+        .routine-status-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 30px;
+        }
+        .routine-status-card {
+            border: 1px solid var(--border-card);
+            background: var(--bg-section);
+            border-radius: 20px;
+            padding: 18px;
+        }
+        .routine-status-card b {
+            display: block;
+            color: var(--ink-1);
+            font-size: 1.5rem;
+            font-weight: 900;
+            margin-bottom: 4px;
+        }
+        .routine-status-card span {
+            color: var(--ink-3);
+            font-size: .86rem;
+            font-weight: 800;
+        }
+        .mission-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+        .mission-header h3 {
+            margin: 0;
+            color: var(--ink-1);
+            font-size: 1.65rem;
+            font-weight: 900;
+        }
+        .mission-header p {
+            margin: 6px 0 0;
+            color: var(--ink-2);
+            font-size: .98rem;
+            font-weight: 700;
+        }
+        .mission-timeline {
+            display: grid;
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+        .mission-step {
+            display: grid;
+            grid-template-columns: 48px 1fr auto;
+            gap: 16px;
+            align-items: center;
+            padding: 18px;
+            border: 1px solid var(--border-card);
+            border-radius: 20px;
+            background: var(--bg-surface);
+        }
+        .mission-number {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            display: grid;
+            place-items: center;
+            background: #eef0ff;
+            color: var(--accent);
+            font-weight: 900;
+            font-size: 1.05rem;
+        }
+        .mission-step h4 {
+            margin: 0 0 5px;
+            color: var(--ink-1);
+            font-size: 1.08rem;
+            font-weight: 900;
+        }
+        .mission-step p {
+            margin: 0;
+            color: var(--ink-2);
+            font-size: .94rem;
+            line-height: 1.45;
+        }
+        .mission-tag {
+            border-radius: 999px;
+            padding: 7px 11px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-size: .78rem;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            padding: 20px;
+            border-radius: 22px;
+            background: var(--bg-section);
+            border: 1px solid var(--border-card);
+        }
+        .quick-link {
+            min-height: 58px;
+            border-radius: 16px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-card);
+            color: var(--ink-1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 16px;
+            text-decoration: none;
+            font-weight: 900;
+            transition: transform .18s ease, border-color .18s ease;
+        }
+        .quick-link:hover { transform: translateY(-2px); border-color: rgba(79,85,231,.45); color: var(--accent); }
+
+        .routine-side-panel {
+            border-radius: 28px;
+            padding: 26px;
+            position: sticky;
+            top: 30px;
+        }
+        .side-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .side-title h3 { margin: 0; color: var(--ink-1); font-size: 1.28rem; font-weight: 900; }
+        .status-pill {
+            border-radius: 999px;
+            padding: 7px 11px;
+            background: var(--success-soft);
+            color: var(--success);
+            font-size: .78rem;
+            font-weight: 900;
+        }
+        .status-pill.upcoming { background: var(--accent-soft); color: var(--accent); }
+        .side-progress {
+            height: 10px;
+            border-radius: 999px;
+            background: var(--border);
+            overflow: hidden;
+            margin: 14px 0 8px;
+        }
+        .side-progress div { height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--accent), var(--success)); }
+        .side-progress-label { display: flex; justify-content: space-between; color: var(--ink-3); font-size: .82rem; font-weight: 800; margin-bottom: 20px; }
+        .join-button,
+        .ghost-button {
+            width: 100%;
+            min-height: 52px;
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-card);
+            font-size: .98rem;
+            font-weight: 900;
+            text-decoration: none;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .join-button { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .join-button.done { background: var(--success); border-color: var(--success); }
+        .ghost-button { background: var(--bg-surface); color: var(--ink-2); }
+        .ghost-button:hover { color: var(--danger); border-color: var(--danger); }
+        .proof-box {
+            margin: 12px 0;
+            padding: 16px;
+            border-radius: 18px;
+            background: var(--bg-section);
+            border: 1px solid var(--border-card);
+        }
+        .proof-box label {
+            display: block;
+            color: var(--ink-1);
+            font-size: .92rem;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+        .proof-box input {
+            width: 100%;
+            border: 1px solid var(--border-card);
+            border-radius: 12px;
+            padding: 12px 13px;
+            color: var(--ink-1);
+            font-size: .92rem;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+        .side-info {
+            border-top: 1px solid var(--border-card);
+            margin-top: 18px;
+            padding-top: 16px;
+        }
+        .side-info-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            color: var(--ink-2);
+            font-size: .9rem;
+            font-weight: 800;
+            padding: 9px 0;
+        }
+        .side-info-row b { color: var(--ink-1); }
+        .message-box {
+            max-width: 1240px;
+            margin: 0 auto 20px;
+            border-radius: 16px;
+            padding: 14px 18px;
+            font-weight: 900;
+        }
+        .message-box.success { background: var(--success-soft); color: var(--success); }
+        .message-box.error { background: var(--danger-soft); color: var(--danger); }
+
+        @media (max-width: 1040px) {
+            .routine-detail-layout { grid-template-columns: 1fr; }
+            .routine-side-panel { position: static; }
+        }
+        @media (max-width: 720px) {
+            .routine-hero { grid-template-columns: 1fr; padding: 26px; }
+            .routine-body { padding: 24px; }
+            .routine-status-row { grid-template-columns: 1fr 1fr; }
+            .mission-step { grid-template-columns: 48px 1fr; }
+            .mission-tag { grid-column: 2; justify-self: start; }
+        }
+    </style>
+<link rel="stylesheet" href="../../../demo.css">
+</head>
+<body class="page-courses">
+<nav>
+  <a href="../../../me/index.html" class="logo">
+    <span class="brand-text"><b>Coding</b>Edu</span>
+  </a>
+
+  <div class="nav-links">
+    <a href="../../../me/index.html" data-tab="home">홈</a>
+    <a href="../../../me/learn/index.html" data-tab="learn">강의</a>
+    <a href="../../../me/quiz/index.html" data-tab="quiz">퀴즈</a>
+    <a href="../../../me/challenge/index.html" data-tab="more">챌린지</a>
+    <a href="../../../me/community/index.html" data-tab="more">커뮤니티</a>
+    <a href="../../../me/ai/index.html" data-tab="more">AI 도우미</a>
+    <a href="../../../me/mypage/index.html" data-tab="my">마이페이지</a>
+  </div>
+
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeToggle" title="테마 전환" aria-label="다크/라이트 모드 전환"></button>
+
+    
+
+    <div class="nav-right-auth">
+      <a href="../../../me/mypage/index.html" class="nav-user">
+        👤 <span class="nav-user-name">데모학습자</span><span class="nav-user-suffix">님</span>
+      </a>
+      <a href="../../../notice.html" class="nav-notify" style="position:relative; text-decoration:none; font-size:1.2rem;" title="알림">
+        🔔
+        
+      </a>
+      <a href="../../../notice.html" class="nav-icon-btn nav-mobile-only" title="설정" aria-label="설정">⚙️</a>
+      <a href="../../../notice.html" class="btn-login ghost nav-mobile-hide">⚙️ 설정</a>
+      <form data-demo-post="/logout" action="../../../challenge/2/index.html" method="get" style="margin:0;">
+        <button type="submit" class="nav-icon-btn nav-icon-btn-logout nav-mobile-only" title="로그아웃" aria-label="로그아웃">🚪</button>
+        <button type="submit" class="btn-login ghost nav-mobile-hide">로그아웃</button>
+      </form>
+    </div>
+  </div>
+</nav>
+
+
+    <main class="course-page-main">
+        <header class="course-page-heading">
+            <div>
+                <span class="course-page-kicker">ROUTINE CHALLENGE</span>
+                <h1>챌린지 상세</h1>
+                <p>오늘 해야 할 강의, 퀴즈, 정리 활동을 확인하고 완료를 인증하세요.</p>
+            </div>
+        </header>
+
+        
+        
+
+        <div class="challenge-detail">
+            <div class="routine-detail-layout">
+                <section class="routine-panel">
+                    <div class="routine-hero">
+                        <div class="routine-hero-icon">JS</div>
+                        <div>
+                            <h2>JavaScript 기초 5일 복습 루틴</h2>
+                            <p>JavaScript 핵심 강의를 보고 개념 퀴즈, 오답 해설, 짧은 실습까지 한 흐름으로 복습합니다.</p>
+                        </div>
+                    </div>
+
+                    <div class="routine-body">
+                        <div class="routine-status-row">
+                            <div class="routine-status-card">
+                                <b>97</b>
+                                <span>참여자</span>
+                            </div>
+                            <div class="routine-status-card">
+                                <b>4</b>
+                                <span>남은 일수</span>
+                            </div>
+                            <div class="routine-status-card">
+                                <b>5</b>
+                                <span>총 미션</span>
+                            </div>
+                            <div class="routine-status-card">
+                                <b>20%</b>
+                                <span>기간 진행률</span>
+                            </div>
+                        </div>
+
+                        <div class="mission-header">
+                            <div>
+                                <h3>오늘의 미션</h3>
+                                <p>하루에 모두 끝내기보다, 작은 단계를 꾸준히 이어가는 것을 목표로 합니다.</p>
+                            </div>
+                        </div>
+
+                        <div class="mission-timeline">
+                            <article class="mission-step">
+                                <div class="mission-number">01</div>
+                                <div>
+                                    <h4>강의 한 편 끝까지 시청</h4>
+                                    <p>현재 루틴과 연결된 강의에서 다음 수업을 완료합니다.</p>
+                                </div>
+                                <span class="mission-tag">강의</span>
+                            </article>
+                            <article class="mission-step">
+                                <div class="mission-number">02</div>
+                                <div>
+                                    <h4>핵심 개념 3줄 기록</h4>
+                                    <p>방금 배운 내용 중 기억해야 할 문장만 짧게 남깁니다.</p>
+                                </div>
+                                <span class="mission-tag">노트</span>
+                            </article>
+                            <article class="mission-step">
+                                <div class="mission-number">03</div>
+                                <div>
+                                    <h4>관련 퀴즈 풀기</h4>
+                                    <p>퀴즈 결과에서 틀린 문제는 AI 오답 해설로 다시 확인합니다.</p>
+                                </div>
+                                <span class="mission-tag">퀴즈</span>
+                            </article>
+                            <article class="mission-step">
+                                <div class="mission-number">04</div>
+                                <div>
+                                    <h4>막힌 부분 질문으로 정리</h4>
+                                    <p>이해가 안 된 부분은 커뮤니티에 올릴 수 있도록 제목과 내용을 정리합니다.</p>
+                                </div>
+                                <span class="mission-tag">커뮤니티</span>
+                            </article>
+                            <article class="mission-step">
+                                <div class="mission-number">05</div>
+                                <div>
+                                    <h4>완료 인증</h4>
+                                    <p>오늘의 학습 기록 링크가 있다면 남기고, 없으면 바로 완료만 인증해도 됩니다.</p>
+                                </div>
+                                <span class="mission-tag">인증</span>
+                            </article>
+                        </div>
+
+                        <div class="quick-links">
+                            
+                            <a href="../../../me/learn/javascript/index.html" class="quick-link">JavaScript 강의로 이동</a>
+                            
+                            <a href="../../../me/learn/java/index.html" class="quick-link">Java 강의로 이동</a>
+                            <a href="../../../me/quiz/index.html" class="quick-link">퀴즈 풀러가기</a>
+                            <a href="../../../me/community/index.html" class="quick-link">질문 정리하기</a>
+                        </div>
+                    </div>
+                </section>
+
+                <aside class="routine-side-panel">
+                    <div class="side-title">
+                        <h3>참여 상태</h3>
+                        <span class="status-pill">진행중</span>
+                        
+                    </div>
+
+                    <div class="side-progress">
+                        <div style="width:20%"></div>
+                    </div>
+                    <div class="side-progress-label">
+                        <span>기간 진행률</span>
+                        <span>20%</span>
+                    </div>
+
+                    
+                        
+                            
+
+                            
+                                
+                                
+
+                                <form data-demo-post="/challenge/2/complete" action="../../../notice.html" method="get" class="proof-box">
+                                    
+                                    <label for="githubUrl">학습 기록 링크</label>
+                                    <input id="githubUrl" type="url" name="githubUrl" placeholder="블로그, GitHub, 노트 링크 선택 입력">
+                                    <button type="submit" class="join-button done">오늘 루틴 완료 인증</button>
+                                </form>
+
+                                <form data-demo-post="/challenge/2/leave" action="../../../notice.html" method="get" style="margin:0;">
+                                    
+                                    <button type="submit" class="ghost-button">참여 취소</button>
+                                </form>
+                            
+                        
+
+                        
+                    
+
+                    
+
+                    <div class="side-info">
+                        <div class="side-info-row"><span>시작일</span><b>2026.10.18</b></div>
+                        <div class="side-info-row"><span>종료일</span><b>2026.10.23</b></div>
+                        <div class="side-info-row"><span>참여자</span><b>97명</b></div>
+                        <div class="side-info-row"><span>총 미션</span><b>5개</b></div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+<script src="../../../js/nav.js"></script>
+<script src="../../../demo.js"></script>
+</body>
+</html>

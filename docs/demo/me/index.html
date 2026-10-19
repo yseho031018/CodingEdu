@@ -30,9 +30,9 @@
     <a href="../me/index.html" data-tab="home">홈</a>
     <a href="../me/learn/index.html" data-tab="learn">강의</a>
     <a href="../me/quiz/index.html" data-tab="quiz">퀴즈</a>
-    <a href="../notice.html" data-tab="more">챌린지</a>
-    <a href="../notice.html" data-tab="more">커뮤니티</a>
-    <a href="../notice.html" data-tab="more">AI 도우미</a>
+    <a href="../me/challenge/index.html" data-tab="more">챌린지</a>
+    <a href="../me/community/index.html" data-tab="more">커뮤니티</a>
+    <a href="../me/ai/index.html" data-tab="more">AI 도우미</a>
     <a href="../me/mypage/index.html" data-tab="my">마이페이지</a>
   </div>
 
@@ -51,7 +51,7 @@
       </a>
       <a href="../notice.html" class="nav-icon-btn nav-mobile-only" title="설정" aria-label="설정">⚙️</a>
       <a href="../notice.html" class="btn-login ghost nav-mobile-hide">⚙️ 설정</a>
-      <form action="../index.html" method="get" style="margin:0;">
+      <form data-demo-post="/logout" action="../index.html" method="get" style="margin:0;">
         <button type="submit" class="nav-icon-btn nav-icon-btn-logout nav-mobile-only" title="로그아웃" aria-label="로그아웃">🚪</button>
         <button type="submit" class="btn-login ghost nav-mobile-hide">로그아웃</button>
       </form>
@@ -1200,7 +1200,7 @@
       <span class="metric-label">도전할 퀴즈</span>
       <img class="metric-icon" src="../images/metrics/metric-quiz.png" alt="" aria-hidden="true">
     </a>
-    <a href="../notice.html" class="metric-card">
+    <a href="../me/community/index.html" class="metric-card">
       <span class="metric-value"><b class="count-up" data-target="9">0</b></span>
       <span class="metric-label">함께하는 학습자</span>
       <img class="metric-icon" src="../images/metrics/metric-learners.png" alt="" aria-hidden="true">
@@ -1216,10 +1216,10 @@
   </div>
   <div>© <span>2026</span> Code<em style="color:var(--accent);font-style:normal;"><i>E</i></em>du. 코딩은 즐거워요!</div>
   <div class="f-links">
-    <a href="../notice.html">커뮤니티</a>
+    <a href="../me/community/index.html">커뮤니티</a>
     <a href="../me/learn/index.html">강의</a>
     <a href="../me/quiz/index.html">퀴즈</a>
-    <a href="../notice.html">AI 도우미</a>
+    <a href="../me/ai/index.html">AI 도우미</a>
     <a href="../notice.html">이용약관</a>
     <a href="../notice.html">개인정보처리방침</a>
   </div>
@@ -1286,5 +1286,6 @@
   });
 
 </script>
+<script src="../demo.js"></script>
 </body>
 </html>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>Spring Boot 성능 최적화 - 실무에서 바로 써먹는 팁 - CodeEdu</title>
+    <link rel="stylesheet" href="../../../css/common.css">
+    <link rel="stylesheet" href="../../../css/tailwind.css">
+    <link rel="stylesheet" href="../../../css/design-refresh.css">
+    <link rel="stylesheet" href="../../../css/site-nav.css">
+    <link rel="stylesheet" href="../../../css/mobile.css">
+    <style>
+        .course-page-heading { max-width: 800px; }
+        .detail-container {
+            max-width: 800px; margin: 0 auto; background: var(--bg-surface);
+            border-radius: 8px; padding: 40px; box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-card);
+        }
+        .detail-header { border-bottom: 2px dashed var(--border-card); padding-bottom: 24px; margin-bottom: 32px; }
+        .post-category {
+            display: inline-block; padding: 5px 10px; border-radius: 4px; font-size: .75rem; font-weight: 800; margin-bottom: 14px;
+            background: var(--border-card); color: var(--ink-2); text-transform: uppercase;
+        }
+        .post-category.qna { background: var(--accent-soft); color: var(--accent); }
+        .post-category.tips { background: var(--amber-soft); color: var(--warning); }
+        .post-category.study { background: var(--success-soft); color: var(--success); }
+        .post-category.free { background: var(--accent-soft); color: var(--accent); }
+        
+        .detail-header h2 { font-size: 1.85rem; font-weight: 900; color: var(--ink-1); margin-bottom: 18px; line-height: 1.35; letter-spacing: -0.02em; }
+        .detail-meta { display: flex; align-items: center; justify-content: space-between; font-size: .9rem; color: var(--ink-2); }
+        .meta-left { display: flex; align-items: center; gap: 12px; }
+        .meta-author { font-weight: 800; color: var(--ink-1); }
+        .meta-right { display: flex; align-items: center; gap: 14px; }
+        
+        .detail-content { line-height: 1.8; font-size: 1.05rem; color: var(--ink-1); min-height: 300px; white-space: pre-wrap; }
+        
+        .btn-back-group { margin-top: 48px; display: flex; justify-content: space-between; align-items: center; padding-top: 24px; border-top: 1px solid var(--border); }
+        .btn-back {
+            background: var(--bg-surface); color: var(--ink-1); padding: 10px 22px; border-radius: 6px;
+            font-weight: 750; text-decoration: none; transition: all .2s; border: 1px solid var(--border-card); cursor: pointer;
+        }
+        .btn-back:hover { background: var(--bg-section); border-color: var(--ink-3); }
+        .post-actions { display: flex; gap: 10px; }
+        .btn-edit {
+            background: var(--bg-surface); color: var(--ink-2); padding: 9px 18px; border-radius: 6px;
+            font-weight: 700; text-decoration: none; transition: all .2s; border: 1px solid var(--border-card); font-size: .88rem;
+        }
+        .btn-edit:hover { background: var(--bg-section); border-color: var(--ink-3); color: var(--ink-1); }
+        .btn-delete {
+            background: var(--bg-surface); color: var(--danger); padding: 9px 18px; border-radius: 6px;
+            font-weight: 700; border: 1px solid var(--danger-soft); cursor: pointer; font-size: .88rem; transition: all .2s;
+        }
+        .btn-delete:hover { background: var(--danger-soft); border-color: var(--danger); }
+        .btn-comment-delete {
+            background: none; border: none; color: var(--ink-3); font-size: .8rem; cursor: pointer;
+            padding: 4px 8px; border-radius: 6px; transition: all .2s;
+        }
+        .btn-comment-delete:hover { color: var(--danger); background: var(--danger-soft); }
+
+        .reaction-group { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
+        .reaction-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 9px 20px; border-radius: 6px; border: 1px solid var(--border-card);
+            background: var(--bg-surface); cursor: pointer; font-size: .9rem; font-weight: 700;
+            color: var(--ink-3); transition: all .2s;
+        }
+        .reaction-btn:hover { border-color: var(--ink-3); color: var(--ink-1); transform: translateY(-1px); }
+        .reaction-btn .reaction-icon { font-size: 1.1rem; transition: transform .2s; }
+        .reaction-btn:hover .reaction-icon, .reaction-btn.active .reaction-icon { transform: scale(1.1); }
+        .reaction-btn.like:hover, .reaction-btn.like.active {
+            border-color: var(--danger); color: var(--danger); background: var(--danger-soft);
+        }
+        .reaction-btn.disappointed:hover, .reaction-btn.disappointed.active {
+            border-color: var(--warning); color: var(--warning); background: var(--amber-soft);
+        }
+    </style>
+<link rel="stylesheet" href="../../../demo.css">
+</head>
+<body class="page-courses">
+<nav>
+  <a href="../../../me/index.html" class="logo">
+    <span class="brand-text"><b>Coding</b>Edu</span>
+  </a>
+
+  <div class="nav-links">
+    <a href="../../../me/index.html" data-tab="home">홈</a>
+    <a href="../../../me/learn/index.html" data-tab="learn">강의</a>
+    <a href="../../../me/quiz/index.html" data-tab="quiz">퀴즈</a>
+    <a href="../../../me/challenge/index.html" data-tab="more">챌린지</a>
+    <a href="../../../me/community/index.html" data-tab="more">커뮤니티</a>
+    <a href="../../../me/ai/index.html" data-tab="more">AI 도우미</a>
+    <a href="../../../me/mypage/index.html" data-tab="my">마이페이지</a>
+  </div>
+
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeToggle" title="테마 전환" aria-label="다크/라이트 모드 전환"></button>
+
+    
+
+    <div class="nav-right-auth">
+      <a href="../../../me/mypage/index.html" class="nav-user">
+        👤 <span class="nav-user-name">데모학습자</span><span class="nav-user-suffix">님</span>
+      </a>
+      <a href="../../../notice.html" class="nav-notify" style="position:relative; text-decoration:none; font-size:1.2rem;" title="알림">
+        🔔
+        
+      </a>
+      <a href="../../../notice.html" class="nav-icon-btn nav-mobile-only" title="설정" aria-label="설정">⚙️</a>
+      <a href="../../../notice.html" class="btn-login ghost nav-mobile-hide">⚙️ 설정</a>
+      <form data-demo-post="/logout" action="../../../community/8/index.html" method="get" style="margin:0;">
+        <button type="submit" class="nav-icon-btn nav-icon-btn-logout nav-mobile-only" title="로그아웃" aria-label="로그아웃">🚪</button>
+        <button type="submit" class="btn-login ghost nav-mobile-hide">로그아웃</button>
+      </form>
+    </div>
+  </div>
+</nav>
+
+
+    <main class="course-page-main">
+        <header class="course-page-heading">
+            <div>
+                <span class="course-page-kicker">COMMUNITY</span>
+                <h1>커뮤니티 글</h1>
+                <p>질문과 경험을 나누며 함께 성장하는 개발자 공간입니다.</p>
+            </div>
+        </header>
+
+        <div class="detail-container">
+    <div class="detail-header">
+        <div class="post-category tips">🔥 꿀팁</div>
+        <h2>Spring Boot 성능 최적화 - 실무에서 바로 써먹는 팁</h2>
+        <div class="detail-meta">
+            <div class="meta-left">
+                <a class="meta-author" href="../../../notice.html"
+                   style="text-decoration:none; color:inherit;">백엔드장인</a>
+                <span class="meta-date">2026-10-19 11:04</span>
+            </div>
+            <div class="meta-right">
+                <span>👁️ 146</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 내용 영역: white-space: pre-wrap 으로 엔터 유지 -->
+    <div class="detail-content">Spring Boot 프로젝트에서 성능을 개선한 경험을 공유합니다.
+
+**1. N+1 문제 해결**
+JPA에서 가장 흔한 성능 이슈입니다.
+```java
+// 나쁜 예
+List&lt;User&gt; users = userRepository.findAll();
+users.forEach(u -&gt; System.out.println(u.getPosts().size())); // N번 쿼리
+
+// 좋은 예 - fetch join 사용
+@Query(&quot;SELECT u FROM User u LEFT JOIN FETCH u.posts&quot;)
+List&lt;User&gt; findAllWithPosts();
+```
+
+**2. 캐싱 적용**
+```java
+@Cacheable(&quot;users&quot;)
+public User findById(Long id) { ... }
+```
+
+**3. 페이지네이션**
+findAll() 대신 Page 객체를 써서 대용량 데이터를 처리하세요.
+
+이 세 가지만 챙겨도 응답 속도가 눈에 띄게 빨라집니다!</div>
+
+    <!-- 반응 버튼 -->
+    <div style="margin-top: 30px; padding-top: 24px; border-top: 1px solid var(--border-card);">
+        <div class="reaction-group">
+            <button type="button" class="reaction-btn like" data-post-id="8" data-reaction-type="LIKE">
+                <span class="reaction-icon">🤍</span>
+                <span id="likeCount">31</span>
+                <span>좋아요</span>
+            </button>
+            <button type="button" class="reaction-btn disappointed" data-post-id="8" data-reaction-type="DISAPPOINTED">
+                <span class="reaction-icon">💭</span>
+                <span id="disappointedCount">0</span>
+                <span>아쉬워요</span>
+            </button>
+        </div>
+        
+    </div>
+
+    <!-- 댓글 영역 -->
+    <div class="comments-section" style="margin-top: 50px; border-top: 2px solid var(--border-card); padding-top: 30px;">
+        <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--ink-1); margin-bottom: 24px;">
+            💬 댓글 <span style="color: var(--accent);">0</span>개
+        </h3>
+
+        <!-- 댓글 목록 -->
+        <div class="comment-list" style="margin-bottom: 30px;">
+            
+            
+            <div style="font-size: .95rem; color: var(--ink-3); text-align: center; padding: 40px 0;">
+                아직 작성된 댓글이 없습니다. 첫 번째 댓글을 남겨보세요! ✨
+            </div>
+        </div>
+
+        <!-- 댓글 작성 폼 -->
+        <div style="background: var(--bg-surface); border: 2px solid var(--border); padding: 24px; border-radius: 16px;">
+            <form data-demo-post="/community/8/comment" action="../../../notice.html" method="get">
+                
+                <textarea name="content" placeholder="궁금한 점이나 응원의 댓글을 남겨주세요!" required
+                          style="width: 100%; min-height: 90px; padding: 16px; border: 1px solid var(--border-card); border-radius: 12px; outline: none; resize: vertical; margin-bottom: 16px; font-family: inherit; font-size: 0.95rem; box-sizing: border-box;"></textarea>
+                <div style="display: flex; justify-content: flex-end;">
+                    <button type="submit" style="background: var(--accent); color: var(--bg-surface); padding: 12px 28px; border: none; border-radius: 6px; font-weight: 800; cursor: pointer; transition: background .2s;">
+                        댓글 등록
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        
+    </div>
+
+    <div class="btn-back-group">
+        <a href="../../../me/community/index.html" class="btn-back">목록으로 돌아가기</a>
+        
+    </div>
+        </div>
+    </main>
+
+<script src="../../../js/nav.js"></script>
+
+<script>
+    const reactionBtns = document.querySelectorAll('.reaction-btn');
+    reactionBtns.forEach((btn) => {
+        btn.addEventListener('click', function () {
+            const postId = this.dataset.postId;
+            const reactionType = this.dataset.reactionType;
+            const csrfToken = document.cookie.split(';')
+                .map(c => c.trim())
+                .find(c => c.startsWith('XSRF-TOKEN='));
+            const token = csrfToken ? decodeURIComponent(csrfToken.split('=')[1]) : '';
+
+            fetch(`/community/${postId}/reaction?type=${encodeURIComponent(reactionType)}`, {
+                method: 'POST',
+                headers: { 'X-XSRF-TOKEN': token }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) { alert(data.error); return; }
+                updateReactionUi(data);
+            });
+        });
+    });
+
+    function updateReactionUi(data) {
+        document.getElementById('likeCount').textContent = data.likeCount;
+        document.getElementById('disappointedCount').textContent = data.disappointedCount;
+
+        reactionBtns.forEach((btn) => {
+            const type = btn.dataset.reactionType;
+            const icon = btn.querySelector('.reaction-icon');
+            const active = data.active && data.reactionType === type;
+            btn.classList.toggle('active', active);
+            if (type === 'LIKE') icon.textContent = active ? '❤️' : '🤍';
+            if (type === 'DISAPPOINTED') icon.textContent = active ? '💛' : '💭';
+        });
+    }
+</script>
+<script src="../../../demo.js"></script>
+</body>
+</html>

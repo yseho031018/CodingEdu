@@ -184,7 +184,7 @@
                     <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어를 입력하세요.">
                     <button type="submit">검색</button>
                 </form>
-                <a th:href="@{/community/write}" class="community-write">글 작성</a>
+                <a th:href="@{/community/write}" class="community-write" data-appbar-action="글쓰기">글 작성</a>
             </div>
 
             <div th:if="${keyword != null and !keyword.isBlank()}" class="search-result-info">

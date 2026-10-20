@@ -32,6 +32,53 @@
   });
 })();
 
+// 모바일 앱 바: 홈은 로고, 그 밖의 화면은 페이지 제목, 상세 화면은 뒤로가기 + 제목 (화면 표시는 mobile.css)
+(function () {
+  var nav = document.querySelector('nav');
+  var links = nav && nav.querySelector('.nav-links');
+  var heading = document.querySelector('main .course-page-heading h1, main .quiz-heading h1');
+  if (!links || !heading) return;
+  function clean(p) { return p.replace(/index\.html$/, '').replace(/\/$/, '') || '/'; }
+  var active = links.querySelector('a.active');
+  if (active && active.getAttribute('data-tab') === 'home') return;
+  var isDetail = !!active && clean(location.pathname) !== clean(active.pathname);
+
+  var bar = document.createElement('div');
+  bar.className = 'appbar-title';
+  if (isDetail) {
+    var back = document.createElement('a');
+    back.className = 'appbar-back';
+    back.href = active.getAttribute('href');
+    back.setAttribute('aria-label', active.textContent.trim() + ' 목록으로');
+    back.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    // 같은 사이트에서 왔다면 브라우저 뒤로가기(스크롤 위치 유지), 아니면 목록으로
+    back.addEventListener('click', function (e) {
+      if (history.length > 1 && document.referrer.indexOf(location.origin) === 0) {
+        e.preventDefault();
+        history.back();
+      }
+    });
+    bar.appendChild(back);
+  }
+  var title = document.createElement('strong');
+  title.textContent = heading.textContent.trim();
+  bar.appendChild(title);
+  nav.insertBefore(bar, nav.querySelector('.nav-right'));
+  document.body.classList.add('has-appbar-title');
+
+  // 화면의 주요 동작(예: 커뮤니티 글쓰기)을 앱 바 오른쪽 버튼으로
+  var action = document.querySelector('[data-appbar-action]');
+  var right = nav.querySelector('.nav-right');
+  if (action && right) {
+    var btn = document.createElement('a');
+    btn.className = 'appbar-action';
+    btn.href = action.getAttribute('href');
+    btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16zM14 6l4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span></span>';
+    btn.querySelector('span').textContent = action.getAttribute('data-appbar-action');
+    right.insertBefore(btn, right.firstChild);
+  }
+})();
+
 // 모바일 하단 탭바 + 더보기 시트 (상단 내비 링크로 구성 → 서버·정적 목업 모두 같은 주소 사용)
 (function () {
   var topNav = document.querySelector('nav .nav-links');

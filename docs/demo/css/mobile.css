@@ -1,18 +1,51 @@
 /* ═══════════════════════════════════════════════════════════════
-   Mobile (≤640px) — 하단 탭바, 단순한 상단바, 엄지로 누르기 쉬운 크기, 목록형 카드
-   탭바·시트 DOM은 nav.js가 상단 내비게이션 링크로 만듭니다.
+   Mobile app layout (≤640px)
+   - 상단 앱 바: 홈은 로고, 그 밖의 화면은 페이지 제목(+ 상세 화면 뒤로가기, 주요 동작 버튼)
+   - 하단 탭바 + 더보기 시트, 회색 앱 배경 위 흰 카드, 16px 여백, 엄지로 누르기 쉬운 크기
+   앱 바·탭바·시트 DOM은 nav.js가 만듭니다. 데스크톱 화면은 바꾸지 않습니다.
+   일부 페이지는 자체 <style>이 나중에 로드되므로 body 클래스로 범위를 지정해 우선합니다.
    ═══════════════════════════════════════════════════════════════ */
-.mobile-tabbar, .mobile-sheet { display: none; }
+.mobile-tabbar, .mobile-sheet, .appbar-title, .appbar-action { display: none; }
 
 @media (max-width: 640px) {
-  /* ── 상단바: 로고 + 알림/테마만. 메뉴는 하단 탭바로 이동 ── */
+  :root {
+    --m-gutter: 16px;
+    --m-radius: 16px;
+    --m-shadow: 0 1px 2px rgba(28, 39, 68, .04), 0 6px 16px rgba(28, 39, 68, .05);
+  }
+  body.page-index, body.page-courses, body.page-quiz-dashboard { background: var(--bg); }
+
+  /* ── 상단 앱 바 ── */
   nav {
-    height: 56px; padding: 0 16px; row-gap: 0;
+    height: 56px; padding: 0 12px 0 var(--m-gutter); row-gap: 0;
     grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "logo right";
   }
+  body.has-appbar-title nav { grid-template-columns: minmax(0, 1fr) auto; }
   nav > .nav-links { display: none; }
   nav .nav-right-auth .btn-login, nav .nav-user, nav .nav-icon-btn, nav form { display: none !important; }
-  nav .nav-right { gap: 12px; }
+  nav .nav-right { gap: 10px; }
+  body.has-appbar-title nav > .logo { display: none; }
+  nav > .appbar-title { grid-area: logo; display: flex; align-items: center; gap: 2px; min-width: 0; }
+  .appbar-title strong {
+    min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    color: var(--ink-1); font-size: 1.15rem; font-weight: 800; letter-spacing: -.01em;
+  }
+  .appbar-back {
+    flex: none; width: 40px; height: 40px; margin-left: -10px; display: grid; place-items: center;
+    color: var(--ink-1); border-radius: 12px; -webkit-tap-highlight-color: transparent;
+  }
+  .appbar-back svg { width: 22px; height: 22px; }
+  .appbar-back:active { background: var(--bg-section); }
+  .appbar-action {
+    display: inline-flex; align-items: center; gap: 4px; height: 36px; padding: 0 12px;
+    border-radius: 999px; background: #4f55e7; color: #fff; font-size: .82rem; font-weight: 750; text-decoration: none;
+  }
+  .appbar-action svg { width: 16px; height: 16px; }
+  .appbar-action:active { transform: scale(.96); }
+  /* 앱 바에 제목이 있으면 화면 안의 큰 머리말·중복 버튼은 숨김 */
+  body.has-appbar-title .course-page-heading,
+  body.has-appbar-title .quiz-heading,
+  body.has-appbar-title [data-appbar-action] { display: none !important; }
 
   /* ── 하단 탭바 ── */
   body.has-mobile-tabbar { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
@@ -75,38 +108,60 @@
   /* iOS 입력 확대 방지(16px) + 충분한 터치 높이 */
   .course-search input, .quiz-search input, .quiz-select { height: 44px; font-size: 16px; }
 
+  /* 카드를 누르면 살짝 눌리는 느낌 (앱 터치 피드백) */
+  .course-card-v2, .course-card, .quiz-row, .community-post-row, .routine-card, .metric-card {
+    -webkit-tap-highlight-color: transparent; transition: transform .12s ease;
+  }
+  .course-card-v2:active, .course-card:active, .quiz-row:active, .community-post-row:active, .routine-card:active, .metric-card:active {
+    transform: scale(.985);
+  }
+
   /* ── 홈 ── */
-  .home-frame { padding: 0 16px 24px; }
+  .home-frame { padding: 0 var(--m-gutter) 24px; }
   .home-hero-art { display: none; }
-  .page-index .home-frame .home-hero { padding: 24px 0 8px; }
+  /* 소개 영역은 흰 인사 카드로 */
+  .page-index .home-frame .home-hero {
+    margin-top: 12px; padding: 20px 18px 18px;
+    background: var(--bg-surface); border: 1px solid var(--border-card); border-radius: 20px; box-shadow: var(--m-shadow);
+  }
   .page-index .home-hero-copy { text-align: left; }
-  .home-hero-copy h1 { font-size: 1.85rem; margin-bottom: 12px; }
-  .home-hero-copy p { font-size: .98rem; margin-bottom: 18px; }
-  .home-hero-actions { justify-content: stretch; }
-  .home-hero-actions a { flex: 1; min-height: 48px; display: inline-flex; align-items: center; justify-content: center; }
+  .home-eyebrow { margin-bottom: 10px; padding: 4px 9px; font-size: .78rem; }
+  .home-hero-copy h1 { font-size: 1.55rem; line-height: 1.3; margin-bottom: 8px; }
+  .home-hero-copy p { font-size: .9rem; line-height: 1.6; margin-bottom: 16px; }
+  .home-hero-actions { justify-content: stretch; gap: 8px; }
+  .home-hero-actions a { flex: 1; min-width: 0; min-height: 46px; display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; font-size: .92rem; }
+  .page-index .home-frame .roadmap { padding: 22px 0 24px; }
+  .rm-eyebrow { font-size: .72rem; }
+  .rm-head { margin-bottom: 14px; }
+  .rm-head h2 { font-size: 1.25rem; }
+  .rm-head p { font-size: .86rem; }
+  .rm-map { border-radius: var(--m-radius); }
+  .rm-panel { padding: 18px 16px; border-radius: var(--m-radius); }
+  .page-index .home-frame .recommended-section { padding-top: 8px; }
+  .recommended-heading h2 { font-size: 1.15rem; }
   /* 추천 강의: 옆으로 넘겨보는 카드 */
   .recommended-grid {
     display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory;
-    margin: 0 -16px; padding: 2px 16px 10px; scrollbar-width: none;
+    margin: 0 calc(var(--m-gutter) * -1); padding: 2px var(--m-gutter) 10px; scrollbar-width: none;
   }
   .recommended-grid::-webkit-scrollbar { display: none; }
-  .recommended-grid > .course-card { flex: 0 0 78%; scroll-snap-align: start; }
-  .page-index .home-frame .home-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-  .metric-card { min-height: 84px; padding: 14px 58px 14px 14px; }
-  .metric-icon { width: 46px; height: 46px; right: 8px; }
-  .metric-value { font-size: 1.3rem; }
+  .recommended-grid > .course-card { flex: 0 0 78%; scroll-snap-align: start; border-radius: 14px; }
+  .page-index .home-frame .home-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding-top: 24px; }
+  .metric-card { min-height: 80px; padding: 14px 58px 14px 14px; border-radius: 14px; }
+  .metric-icon { width: 44px; height: 44px; right: 8px; }
+  .metric-value { font-size: 1.25rem; }
+
+  /* ── 공통 페이지 본문 (강의·챌린지·커뮤니티·AI·마이페이지) ── */
+  .page-courses .course-page-main { padding: 12px var(--m-gutter) 24px; }
 
   /* ── 강의 ── */
-  .page-courses .course-page-main { padding: 18px 16px 28px; }
-  .course-page-heading { margin-bottom: 16px; }
-  .course-page-heading h1 { font-size: 1.6rem; }
-  .course-roadmap-bar { padding: 12px 14px; margin-bottom: 16px; }
+  .course-roadmap-bar { padding: 12px 14px; margin-bottom: 12px; border-radius: 14px; }
   .course-roadmap-steps li { font-size: .86rem; }
-  .course-progress-panel { order: 1; }
-  /* 카테고리·검색은 목록을 내려도 상단바 아래에 고정 */
+  .course-progress-panel { order: 1; border-radius: var(--m-radius); }
+  /* 카테고리·검색은 목록을 내려도 앱 바 아래에 고정 */
   .course-toolbar {
     position: sticky; top: 56px; z-index: 20; gap: 10px;
-    margin: 0 -16px 14px; padding: 10px 16px;
+    margin: 0 calc(var(--m-gutter) * -1) 12px; padding: 10px var(--m-gutter);
     background: color-mix(in srgb, var(--bg, #f7f8fc) 94%, transparent);
     backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
   }
@@ -119,7 +174,7 @@
   .course-tab.active { background: #4f55e7; border-color: #4f55e7; color: #fff; }
   /* 목록형 카드: 왼쪽 썸네일 + 오른쪽 정보 */
   .course-grid-v2 { grid-template-columns: minmax(0, 1fr); gap: 10px; }
-  .course-card-v2 { display: grid; grid-template-columns: 112px minmax(0, 1fr); }
+  .course-card-v2 { display: grid; grid-template-columns: 112px minmax(0, 1fr); border-radius: 14px; box-shadow: var(--m-shadow); }
   .course-card-v2:hover { transform: none; }
   .course-card-v2 .course-thumbnail { height: 100%; min-height: 104px; }
   .course-card-v2 .course-play-badge { width: 30px; height: 30px; }
@@ -129,23 +184,142 @@
   .course-card-body p.course-prereq { margin-bottom: 6px; }
   .course-favorite { left: 6px; right: auto; top: 6px; width: 32px; height: 32px; background: rgba(15, 23, 42, .35); }
 
-  /* ── 퀴즈 (페이지 내부 스타일보다 우선하도록 body 클래스로 범위 지정) ── */
-  body.page-quiz-dashboard .quiz-main { padding: 18px 16px 28px; }
-  body.page-quiz-dashboard .quiz-heading h1 { font-size: 1.6rem; }
-  body.page-quiz-dashboard .quiz-practice-banner { padding: 18px; }
-  body.page-quiz-dashboard .quiz-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-  body.page-quiz-dashboard .quiz-stat-card { min-height: 0; padding: 14px; gap: 10px; }
-  body.page-quiz-dashboard .quiz-stat-icon { width: 38px; height: 38px; }
+  /* ── 퀴즈 ── */
+  body.page-quiz-dashboard .quiz-main { padding: 12px var(--m-gutter) 24px; }
+  /* 내 기록 4개를 한 줄로 */
+  body.page-quiz-dashboard .quiz-stat-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
+  body.page-quiz-dashboard .quiz-stat-card { min-height: 0; padding: 12px 6px; justify-content: center; text-align: center; border-radius: 14px; }
+  body.page-quiz-dashboard .quiz-stat-card > div { width: 100%; }
+  body.page-quiz-dashboard .quiz-stat-icon { display: none; }
+  body.page-quiz-dashboard .quiz-stat-label { display: block; font-size: .68rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body.page-quiz-dashboard .quiz-stat-value { justify-content: center; font-size: 1.15rem; }
+  body.page-quiz-dashboard .quiz-stat-value small { font-size: .7rem; }
+  body.page-quiz-dashboard .quiz-practice-banner { padding: 16px; gap: 12px; border-radius: var(--m-radius); }
+  body.page-quiz-dashboard .practice-banner-copy h3 { font-size: 1rem; }
+  body.page-quiz-dashboard .practice-banner-copy p { font-size: .8rem; }
+  body.page-quiz-dashboard .practice-banner-btn { min-height: 42px; }
   body.page-quiz-dashboard .quiz-tabs { scrollbar-width: none; }
   body.page-quiz-dashboard .quiz-tabs::-webkit-scrollbar { display: none; }
   body.page-quiz-dashboard .quiz-controls { width: 100%; display: flex; gap: 8px; }
   body.page-quiz-dashboard .quiz-controls .quiz-select { flex: 1; min-width: 0; }
-  body.page-quiz-dashboard .quiz-row { padding: 16px; gap: 12px; }
+  body.page-quiz-dashboard .quiz-row { padding: 16px; gap: 12px; border-radius: 14px; box-shadow: var(--m-shadow); }
   /* 설명은 두 줄까지만 보여 한 화면에 더 많은 퀴즈가 보이도록 */
   body.page-quiz-dashboard .quiz-description {
     display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
   }
-  body.page-quiz-dashboard .quiz-action { min-height: 44px; display: flex; align-items: center; justify-content: center; }
+  body.page-quiz-dashboard .quiz-action { min-height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 12px; }
+  body.page-quiz-dashboard .quiz-panel { border-radius: var(--m-radius); }
+
+  /* ── 챌린지 목록 ── */
+  body.page-courses .challenge-hero { gap: 12px; }
+  body.page-courses .routine-spotlight { padding: 20px 18px; gap: 14px; border-radius: 18px; }
+  body.page-courses .spotlight-visual { display: none; }
+  body.page-courses .routine-spotlight h2 { font-size: 1.4rem; line-height: 1.3; margin-bottom: 8px; }
+  body.page-courses .spotlight-copy p {
+    font-size: .88rem; line-height: 1.6;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden;
+  }
+  body.page-courses .spotlight-actions { display: flex; gap: 8px; }
+  body.page-courses .spotlight-actions .routine-button { flex: 1; min-height: 44px; justify-content: center; }
+  body.page-courses .spotlight-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 16px; }
+  body.page-courses .spotlight-metrics div { padding: 10px; border-radius: 12px; }
+  body.page-courses .spotlight-metrics b { font-size: 1.15rem; }
+  body.page-courses .spotlight-metrics span { font-size: .7rem; }
+  body.page-courses .routine-summary,
+  body.page-courses .routine-card,
+  body.page-courses .upcoming-routine { border-radius: var(--m-radius); box-shadow: var(--m-shadow); }
+  body.page-courses .routine-card { padding: 16px; }
+  body.page-courses .routine-summary { padding: 18px 16px; }
+  body.page-courses .summary-title { font-size: 1.05rem; margin-bottom: 10px; }
+  body.page-courses .summary-item { padding: 12px; gap: 12px; }
+  body.page-courses .routine-button { min-height: 44px; }
+
+  /* ── 챌린지 상세 ── */
+  body.page-courses .routine-panel,
+  body.page-courses .routine-side-panel { border-radius: var(--m-radius); }
+  /* common.css의 오래된 "section { padding: 56px }" 규칙을 덮어씀 */
+  body.page-courses .routine-panel { padding: 12px; }
+  body.page-courses .routine-body { padding: 16px 4px 4px; }
+  body.page-courses .routine-side-panel { padding: 16px; }
+  body.page-courses .mission-header > * { font-size: 1.15rem; }
+  body.page-courses .mission-step { padding: 14px; gap: 12px; }
+  body.page-courses .routine-hero { padding: 18px; gap: 12px; border-radius: 14px; }
+  body.page-courses .routine-hero-icon { width: 52px; height: 52px; border-radius: 14px; font-size: 1rem; }
+  body.page-courses .routine-hero h2 { font-size: 1.3rem; line-height: 1.35; }
+  body.page-courses .routine-hero p { font-size: .88rem; }
+  body.page-courses .routine-status-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  body.page-courses .routine-status-card { padding: 12px; border-radius: 12px; }
+  body.page-courses .join-button { min-height: 48px; border-radius: 12px; }
+
+  /* ── 커뮤니티 목록 ── */
+  body.page-courses .community-tabs {
+    gap: 8px; margin: 0 calc(var(--m-gutter) * -1) 12px; padding: 2px var(--m-gutter) 4px;
+    border-bottom: 0; overflow-x: auto; scrollbar-width: none;
+  }
+  body.page-courses .community-tabs::-webkit-scrollbar { display: none; }
+  body.page-courses .community-tab {
+    flex: 0 0 auto; height: 36px; display: inline-flex; align-items: center; padding: 0 14px;
+    border: 1px solid var(--border-card); border-radius: 999px; background: var(--bg-surface);
+    font-size: .86rem; white-space: nowrap;
+  }
+  body.page-courses .community-tab.active { background: #4f55e7; border-color: #4f55e7; color: #fff; }
+  body.page-courses .community-toolbar { margin-bottom: 12px; }
+  body.page-courses .community-search input { height: 44px; font-size: 16px; border-radius: 12px; }
+  body.page-courses .community-search button { height: 44px; border-radius: 12px; }
+  /* 표 대신 카드 목록 */
+  body.page-courses .community-table {
+    display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px;
+    overflow: visible; background: transparent; border: 0; box-shadow: none;
+  }
+  body.page-courses .community-post-row,
+  body.page-courses .community-post-row:last-child {
+    min-width: 0; padding: 14px; background: var(--bg-surface); border: 1px solid var(--border-card); border-radius: 14px; box-shadow: var(--m-shadow);
+  }
+  body.page-courses .community-post-title-line { min-width: 0; }
+  body.page-courses .community-post-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  body.page-courses .community-post-preview { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  body.page-courses .sidebar-box,
+  body.page-courses .challenge-box { border-radius: var(--m-radius); }
+
+  /* ── 커뮤니티 글 ── */
+  body.page-courses .detail-container { padding: 20px 16px; border-radius: var(--m-radius); }
+  body.page-courses .detail-header h2 { font-size: 1.3rem; line-height: 1.4; margin-bottom: 12px; }
+  body.page-courses .detail-content { font-size: .95rem; line-height: 1.7; min-height: 0; }
+  body.page-courses .reaction-btn { min-height: 44px; }
+  body.page-courses .comments-section { margin-top: 28px !important; padding-top: 20px !important; }
+  body.page-courses .btn-back-group { margin-top: 24px; }
+  body.page-courses .btn-back { display: none; } /* 앱 바 뒤로가기로 대신 */
+
+  /* ── AI 도우미: 메신저처럼 대화가 화면을 채우고 입력창은 아래에 고정 ── */
+  body.page-ai .course-page-main { padding: 8px 12px; }
+  body.page-ai .ai-page-grid { grid-template-columns: 1fr; gap: 0; }
+  body.page-ai .ai-guide-card { display: none; }
+  body.page-ai .ai-chat-card {
+    min-height: 0; border-radius: var(--m-radius);
+    height: calc(100vh - 56px - 64px - 16px); height: calc(100dvh - 56px - 64px - 16px - env(safe-area-inset-bottom));
+  }
+  body.page-ai .ai-chat-card { padding: 0; }
+  body.page-ai .ai-chat-hero { flex-direction: row; align-items: center; padding: 12px 14px; gap: 10px; }
+  body.page-ai .ai-chat-title { flex-direction: row; align-items: center; gap: 10px; min-width: 0; }
+  body.page-ai .ai-status-pill { flex: none; padding: 5px 10px; font-size: .74rem; }
+  body.page-ai .ai-chat-title h1 { font-size: 1rem; margin: 0; }
+  body.page-ai .ai-chat-title p { display: none; }
+  body.page-ai .ai-page-face { width: 40px; height: 40px; flex: none; }
+  body.page-ai .ai-page-body { padding: 14px; gap: 10px; }
+  body.page-ai .ai-message { max-width: 88%; padding: 11px 13px; font-size: .9rem; line-height: 1.6; }
+  body.page-ai .ai-quick-prompts {
+    flex-wrap: nowrap; overflow-x: auto; margin: 0 -14px; padding: 0 14px 2px; scrollbar-width: none;
+  }
+  body.page-ai .ai-quick-prompts::-webkit-scrollbar { display: none; }
+  body.page-ai .ai-quick-prompts button { flex: 0 0 auto; padding: 8px 12px; font-size: .82rem; }
+  body.page-ai .ai-page-form { grid-template-columns: minmax(0, 1fr) auto; padding: 10px 12px 12px; gap: 8px; border-top: 1px solid var(--border); }
+  body.page-ai .ai-page-input { height: 46px; font-size: 16px; border-radius: 14px; }
+  body.page-ai .ai-page-send { height: 46px; min-width: 64px; border-radius: 14px; }
+
+  /* ── 마이페이지 ── */
+  body.page-courses .mypage-layout { padding: 0; gap: 12px; }
+  body.page-courses .profile-card { padding: 20px 16px; border-radius: 18px; }
+  body.page-courses .section-block { padding: 18px 16px; border-radius: var(--m-radius); }
 }
 
 @media (max-width: 640px) and (prefers-reduced-motion: reduce) {

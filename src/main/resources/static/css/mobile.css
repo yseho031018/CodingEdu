@@ -78,7 +78,7 @@
   /* ── 홈 ── */
   .home-frame { padding: 0 16px 24px; }
   .home-hero-art { display: none; }
-  .page-index .home-hero { padding: 22px 0 6px; }
+  .page-index .home-frame .home-hero { padding: 24px 0 8px; }
   .page-index .home-hero-copy { text-align: left; }
   .home-hero-copy h1 { font-size: 1.85rem; margin-bottom: 12px; }
   .home-hero-copy p { font-size: .98rem; margin-bottom: 18px; }

@@ -34,7 +34,8 @@
     flex: none; width: 40px; height: 40px; margin-left: -10px; display: grid; place-items: center;
     color: var(--ink-1); border-radius: 12px; -webkit-tap-highlight-color: transparent;
   }
-  .appbar-back svg { width: 22px; height: 22px; }
+  /* 한글 제목은 글자가 줄 가운데보다 살짝 위에 그려지므로 화살표도 1px 올려 높이를 맞춤 */
+  .appbar-back svg { width: 24px; height: 24px; transform: translateY(-1px); }
   .appbar-back:active { background: var(--bg-section); }
   .appbar-action {
     display: inline-flex; align-items: center; gap: 4px; height: 36px; padding: 0 12px;

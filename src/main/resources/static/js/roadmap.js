@@ -309,7 +309,63 @@
       markTarget(active, stepNumber);
       if (!stay) revealPanel(active);
     }
+    // 좁은 화면(가로로 넘기는 단계 카드): 고른 강의, 없으면 현재 단계가 보이도록
+    if (active) {
+      var current = active.querySelector('.rm-step[aria-current="step"]');
+      scrollToStep(active, stepNumber || (current && current.getAttribute('data-step')), fromUser);
+    }
   }
+
+  // ── 좁은 화면: 단계 카드를 옆으로 넘기는 캐러셀 + 아래 위치 점 (가로 스크롤이 생길 때만 동작)
+  function scrollToStep(panel, stepNumber, smooth) {
+    var list = panel.querySelector('.rm-steps');
+    var step = stepNumber && list && list.querySelector('.rm-step[data-step="' + stepNumber + '"]');
+    if (!step || list.scrollWidth <= list.clientWidth + 1) return;
+    var pad = parseFloat(getComputedStyle(list).paddingLeft) || 0;
+    list.scrollTo({
+      left: list.scrollLeft + step.getBoundingClientRect().left - list.getBoundingClientRect().left - pad,
+      behavior: smooth && !reduceMotion.matches ? 'smooth' : 'auto'
+    });
+  }
+
+  panels.forEach(function (panel) {
+    var list = panel.querySelector('.rm-steps');
+    var steps = list ? Array.prototype.slice.call(list.querySelectorAll('.rm-step')) : [];
+    if (steps.length < 2) return;
+    var dots = document.createElement('div');
+    dots.className = 'rm-steps-dots';
+    steps.forEach(function (step) {
+      var dot = document.createElement('button');
+      dot.type = 'button';
+      dot.setAttribute('aria-label', step.getAttribute('data-step') + '단계 보기');
+      dot.addEventListener('click', function () { scrollToStep(panel, step.getAttribute('data-step'), true); });
+      dots.appendChild(dot);
+    });
+    list.parentNode.insertBefore(dots, list.nextSibling);
+
+    // 왼쪽 끝에 가장 가까운 카드를 현재 위치로 표시
+    var ticking = false;
+    function update() {
+      ticking = false;
+      var left = list.getBoundingClientRect().left;
+      var best = 0, bestDist = Infinity;
+      steps.forEach(function (step, i) {
+        var d = Math.abs(step.getBoundingClientRect().left - left);
+        if (d < bestDist) { bestDist = d; best = i; }
+      });
+      if (list.scrollLeft + list.clientWidth >= list.scrollWidth - 2) best = steps.length - 1; // 끝까지 넘기면 마지막 점
+      Array.prototype.forEach.call(dots.children, function (dot, i) {
+        dot.classList.toggle('is-on', i === best);
+        dot.setAttribute('aria-current', i === best ? 'true' : 'false');
+      });
+    }
+    list.addEventListener('scroll', function () {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }, { passive: true });
+    list.addEventListener('scrollend', update); // 넘기기가 끝난 위치로 한 번 더 맞춤
+    update();
+    if ('ResizeObserver' in window) new ResizeObserver(update).observe(list);
+  });
 
   // 지도에서 고른 강의를 경로 패널의 해당 단계 카드에 잠시 표시
   function markTarget(panel, stepNumber) {

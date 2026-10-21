@@ -371,7 +371,9 @@
   .rm-step:nth-child(even)::after { display: none; }
 }
 
-/* ── Mobile: 1열, 경로는 왼쪽 세로선 하나로 단순화 ─────────────── */
+.rm-steps-dots { display: none; } /* 단계 위치 점: 좁은 화면에서만 */
+
+/* ── Mobile: 단계 카드는 데스크톱처럼 가로로 잇고 옆으로 넘겨 봄 ─── */
 @media (max-width: 640px) {
   .page-index .home-frame .roadmap { padding: 16px 0 32px; }
   .rm-head h2 { font-size: 1.4rem; }
@@ -382,17 +384,29 @@
   .rm-dest-summary { min-height: 0; }
   .rm-panel { padding: 20px 16px; }
   .rm-panel-copy h3 { font-size: 1.25rem; }
-  .rm-steps { grid-template-columns: minmax(0, 1fr); gap: 0; }
-  .rm-step { display: grid; grid-template-columns: 36px minmax(0, 1fr); column-gap: 12px; padding-bottom: 16px; }
-  .rm-step:last-child { padding-bottom: 0; }
-  .rm-step-marker { margin: 0; }
-  .rm-step::after { display: block; top: 40px; bottom: 4px; left: 17px; right: auto; width: 0; height: auto; border-top: 0; border-left: 2px dashed var(--rm-route); }
-  .rm-step.is-done::after { border-left-style: solid; border-left-color: var(--rm-done); }
-  .rm-step.is-current::after { border-left-color: var(--rm-primary); }
+  /* 다음 카드가 오른쪽에 살짝 보여 옆으로 넘길 수 있음을 알림. 패널 여백(16px)까지 넓혀 화면 끝에서 넘어가게 */
+  .rm-steps {
+    display: flex; gap: 12px; margin: 0 -16px; padding: 6px 16px 4px;
+    overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 16px;
+    overscroll-behavior-x: contain; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  }
+  .rm-steps::-webkit-scrollbar { display: none; }
+  .rm-steps:has(> :nth-child(2):last-child) { max-width: none; }
+  .rm-step { flex: 0 0 82%; scroll-snap-align: start; }
+  .rm-step:only-child { flex-basis: 100%; }
+  .rm-step:not(:last-child)::after { display: block; } /* 태블릿의 2열 규칙 해제: 모든 단계를 경로선으로 연결 */
   .rm-step-card { padding: 16px; }
   .rm-step-card:hover { transform: none; box-shadow: none; }
-  .rm-panel.is-entering .rm-step { animation-name: rm-step-in-y; }
-  @keyframes rm-step-in-y { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .rm-steps-dots { display: flex; justify-content: center; gap: 4px; margin-top: 10px; }
+  .rm-steps-dots button {
+    width: 22px; height: 22px; padding: 0; border: 0; background: transparent; cursor: pointer;
+    display: grid; place-items: center; -webkit-tap-highlight-color: transparent;
+  }
+  .rm-steps-dots button::before {
+    content: ''; width: 7px; height: 7px; border-radius: 999px; background: var(--rm-route);
+    transition: width var(--rm-fast) var(--rm-ease), background-color var(--rm-fast) var(--rm-ease);
+  }
+  .rm-steps-dots button.is-on::before { width: 20px; background: var(--rm-primary); }
 }
 
 @media (prefers-reduced-motion: reduce) {

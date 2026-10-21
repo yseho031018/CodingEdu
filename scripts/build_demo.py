@@ -207,7 +207,9 @@ def target_for(path, area, here):
     elif area == '' and re.match(r'^/challenge/\d+/join$', page):
         out = 'me/' + PAGES.get(page.rsplit('/', 1)[0], here)   # 참여 → 로그인한 상세 화면
     elif area == 'me/' and page == '/logout':
-        out = here                               # 로그아웃 → 비로그인 같은 화면
+        # 로그아웃 → 비로그인 같은 화면 (마이페이지·글쓰기처럼 비로그인 화면이 없으면 홈)
+        # 비로그인 화면을 먼저 내보내므로 파일이 있는지로 판단
+        out = here if os.path.exists(os.path.join(OUT, here)) else 'index.html'
     elif page in PAGES:
         out = area + PAGES[page]
     elif area == 'me/' and page in ME_ONLY:

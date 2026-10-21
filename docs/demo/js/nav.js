@@ -156,7 +156,7 @@ window.addEventListener('pagereveal', function (e) {
   if (topNav.querySelector('a[data-tab="more"].active')) moreBtn.classList.add('active');
   bar.appendChild(moreBtn);
 
-  // 더보기 시트: 나머지 메뉴 + 계정 메뉴
+  // 더보기 시트: 탭바에 없는 주요 기능만 (알림은 앱 바, 설정·로그아웃은 MY 화면)
   var sheet = document.createElement('div');
   sheet.id = 'mobileMoreSheet';
   sheet.className = 'mobile-sheet';
@@ -164,21 +164,24 @@ window.addEventListener('pagereveal', function (e) {
   sheet.setAttribute('aria-modal', 'true');
   sheet.setAttribute('aria-label', '더보기 메뉴');
   sheet.hidden = true;
+  var MORE = {
+    challenge: { desc: '매일 학습 루틴을 함께 지켜요',
+      icon: '<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>' },
+    community: { desc: '질문하고 공부 기록을 나눠요',
+      icon: '<path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 20.5l1.4-5.2A8.5 8.5 0 1 1 21 11.5z"/><path d="M8.5 11.5h.01M12.5 11.5h.01M16.5 11.5h.01"/>' },
+    ai: { desc: '막히는 부분을 바로 물어보세요',
+      icon: '<path d="M11 3.5 12.9 8l4.6 1.9-4.6 1.9L11 16.3l-1.9-4.5-4.6-1.9L9.1 8z"/><path d="M18.5 14.5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/>' }
+  };
   var items = '';
   topNav.querySelectorAll('a[data-tab="more"]').forEach(function (a) {
-    items += '<a href="' + a.getAttribute('href') + '">' + a.textContent.trim() + '<span aria-hidden="true">›</span></a>';
+    var key = (a.pathname.match(/\/(challenge|community|ai)(?:\/index\.html)?\/?$/) || [])[1];
+    var info = MORE[key] || { desc: '', icon: ICONS.more };
+    items += '<a class="mobile-sheet-item' + (key ? ' is-' + key : '') + '" href="' + a.getAttribute('href') + '"'
+      + (a.classList.contains('active') ? ' aria-current="page"' : '') + '>'
+      + '<span class="mobile-sheet-icon"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + info.icon + '</svg></span>'
+      + '<span class="mobile-sheet-text"><b>' + a.textContent.trim() + '</b>' + (info.desc ? '<small>' + info.desc + '</small>' : '') + '</span>'
+      + '<span class="mobile-sheet-chev" aria-hidden="true">›</span></a>';
   });
-  var accountLinks = document.querySelectorAll('nav .nav-right a[href]:not(.nav-mobile-only)');
-  accountLinks.forEach(function (a) {
-    var text = a.textContent.replace(/[⚙️🔔👤]/g, '').replace(/\s+/g, ' ').trim();
-    if (a.classList.contains('nav-notify')) text = '알림';
-    // 탭바에 이미 있는 로그인·마이페이지(사용자 이름) 링크는 제외
-    if (!text || a === mySource || a.classList.contains('nav-user')) return;
-    items += '<a href="' + a.getAttribute('href') + '">' + text + '<span aria-hidden="true">›</span></a>';
-  });
-  // 상단바의 폼은 로그아웃 폼 하나뿐 (정적 목업에서는 action 주소가 바뀌므로 위치로 찾음)
-  var logoutForm = document.querySelector('nav .nav-right form');
-  if (logoutForm) items += '<button type="button" data-logout>로그아웃</button>';
   sheet.innerHTML = '<div class="mobile-sheet-panel"><span class="mobile-sheet-handle" aria-hidden="true"></span>'
     + '<div class="mobile-sheet-head"><strong>더보기</strong>'
     + '<button type="button" class="mobile-sheet-close" aria-label="닫기">✕</button></div>'
@@ -191,7 +194,7 @@ window.addEventListener('pagereveal', function (e) {
     void sheet.offsetWidth; // 닫힌 상태를 먼저 그린 뒤 열림 전환이 일어나도록 (프레임 대기 없이)
     sheet.classList.add('open');
     moreBtn.setAttribute('aria-expanded', 'true');
-    var first = sheet.querySelector('.mobile-sheet-list a, .mobile-sheet-list button');
+    var first = sheet.querySelector('.mobile-sheet-item');
     if (first) first.focus({ preventScroll: true });
   }
   function closeSheet() {
@@ -225,7 +228,6 @@ window.addEventListener('pagereveal', function (e) {
   moreBtn.addEventListener('click', function () { sheet.hidden ? openSheet() : closeSheet(); });
   sheet.addEventListener('click', function (e) {
     if (e.target === sheet || e.target.closest('.mobile-sheet-close')) closeSheet();
-    if (e.target.closest('[data-logout]') && logoutForm) logoutForm.submit();
   });
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && !sheet.hidden) closeSheet();
@@ -234,6 +236,24 @@ window.addEventListener('pagereveal', function (e) {
   document.body.appendChild(sheet);
   document.body.appendChild(bar);
   document.body.classList.add('has-mobile-tabbar');
+})();
+
+// 알림: 모바일 앱 바에서는 이모지 대신 선 아이콘으로 (안 읽은 개수 배지는 그대로, 표시는 mobile.css)
+(function () {
+  var bell = document.querySelector('nav .nav-notify');
+  if (!bell) return;
+  Array.prototype.slice.call(bell.childNodes).forEach(function (n) {
+    if (n.nodeType === 3 && n.textContent.trim()) {
+      var emoji = document.createElement('span');
+      emoji.className = 'notify-emoji';
+      emoji.textContent = n.textContent.trim();
+      bell.replaceChild(emoji, n);
+    }
+  });
+  bell.insertAdjacentHTML('afterbegin', '<svg class="notify-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8.5a6 6 0 0 1 12 0c0 6.5 2.5 8.5 2.5 8.5h-17S6 15 6 8.5"/><path d="M10.2 20.5a2 2 0 0 0 3.6 0"/></svg>');
+  var badge = bell.querySelector('span:not(.notify-emoji)');
+  var count = badge ? badge.textContent.trim() : '';
+  bell.setAttribute('aria-label', count ? '알림 ' + count + '개 안 읽음' : '알림');
 })();
 
 // 모바일 모션: 앱 바 그림자, 스크롤하면 나타나는 섹션, 이미지 페이드인, 숫자 카운트업

@@ -5,7 +5,7 @@
    앱 바·탭바·시트 DOM은 nav.js가 만듭니다. 데스크톱 화면은 바꾸지 않습니다.
    일부 페이지는 자체 <style>이 나중에 로드되므로 body 클래스로 범위를 지정해 우선합니다.
    ═══════════════════════════════════════════════════════════════ */
-.mobile-tabbar, .mobile-sheet, .appbar-title, .appbar-action { display: none; }
+.mobile-tabbar, .mobile-sheet, .appbar-title, .appbar-action, .notify-icon, .mypage-account { display: none; }
 
 @media (max-width: 640px) {
   :root {
@@ -92,13 +92,35 @@
   .mobile-sheet-head { display: flex; align-items: center; justify-content: space-between; min-height: 52px; }
   .mobile-sheet-head strong { color: var(--ink-1); font-size: 1.05rem; }
   .mobile-sheet-close { width: 44px; height: 44px; margin-right: -10px; border: 0; background: transparent; color: var(--ink-3); font-size: 1.1rem; cursor: pointer; }
-  .mobile-sheet-list a, .mobile-sheet-list button {
-    width: 100%; min-height: 54px; display: flex; align-items: center; justify-content: space-between;
-    padding: 0 4px; border: 0; border-top: 1px solid var(--border-card, #e4e8f0); background: transparent;
-    color: var(--ink-1); font: inherit; font-size: 1rem; font-weight: 650; text-decoration: none; text-align: left; cursor: pointer;
+  .mobile-sheet-list { display: grid; gap: 4px; padding-top: 2px; }
+  .mobile-sheet-item {
+    display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 14px;
+    min-height: 66px; padding: 10px 8px; border-radius: 14px;
+    color: var(--ink-1); text-decoration: none; -webkit-tap-highlight-color: transparent;
+    transition: background-color .2s ease, transform .12s ease;
   }
-  .mobile-sheet-list span { color: var(--ink-3); font-size: 1.2rem; }
-  .mobile-sheet-list [data-logout] { color: #dc2626; }
+  .mobile-sheet-item:active { background: var(--bg-section); transform: scale(.98); }
+  .mobile-sheet-item[aria-current="page"] { background: var(--accent-soft); }
+  .mobile-sheet-icon { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 13px; background: #ecedff; color: #4f55e7; }
+  .mobile-sheet-icon svg { width: 22px; height: 22px; }
+  .mobile-sheet-item.is-challenge .mobile-sheet-icon { background: #fff2dc; color: #d97706; }
+  .mobile-sheet-item.is-community .mobile-sheet-icon { background: #e2f6ee; color: #0f9f6e; }
+  .mobile-sheet-text { min-width: 0; }
+  .mobile-sheet-text b { display: block; font-size: 1rem; font-weight: 750; }
+  .mobile-sheet-text small {
+    display: block; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    color: var(--ink-3); font-size: .8rem; font-weight: 500;
+  }
+  .mobile-sheet-chev { color: var(--ink-3); font-size: 1.25rem; }
+  [data-theme="dark"] .mobile-sheet-icon { background: rgba(139, 143, 255, .16); color: #a5a8ff; }
+  [data-theme="dark"] .mobile-sheet-item.is-challenge .mobile-sheet-icon { background: rgba(245, 158, 11, .16); color: #fbbf24; }
+  [data-theme="dark"] .mobile-sheet-item.is-community .mobile-sheet-icon { background: rgba(16, 185, 129, .16); color: #34d399; }
+
+  /* 알림: 앱 바 오른쪽 선 아이콘 + 안 읽은 개수 배지 */
+  nav .nav-right .nav-notify { width: 40px; height: 40px; padding: 0; justify-content: center; color: var(--ink-1); }
+  nav .nav-notify .notify-emoji { display: none; }
+  nav .nav-notify .notify-icon { display: block; width: 22px; height: 22px; }
+  nav .nav-notify > span:not(.notify-emoji) { top: 3px !important; right: 3px !important; }
 
   /* AI 도우미: 하단 탭바 바로 위 오른쪽에 작게. 대화창은 상단바를 가리지 않는 높이까지 */
   body.has-mobile-tabbar .ai-buddy { right: 12px !important; bottom: calc(72px + env(safe-area-inset-bottom)) !important; }
@@ -321,6 +343,24 @@
   body.page-courses .mypage-layout { padding: 0; gap: 12px; }
   body.page-courses .profile-card { padding: 20px 16px; border-radius: 18px; }
   body.page-courses .section-block { padding: 18px 16px; border-radius: var(--m-radius); }
+  /* MY 화면 맨 아래 계정 메뉴 (데스크톱은 상단 내비에 있음) */
+  .mypage-account {
+    display: block; margin-top: 12px; padding: 0; overflow: hidden; /* common.css의 section 여백 무시 */
+    background: var(--bg-surface); border: 1px solid var(--border-card, #e4e8f0); border-radius: var(--m-radius); box-shadow: var(--m-shadow);
+  }
+  .mypage-account-title { margin: 0; padding: 14px 16px 6px; color: var(--ink-3); font-size: .78rem; font-weight: 750; }
+  .mypage-account form { margin: 0; }
+  .mypage-account-item {
+    width: 100%; min-height: 54px; display: flex; align-items: center; gap: 12px; padding: 0 16px;
+    border: 0; border-top: 1px solid var(--border-card, #e4e8f0); background: transparent;
+    color: var(--ink-1); font: inherit; font-size: .98rem; font-weight: 650; text-align: left; text-decoration: none; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mypage-account-title + .mypage-account-item { border-top: 0; }
+  .mypage-account-item:active { background: var(--bg-section); }
+  .mypage-account-item svg { width: 20px; height: 20px; flex: none; color: var(--ink-2); }
+  .mypage-account-item .mypage-account-chev { margin-left: auto; color: var(--ink-3); font-size: 1.2rem; }
+  .mypage-account-item.is-logout, .mypage-account-item.is-logout svg { color: #dc2626; }
 }
 
 @media (max-width: 640px) and (prefers-reduced-motion: reduce) {
@@ -391,6 +431,9 @@
   /* 7) 채팅 말풍선·로드맵 정보 카드 내용이 바뀔 때 */
   .ai-message, .ai-buddy-msg { animation: m-bubble 220ms cubic-bezier(.2, .7, .2, 1) backwards; }
   .rm-ginfo > * { animation: m-fade 200ms ease backwards; }
+  .mobile-sheet.open .mobile-sheet-item { animation: m-rise 260ms cubic-bezier(.2, .7, .2, 1) 60ms backwards; }
+  .mobile-sheet.open .mobile-sheet-item:nth-child(2) { animation-delay: 100ms; }
+  .mobile-sheet.open .mobile-sheet-item:nth-child(3) { animation-delay: 140ms; }
 
   /* 8) 버튼·칩 눌림과 선택 전환 */
   .home-primary-btn, .home-secondary-btn, .rm-ginfo-btn, .quiz-action, .routine-button, .join-button,

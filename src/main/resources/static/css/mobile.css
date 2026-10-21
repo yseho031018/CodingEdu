@@ -157,8 +157,7 @@
   .page-courses .course-page-main { padding: 12px var(--m-gutter) 24px; }
 
   /* ── 강의 ── */
-  .course-roadmap-bar { padding: 12px 14px; margin-bottom: 12px; border-radius: 14px; }
-  .course-roadmap-steps li { font-size: .86rem; }
+  .course-roadmap-link { margin-bottom: 10px; font-size: .86rem; }
   .course-progress-panel { order: 1; border-radius: var(--m-radius); }
   /* 카테고리·검색은 목록을 내려도 앱 바 아래에 고정 */
   .course-toolbar {

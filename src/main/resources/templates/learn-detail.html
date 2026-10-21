@@ -793,6 +793,7 @@
             .page-lesson-detail .nav-btn { min-height: 46px; font-size: .9rem !important; }
             .page-lesson-detail .main-content { padding-bottom: 0 !important; }
             .page-lesson-detail .ai-buddy { right: 12px !important; bottom: calc(80px + env(safe-area-inset-bottom)) !important; }
+            .lesson-panel-open .ai-buddy { visibility: hidden; } /* 목차·노트 패널을 가리지 않도록 */
             .next-lesson-link { display: none !important; } /* 하단 고정 버튼과 중복 */
         }
         /* H1: 비로그인 상태에서는 진도율 0%를 보여주지 않음 */
@@ -844,7 +845,7 @@
         <div class="lesson-tools-head">
             <button class="lesson-tool-tab active" data-panel="notes" onclick="switchToolPanel('notes', this)">노트</button>
             <button class="lesson-tool-tab" data-panel="resources" onclick="switchToolPanel('resources', this)">강의자료</button>
-            <button class="lesson-tools-close" onclick="document.getElementById('lessonTools').classList.remove('open')" aria-label="패널 닫기">×</button>
+            <button class="lesson-tools-close" data-panel-close="lessonTools" aria-label="패널 닫기">×</button>
         </div>
         <div class="lesson-tool-panel active" id="tool-notes">
             <div th:if="${isLoggedIn}" id="note-panel" class="note-panel">
@@ -879,17 +880,34 @@
 (function () {
     var backdrop = document.getElementById('lessonBackdrop');
     var toggles = document.querySelectorAll('[data-panel-toggle]');
+    var panels = ['sidebar', 'lessonTools'];
+    // 패널의 열림 상태에 맞춰 어두운 배경과 앱바 버튼 상태를 맞춤
+    function sync() {
+        var anyOpen = false;
+        panels.forEach(function (id) {
+            var open = document.getElementById(id).classList.contains('open');
+            anyOpen = anyOpen || open;
+            toggles.forEach(function (b) {
+                if (b.getAttribute('data-panel-toggle') === id) b.setAttribute('aria-expanded', open ? 'true' : 'false');
+            });
+        });
+        backdrop.hidden = !anyOpen;
+        document.body.classList.toggle('lesson-panel-open', anyOpen);
+    }
     function setOpen(id, open) {
         var panel = document.getElementById(id);
         if (!panel) return;
         panel.classList.toggle('open', open);
-        toggles.forEach(function (b) {
-            if (b.getAttribute('data-panel-toggle') === id) b.setAttribute('aria-expanded', open ? 'true' : 'false');
-        });
-        var anyOpen = document.querySelector('#sidebar.open, #lessonTools.open');
-        backdrop.hidden = !anyOpen;
+        sync();
     }
     function closeAll() { setOpen('sidebar', false); setOpen('lessonTools', false); }
+    // × 버튼이나 태블릿용 토글처럼 클래스를 직접 바꾸는 경우에도 배경이 남지 않도록
+    panels.forEach(function (id) {
+        new MutationObserver(sync).observe(document.getElementById(id), { attributes: true, attributeFilter: ['class'] });
+    });
+    document.querySelectorAll('[data-panel-close]').forEach(function (btn) {
+        btn.addEventListener('click', function () { setOpen(btn.getAttribute('data-panel-close'), false); });
+    });
     toggles.forEach(function (btn) {
         btn.addEventListener('click', function () {
             var id = btn.getAttribute('data-panel-toggle');

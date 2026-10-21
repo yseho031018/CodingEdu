@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>설정 - CodeEdu</title>
+    <link rel="stylesheet" href="../../css/common.css">
+    <link rel="stylesheet" href="../../css/tailwind.css">
+    <link rel="stylesheet" href="../../css/design-refresh.css">
+    <link rel="stylesheet" href="../../css/site-nav.css">
+    <link rel="stylesheet" href="../../css/mobile.css">
+    <style>
+        .page-settings .course-page-heading,
+        .settings-wrap { max-width: 720px; margin-left: auto; margin-right: auto; }
+        .settings-wrap { display: grid; gap: 22px; }
+        .settings-group { padding: 0; } /* common.css의 section 여백 무시 */
+
+        .settings-alert {
+            padding: 13px 16px; border-radius: 12px; font-size: .92rem; font-weight: 650;
+            background: var(--accent-soft); color: var(--accent);
+        }
+        .settings-alert.is-success { background: #e2f6ee; color: #0b7a55; }
+        .settings-alert.is-error { background: #fdecec; color: #c62828; }
+
+        .settings-profile {
+            display: flex; align-items: center; gap: 16px; padding: 20px;
+            background: var(--bg-surface); border: 1px solid var(--border-card); border-radius: 16px;
+        }
+        .settings-avatar {
+            width: 56px; height: 56px; flex: none; display: grid; place-items: center; border-radius: 50%;
+            border: 3px solid #4f55e7; color: #4f55e7; font-size: 1.4rem; font-weight: 850;
+        }
+        .settings-profile-text { min-width: 0; display: grid; gap: 2px; }
+        .settings-profile-text strong { font-size: 1.1rem; }
+        .settings-profile-text span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-3); font-size: .86rem; }
+
+        .settings-group-title { margin: 0 0 8px 4px; color: var(--ink-3); font-size: .8rem; font-weight: 750; }
+        .settings-list {
+            overflow: hidden; background: var(--bg-surface); border: 1px solid var(--border-card); border-radius: 16px;
+        }
+        .settings-list > :not(:first-child) { border-top: 1px solid var(--border-card); } /* .settings-row의 border: 0보다 우선 */
+        .settings-row {
+            width: 100%; min-height: 56px; display: grid; grid-template-columns: 22px auto minmax(0, 1fr) auto; align-items: center; gap: 12px;
+            padding: 0 18px; border: 0; background: transparent; color: var(--ink-1);
+            font: inherit; font-size: .96rem; font-weight: 650; text-align: left; cursor: pointer; list-style: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .settings-row::-webkit-details-marker { display: none; }
+        .settings-row svg { width: 20px; height: 20px; color: var(--ink-2); }
+        .settings-value {
+            min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+            color: var(--ink-3); font-size: .9rem; font-weight: 500; text-align: right;
+        }
+        .settings-chev { color: var(--ink-3); font-size: 1.2rem; transition: transform .2s ease; }
+        details[open] > .settings-row .settings-chev { transform: rotate(90deg); }
+        summary.settings-row:hover, button.settings-row:hover { background: var(--bg-section); }
+        div.settings-row { cursor: default; grid-template-columns: 22px auto minmax(0, 1fr); }
+        .settings-row.is-danger, .settings-row.is-danger svg { color: #dc2626; }
+
+        .settings-form { display: grid; gap: 10px; padding: 4px 18px 18px 52px; }
+        .settings-form label { color: var(--ink-2); font-size: .84rem; font-weight: 700; }
+        .settings-form input {
+            width: 100%; height: 46px; padding: 0 14px; border: 1px solid var(--border-card); border-radius: 12px;
+            background: var(--bg); color: var(--ink-1); font: inherit; font-size: 16px;
+        }
+        .settings-form input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+        .settings-hint { margin: 0; color: var(--ink-3); font-size: .8rem; }
+        .settings-btn {
+            height: 46px; margin-top: 4px; border: 0; border-radius: 12px; background: #4f55e7; color: #fff;
+            font: inherit; font-size: .95rem; font-weight: 750; cursor: pointer;
+        }
+        .settings-btn:active { transform: scale(.98); }
+
+        /* 계정 삭제 확인: 모바일은 아래에서 올라오는 시트, 데스크톱은 가운데 창 */
+        .settings-sheet {
+            position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px;
+            background: rgba(15, 23, 42, .45);
+        }
+        .settings-sheet[hidden] { display: none; }
+        .settings-sheet-panel {
+            width: min(420px, 100%); padding: 28px 24px; border-radius: 20px; background: var(--bg-surface);
+            box-shadow: 0 20px 60px rgba(15, 23, 42, .25);
+        }
+        .settings-sheet-panel h3 { margin: 0 0 8px; color: #dc2626; font-size: 1.15rem; }
+        .settings-sheet-panel p { margin: 0 0 18px; color: var(--ink-2); font-size: .92rem; line-height: 1.6; }
+        .settings-sheet-panel form { display: grid; gap: 10px; padding: 0; }
+        .settings-sheet-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+        .settings-sheet-actions button {
+            height: 48px; border-radius: 12px; font: inherit; font-size: .95rem; font-weight: 750; cursor: pointer;
+            border: 1px solid var(--border-card); background: var(--bg-section); color: var(--ink-1);
+        }
+        .settings-sheet-actions .is-danger { border: 0; background: #dc2626; color: #fff; }
+
+        [data-theme="dark"] .settings-alert.is-success { background: rgba(16, 185, 129, .16); color: #34d399; }
+        [data-theme="dark"] .settings-alert.is-error { background: rgba(239, 68, 68, .16); color: #f87171; }
+        [data-theme="dark"] .settings-avatar { border-color: #8b8fff; color: #8b8fff; }
+
+        @media (max-width: 640px) {
+            .settings-wrap { gap: 18px; }
+            .settings-profile, .settings-list { border-radius: var(--m-radius); box-shadow: var(--m-shadow); }
+            .settings-profile { padding: 16px; }
+            .settings-row { padding: 0 16px; }
+            summary.settings-row:active, button.settings-row:active { background: var(--bg-section); }
+            .settings-form { padding: 2px 16px 16px; }
+            .settings-sheet { align-items: flex-end; padding: 0; }
+            .settings-sheet-panel {
+                width: 100%; padding: 22px 20px calc(20px + env(safe-area-inset-bottom));
+                border-radius: 20px 20px 0 0; animation: settings-sheet-up .26s cubic-bezier(.2, .8, .2, 1);
+            }
+        }
+        @keyframes settings-sheet-up { from { transform: translateY(100%); } }
+        @media (prefers-reduced-motion: reduce) { .settings-sheet-panel { animation: none; } }
+    </style>
+<link rel="stylesheet" href="../../demo.css">
+</head>
+<body class="page-courses page-settings" data-mobile-tab="my">
+<nav>
+  <a href="../../me/index.html" class="logo">
+    <span class="brand-text"><b>Coding</b>Edu</span>
+  </a>
+
+  <div class="nav-links">
+    <a href="../../me/index.html" data-tab="home">홈</a>
+    <a href="../../me/learn/index.html" data-tab="learn">강의</a>
+    <a href="../../me/quiz/index.html" data-tab="quiz">퀴즈</a>
+    <a href="../../me/challenge/index.html" data-tab="more">챌린지</a>
+    <a href="../../me/community/index.html" data-tab="more">커뮤니티</a>
+    <a href="../../me/ai/index.html" data-tab="more">AI 도우미</a>
+  </div>
+
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeToggle" title="테마 전환" aria-label="다크/라이트 모드 전환"></button>
+
+    
+
+    <div class="nav-right-auth">
+      <a href="../../me/mypage/index.html" class="nav-user">
+        👤 <span class="nav-user-name">데모학습자</span><span class="nav-user-suffix">님</span>
+      </a>
+      <a href="../../me/notifications/index.html" class="nav-notify" style="position:relative; text-decoration:none; font-size:1.2rem;" title="알림">
+        🔔
+        <span style="position:absolute; top:-6px; right:-8px; background:var(--danger); color:#fff; font-size:.6rem; font-weight:800; border-radius:50%; min-width:16px; height:16px; display:flex; align-items:center; justify-content:center; padding:0 2px; line-height:1;">2</span>
+      </a>
+      <a href="../../me/settings/index.html" class="nav-icon-btn nav-mobile-only" title="설정" aria-label="설정">⚙️</a>
+      <a href="../../me/settings/index.html" class="btn-login ghost nav-mobile-hide">⚙️ 설정</a>
+      <form data-demo-post="/logout" action="../../index.html" method="get" style="margin:0;">
+        <button type="submit" class="nav-icon-btn nav-icon-btn-logout nav-mobile-only" title="로그아웃" aria-label="로그아웃">🚪</button>
+        <button type="submit" class="btn-login ghost nav-mobile-hide">로그아웃</button>
+      </form>
+    </div>
+  </div>
+</nav>
+
+    <main class="course-page-main">
+        <!-- 모바일 앱 바 뒤로가기: 이전 화면이 없으면 마이페이지로 -->
+        <a href="../../me/mypage/index.html" data-appbar-back hidden>마이페이지</a>
+        <header class="course-page-heading">
+            <div>
+                <span class="course-page-kicker">SETTINGS</span>
+                <h1>설정</h1>
+                <p>프로필과 비밀번호를 관리하세요.</p>
+            </div>
+        </header>
+
+        <div class="settings-wrap">
+            
+            
+
+            <section class="settings-profile" aria-label="내 프로필">
+                <div class="settings-avatar" data-field="initial">데</div>
+                <div class="settings-profile-text">
+                    <strong data-field="nickname">데모학습자</strong>
+                    <span>@demo_learner</span>
+                    <span data-field="email">demo@example.com</span>
+                </div>
+            </section>
+
+            <section class="settings-group" aria-labelledby="settingsProfileTitle">
+                <h2 class="settings-group-title" id="settingsProfileTitle">프로필</h2>
+                <div class="settings-list">
+                    <details name="settings-edit">
+                        <summary class="settings-row">
+                            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+                            닉네임
+                            <span class="settings-value" data-field="nickname">데모학습자</span>
+                            <span class="settings-chev" aria-hidden="true">›</span>
+                        </summary>
+                        <form data-demo-post="/settings/nickname" action="../../notice.html" method="get" class="settings-form">
+                            <label for="nickname">새 닉네임</label>
+                            <input type="text" id="nickname" name="newNickname" value="데모학습자"
+                                   placeholder="새 닉네임을 입력하세요" required maxlength="20" autocomplete="nickname">
+                            <button type="submit" class="settings-btn">닉네임 저장</button>
+                        </form>
+                    </details>
+                    <details name="settings-edit">
+                        <summary class="settings-row">
+                            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+                            이메일
+                            <span class="settings-value" data-field="email">demo@example.com</span>
+                            <span class="settings-chev" aria-hidden="true">›</span>
+                        </summary>
+                        <form data-demo-post="/settings/email" action="../../notice.html" method="get" class="settings-form">
+                            <label for="email">새 이메일 주소</label>
+                            <input type="email" id="email" name="newEmail" value="demo@example.com"
+                                   placeholder="새 이메일을 입력하세요" required autocomplete="email">
+                            <button type="submit" class="settings-btn">이메일 저장</button>
+                        </form>
+                    </details>
+                    <div class="settings-row">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 16 0 8 8 0 0 0-16 0"/><path d="M16 12v1.5a2.5 2.5 0 0 0 5 0V12M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0"/></svg>
+                        아이디
+                        <span class="settings-value">demo_learner · 변경 불가</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="settings-group" aria-labelledby="settingsSecurityTitle">
+                <h2 class="settings-group-title" id="settingsSecurityTitle">보안</h2>
+                <div class="settings-list">
+                    <details name="settings-edit">
+                        <summary class="settings-row">
+                            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                            비밀번호 변경
+                            <span class="settings-value"></span>
+                            <span class="settings-chev" aria-hidden="true">›</span>
+                        </summary>
+                        <form data-demo-post="/settings/password" action="../../notice.html" method="get" class="settings-form">
+                            <p class="settings-hint">현재 비밀번호를 확인한 뒤 새 비밀번호로 바꿔요.</p>
+                            <label for="oldPassword">현재 비밀번호</label>
+                            <input type="password" id="oldPassword" name="oldPassword" required autocomplete="current-password">
+                            <label for="newPassword">새 비밀번호</label>
+                            <input type="password" id="newPassword" name="newPassword" required autocomplete="new-password">
+                            <label for="confirmPassword">새 비밀번호 확인</label>
+                            <input type="password" id="confirmPassword" name="confirmPassword" required autocomplete="new-password">
+                            <button type="submit" class="settings-btn">비밀번호 변경</button>
+                        </form>
+                    </details>
+                </div>
+            </section>
+
+            <section class="settings-group" aria-labelledby="settingsAccountTitle">
+                <h2 class="settings-group-title" id="settingsAccountTitle">계정 정보</h2>
+                <div class="settings-list">
+                    <div class="settings-row">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+                        가입일
+                        <span class="settings-value">2026년 10월 21일</span>
+                    </div>
+                    <div class="settings-row">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/></svg>
+                        회원 유형
+                        <span class="settings-value">일반 사용자</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="settings-group" aria-label="계정 삭제">
+                <div class="settings-list">
+                    <button type="button" class="settings-row is-danger" data-open-delete aria-haspopup="dialog" aria-controls="deleteSheet">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>
+                        계정 삭제
+                    </button>
+                </div>
+            </section>
+        </div>
+
+        <div class="settings-sheet" id="deleteSheet" role="dialog" aria-modal="true" aria-labelledby="deleteSheetTitle" hidden>
+            <div class="settings-sheet-panel">
+                <h3 id="deleteSheetTitle">계정을 삭제할까요?</h3>
+                <p>모든 학습 기록, 퀴즈 결과, 게시글이 영구적으로 삭제되며 <strong>복구할 수 없어요.</strong></p>
+                <form data-demo-post="/settings/delete-account" action="../../notice.html" method="get" class="settings-form">
+                    <label for="deletePassword">확인을 위해 현재 비밀번호를 입력하세요</label>
+                    <input type="password" id="deletePassword" name="confirmPassword" required autocomplete="current-password">
+                    <div class="settings-sheet-actions">
+                        <button type="button" data-close-delete>취소</button>
+                        <button type="submit" class="is-danger">삭제</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+<script src="../../js/nav.js"></script>
+<script>
+(function () {
+    var sheet = document.getElementById('deleteSheet');
+    var opener = document.querySelector('[data-open-delete]');
+    function close() { sheet.hidden = true; opener.focus(); }
+    opener.addEventListener('click', function () {
+        sheet.hidden = false;
+        document.getElementById('deletePassword').focus();
+    });
+    sheet.addEventListener('click', function (e) {
+        if (e.target === sheet || e.target.closest('[data-close-delete]')) close();
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !sheet.hidden) close(); });
+})();
+</script>
+
+<script src="../../demo.js"></script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 // 홈 학습 로드맵
 // 1단계: 분야(큰 노드)와 강의(작은 노드)를 학습 순서 화살표로 잇는 지도
 //        화면 크기와 관계없이 같은 배치를 유지하고, 좁은 화면은 확대/축소·이동(핀치·버튼·드래그)으로 봅니다.
-//        마우스는 오버로 강조, 터치는 탭으로 강조 + 정보 카드
+//        마우스는 오버로 강조, 터치는 탭으로 강조 (같은 노드를 다시 탭하면 학습 순서로 이동)
 // 2단계: 선택한 분야의 순서형 경로 패널
 (function () {
   var root = document.getElementById('learningRoadmap');
@@ -10,7 +10,6 @@
   var SVG_NS = 'http://www.w3.org/2000/svg';
   var graph = root.querySelector('[data-rm-graph]');
   var svg = root.querySelector('[data-rm-graph-svg]');
-  var info = root.querySelector('[data-rm-ginfo]');
   var branches = Array.prototype.slice.call(root.querySelectorAll('.rm-branch'));
   var panels = Array.prototype.slice.call(root.querySelectorAll('.rm-panel'));
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -164,7 +163,7 @@
 
     // 빈 곳을 탭하면 선택 해제
     el('rect', { 'class': 'rm-gbg', x: 0, y: 0, width: layout.width, height: layout.height }, svg)
-      .addEventListener('click', function () { clearFocus(); showInfo(null); });
+      .addEventListener('click', function () { clearFocus(); });
 
     var edgeLayer = el('g', { 'class': 'rm-edges' }, svg);
     var nodeLayer = el('g', { 'class': 'rm-gnodes' }, svg);
@@ -207,7 +206,7 @@
       hit.addEventListener('pointerenter', function (ev) { if (ev.pointerType === 'mouse') focusNode(id); });
       hit.addEventListener('pointerleave', function (ev) { if (ev.pointerType === 'mouse') clearFocus(); });
       // 키보드로 이동했을 때만 포커스 강조 (클릭 후 남는 포커스로 강조가 유지되지 않게)
-      g.addEventListener('focus', function () { if (g.matches(':focus-visible')) { focusNode(id); showInfo(id); } });
+      g.addEventListener('focus', function () { if (g.matches(':focus-visible')) focusNode(id); });
       g.addEventListener('blur', function () { if (lastPointer === 'mouse') clearFocus(); });
       g.addEventListener('click', function () { onNodeClick(id); });
       g.addEventListener('keydown', function (ev) {
@@ -217,21 +216,18 @@
         }
       });
     });
-    showInfo(null);
   }
 
-  // 마우스: 클릭하면 바로 학습 순서로 이동 / 터치: 첫 탭은 강조 + 정보 카드, 같은 노드를 다시 탭하면 이동
+  // 마우스: 클릭하면 바로 학습 순서로 이동
+  // 터치: 첫 탭은 강조하고 지도 아래 경로 패널을 그 분야·단계로 바꿈(화면은 그대로),
+  //       같은 노드를 다시 탭하면 경로 패널이 화면 밖일 때 그 위치로 이동
   function onNodeClick(id) {
-    if (lastPointer === 'mouse') {
-      activate(id);
-      return;
-    }
-    if (focusedId === id) {
+    if (lastPointer === 'mouse' || focusedId === id) {
       activate(id);
       return;
     }
     focusNode(id);
-    showInfo(id);
+    activate(id, true);
   }
 
   // 올린(탭한) 노드만 커지고, 선수 강의(앰버)·다음 강의(파란 테두리)와 그 연결선만 남깁니다.
@@ -278,51 +274,14 @@
     });
   }
 
-  // ── 탭 정보 카드 (좁은 화면)
-  function courseLink(node, trackKey) {
-    var cta = root.querySelector('#rm-panel-' + trackKey + ' .rm-step[data-step="' + node.tracks[trackKey] + '"] a.rm-step-cta');
-    return cta ? cta.getAttribute('href') : null;
-  }
-
-  function showInfo(id) {
-    if (!info) return;
-    if (!id) {
-      info.innerHTML = '<p class="rm-ginfo-hint">두 손가락으로 지도를 확대하고, 노드를 탭하면 연결된 강의와 학습 순서를 볼 수 있어요.</p>';
-      return;
-    }
+  function activate(id, stay) {
     var n = nodes[id];
     var key = trackFor(n);
-    var html;
-    if (n.kind === 'field') {
-      html = '<div class="rm-ginfo-head"><span class="rm-ginfo-kind">분야</span><strong>' + n.name + '</strong></div>'
-        + '<p class="rm-ginfo-meta">' + n.meta + '</p>'
-        + '<p class="rm-ginfo-text">' + n.summary + '</p>'
-        + '<div class="rm-ginfo-actions"><button type="button" class="rm-ginfo-btn is-primary" data-act="path">학습 순서 보기</button></div>';
-    } else {
-      var steps = Object.keys(n.tracks).map(function (k) { return trackByKey[k].name + ' ' + n.tracks[k] + '단계'; }).join(' · ');
-      var link = courseLink(n, key);
-      html = '<div class="rm-ginfo-head"><span class="rm-ginfo-kind">강의</span><strong>' + n.name + '</strong>'
-        + (n.status === 'done' ? '<span class="rm-ginfo-done">✓ 완료</span>' : '') + '</div>'
-        + '<p class="rm-ginfo-meta">' + steps + '</p>'
-        + '<p class="rm-ginfo-text">' + relationText(n) + '</p>'
-        + '<div class="rm-ginfo-actions">'
-        + '<button type="button" class="rm-ginfo-btn" data-act="path">학습 순서 보기</button>'
-        + (link ? '<a class="rm-ginfo-btn is-primary" href="' + link + '">강의 보기</a>' : '')
-        + '</div>';
-    }
-    info.innerHTML = html;
-    var pathBtn = info.querySelector('[data-act="path"]');
-    if (pathBtn) pathBtn.addEventListener('click', function () { activate(id); });
-  }
-
-  function activate(id) {
-    var n = nodes[id];
-    var key = trackFor(n);
-    select(key, true, n.kind === 'field' ? null : n.tracks[key]);
+    select(key, true, n.kind === 'field' ? null : n.tracks[key], stay);
   }
 
   // ── 선택 상태 (지도·트리·경로 패널 공통)
-  function select(key, fromUser, stepNumber) {
+  function select(key, fromUser, stepNumber, stay) {
     if (!key) return;
     var changed = key !== selected;
     selected = key;
@@ -348,7 +307,7 @@
         active.classList.add('is-entering');
       }
       markTarget(active, stepNumber);
-      revealPanel(active);
+      if (!stay) revealPanel(active);
     }
   }
 

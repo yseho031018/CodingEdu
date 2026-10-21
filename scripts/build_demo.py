@@ -36,7 +36,9 @@ for _lang in LANGS:
 COMMUNITY_CATEGORIES = ['free', 'qna', 'study', 'tips']
 for _cat in COMMUNITY_CATEGORIES:
     PAGES['/community?category=' + _cat] = 'community/' + _cat + '/index.html'
-ME_ONLY = {'/mypage': 'mypage/index.html', '/community/write': 'community/write/index.html'}
+# 알림 화면은 열면 모두 읽음 처리되므로 마지막에 캡처 (그 전 화면들에는 안 읽은 개수 배지가 남음)
+ME_ONLY = {'/mypage': 'mypage/index.html', '/community/write': 'community/write/index.html',
+           '/settings': 'settings/index.html', '/notifications': 'notifications/index.html'}
 
 # 데모 계정: 메모리 DB에만 존재. 비밀번호는 매 빌드마다 무작위로 만들고 저장하지 않음.
 DEMO_USER = {'username': 'demo_learner', 'nickname': '데모학습자', 'email': 'demo@example.com',
@@ -48,6 +50,13 @@ DEMO_POST = {'category': 'qna', 'title': 'CSS 박스 모델에서 margin과 padd
              'content': 'WEB2 CSS 8강 박스 모델을 듣고 있는데, margin과 padding을 언제 써야 할지 헷갈립니다.\n'
                         '배경색이 들어가는 영역 기준으로 구분하면 될까요?'}
 DEMO_COMMENT = '로드맵 순서대로 HTML 다음 CSS를 듣고 있어요. 저도 같은 부분에서 막혔는데 도움이 됐습니다!'
+# 데모 계정 글에 댓글을 달아 알림을 만들어 줄 다른 학습자들
+HELPERS = [
+    ({'username': 'code_friend', 'nickname': '코딩친구', 'email': 'friend@example.com'},
+     '배경색 기준으로 구분하는 게 맞아요! padding은 테두리 안쪽 여백이라 배경색이 칠해지고, margin은 바깥 여백이라 투명해요.'),
+    ({'username': 'dev_acorn', 'nickname': '개발도토리', 'email': 'acorn@example.com'},
+     '개발자 도구(F12)에서 요소를 선택하면 박스 모델 그림이 나와서 margin과 padding을 눈으로 확인할 수 있어요.'),
+]
 
 
 def session():
@@ -145,6 +154,15 @@ def prepare_demo_account():
     if first_post:
         detail = get(op, '/community/' + first_post[-1])
         post_form(op, '/community/%s/comment' % first_post[-1], {'content': DEMO_COMMENT}, csrf_from(detail))
+        # 다른 학습자들이 데모 계정 글(가장 최근 글)에 댓글 → 데모 계정에 댓글 알림이 생김
+        my_post = str(max(int(pid) for pid in first_post))
+        for helper, comment in HELPERS:
+            hop = session()
+            account = dict(helper, password=secrets.token_urlsafe(12))
+            post_form(hop, '/register', account, csrf_from(get(hop, '/register')))
+            post_form(hop, '/login_process', {'username': account['username'], 'password': account['password']},
+                      csrf_from(get(hop, '/login')))
+            post_form(hop, '/community/%s/comment' % my_post, {'content': comment}, csrf_from(get(hop, '/community/' + my_post)))
     return op
 
 

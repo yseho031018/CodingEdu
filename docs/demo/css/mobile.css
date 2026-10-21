@@ -127,8 +127,6 @@
   body.has-mobile-tabbar .ai-buddy { right: 12px !important; bottom: calc(72px + env(safe-area-inset-bottom)) !important; }
   body.has-mobile-tabbar .ai-buddy-panel { max-height: calc(100vh - 150px); max-height: calc(100dvh - 150px); }
   .ai-buddy-input { font-size: 16px; } /* iOS 입력 확대 방지 */
-  /* 로드맵 정보 카드는 오른쪽을 비워 AI 도우미 버튼과 겹치지 않게 */
-  body.has-mobile-tabbar .rm-graph.is-narrow .rm-ginfo { margin-left: 0; margin-right: 58px; }
 
   /* iOS 입력 확대 방지(16px) + 충분한 터치 높이 */
   .course-search input, .quiz-search input, .quiz-select { height: 44px; font-size: 16px; }
@@ -373,7 +371,6 @@
    "동작 줄이기" 설정 사용자에게는 적용하지 않음. 데스크톱은 그대로.
    ═══════════════════════════════════════════════════════════════ */
 @keyframes m-rise { from { opacity: 0; transform: translateY(10px); } }
-@keyframes m-fade { from { opacity: 0; } }
 @keyframes m-pop { from { opacity: .4; transform: scale(.82); } }
 @keyframes m-bar { from { transform: scaleX(0); } }
 @keyframes m-bubble { from { opacity: 0; transform: translateY(6px) scale(.98); } }
@@ -431,17 +428,16 @@
 
   /* 7) 채팅 말풍선·로드맵 정보 카드 내용이 바뀔 때 */
   .ai-message, .ai-buddy-msg { animation: m-bubble 220ms cubic-bezier(.2, .7, .2, 1) backwards; }
-  .rm-ginfo > * { animation: m-fade 200ms ease backwards; }
   .mobile-sheet.open .mobile-sheet-item { animation: m-rise 260ms cubic-bezier(.2, .7, .2, 1) 60ms backwards; }
   .mobile-sheet.open .mobile-sheet-item:nth-child(2) { animation-delay: 100ms; }
   .mobile-sheet.open .mobile-sheet-item:nth-child(3) { animation-delay: 140ms; }
 
   /* 8) 버튼·칩 눌림과 선택 전환 */
-  .home-primary-btn, .home-secondary-btn, .rm-ginfo-btn, .quiz-action, .routine-button, .join-button,
+  .home-primary-btn, .home-secondary-btn, .quiz-action, .routine-button, .join-button,
   .practice-banner-btn, .course-record-button, .community-search button {
     transition: transform .12s ease, background-color .2s ease, color .2s ease, box-shadow .2s ease;
   }
-  .home-primary-btn:active, .home-secondary-btn:active, .rm-ginfo-btn:active, .quiz-action:active, .routine-button:active,
+  .home-primary-btn:active, .home-secondary-btn:active, .quiz-action:active, .routine-button:active,
   .join-button:active, .practice-banner-btn:active, .course-record-button:active, .community-search button:active {
     transform: scale(.97);
   }

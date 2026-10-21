@@ -55,7 +55,9 @@ window.addEventListener('pagereveal', function (e) {
   if (active && active.getAttribute('data-tab') === 'home') return;
   var isDetail = !!active && clean(location.pathname) !== clean(active.pathname);
   // 상세 화면은 목록으로, 탭 첫 화면(강의·퀴즈 등)은 홈으로 돌아가는 화살표
-  var backTo = isDetail ? active : nav.querySelector('.logo');
+  // 메뉴에 없는 화면(알림·설정)은 페이지가 data-appbar-back 링크로 돌아갈 곳을 지정
+  var custom = document.querySelector('main a[data-appbar-back]');
+  var backTo = custom || (isDetail ? active : nav.querySelector('.logo'));
 
   var bar = document.createElement('div');
   bar.className = 'appbar-title';
@@ -63,14 +65,14 @@ window.addEventListener('pagereveal', function (e) {
     var back = document.createElement('a');
     back.className = 'appbar-back';
     back.href = backTo.getAttribute('href');
-    back.setAttribute('aria-label', isDetail ? active.textContent.trim() + ' 목록으로' : '홈으로');
+    back.setAttribute('aria-label', custom ? '이전 화면으로' : isDetail ? active.textContent.trim() + ' 목록으로' : '홈으로');
     back.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     // 같은 사이트에서 왔다면 브라우저 뒤로가기(스크롤 위치 유지), 아니면 목록으로
     // 탭 첫 화면은 홈에서 바로 왔을 때만 뒤로가기 (다른 탭에서 왔으면 홈으로 이동)
     back.addEventListener('click', function (e) {
       var ref = document.referrer;
       if (history.length > 1 && ref.indexOf(location.origin) === 0 &&
-          (isDetail || clean(new URL(ref).pathname) === clean(back.pathname))) {
+          (isDetail || custom || clean(new URL(ref).pathname) === clean(back.pathname))) {
         e.preventDefault();
         history.back();
       }
@@ -126,11 +128,14 @@ window.addEventListener('pagereveal', function (e) {
     a.href = source.getAttribute('href');
     a.innerHTML = icon(name) + '<span>' + label + '</span>';
     var here = function (p) { return p.replace(/index\.html$/, '').replace(/\/$/, ''); };
-    if (source.classList.contains('active') || (name === 'my' && here(source.pathname) === here(location.pathname))) {
+    var atRoot = here(source.pathname) === here(location.pathname);
+    // 설정처럼 메뉴에 없는 화면은 body의 data-mobile-tab으로 어느 탭에 속하는지 표시
+    if (source.classList.contains('active') || document.body.getAttribute('data-mobile-tab') === name ||
+        (name === 'my' && atRoot)) {
       a.classList.add('active');
-      a.setAttribute('aria-current', 'page');
-      // 지금 보고 있는 탭을 다시 누르면 맨 위로 (모바일 앱 관습)
-      a.addEventListener('click', function (e) {
+      a.setAttribute('aria-current', atRoot ? 'page' : 'true');
+      // 탭 첫 화면에서 다시 누르면 맨 위로, 하위 화면(상세·설정 등)에서는 그 탭 첫 화면으로 (모바일 앱 관습)
+      if (atRoot) a.addEventListener('click', function (e) {
         e.preventDefault();
         var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });

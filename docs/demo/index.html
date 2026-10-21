@@ -1,1245 +1,1244 @@
-<!DOCTYPE html>
-<html lang="ko" data-theme="light">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>CodeEdu - 코딩은 즐거워요!</title>
-<!-- Prevent flash of wrong theme -->
-<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/common.css">
-<link rel="stylesheet" href="css/tailwind.css">
-<link rel="stylesheet" href="css/landing.css">
-<link rel="stylesheet" href="css/design-refresh.css">
-<link rel="stylesheet" href="css/roadmap.css">
-<link rel="stylesheet" href="css/site-nav.css">
-<link rel="stylesheet" href="css/mobile.css">
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>CodeEdu - 코딩은 즐거워요!</title>
+<!-- Prevent flash of wrong theme -->
+<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/common.css">
+<link rel="stylesheet" href="css/tailwind.css">
+<link rel="stylesheet" href="css/landing.css">
+<link rel="stylesheet" href="css/design-refresh.css">
+<link rel="stylesheet" href="css/roadmap.css">
+<link rel="stylesheet" href="css/site-nav.css">
+<link rel="stylesheet" href="css/mobile.css">
 <link rel="stylesheet" href="demo.css">
-</head>
-<body class="page-index">
-
-<!-- ══════ NAV ══════ -->
-<nav>
-  <a href="index.html" class="logo">
-    <span class="brand-text"><b>Coding</b>Edu</span>
-  </a>
-
-  <div class="nav-links">
-    <a href="index.html" data-tab="home">홈</a>
-    <a href="learn/index.html" data-tab="learn">강의</a>
-    <a href="quiz/index.html" data-tab="quiz">퀴즈</a>
-    <a href="challenge/index.html" data-tab="more">챌린지</a>
-    <a href="community/index.html" data-tab="more">커뮤니티</a>
-    <a href="ai/index.html" data-tab="more">AI 도우미</a>
-  </div>
-
-  <div class="nav-right">
-    <button class="theme-toggle" id="themeToggle" title="테마 전환" aria-label="다크/라이트 모드 전환"></button>
-
-    <div class="nav-right-auth">
-      <a href="me/index.html" class="btn-login ghost">로그인</a>
-      <a href="me/index.html" class="btn-login">회원가입</a>
-    </div>
-
-    
-  </div>
-</nav>
-
-<main class="home-frame">
-  <section class="home-hero">
-    <div class="home-hero-copy">
-      <span class="home-eyebrow">처음이어도 괜찮아요</span>
-      
-      <h1>코딩, <em>함께 배우고</em><br>성장하는 공간</h1>
-      <p>다양한 강의와 퀴즈, 챌린지로<br>나만의 성장을 기록해보세요.</p>
-      <div class="home-hero-actions">
-        <a href="learn/index.html" class="home-primary-btn">강의 시작하기</a>
-        
-        <a href="#learningRoadmap" class="home-secondary-btn">학습 지도 보기</a>
-      </div>
-    </div>
-    <div class="home-hero-art">
-      <img src="images/coding-hero-transparent.png" alt="노트북으로 코딩을 공부하는 학습자">
-    </div>
-  </section>
-
-  <!-- ══════ LEARNING ROADMAP: 분야 선택 지도 → 분야별 학습 순서 ══════ -->
-  <section class="roadmap" id="learningRoadmap" aria-labelledby="roadmapTitle" data-initial-track="web">
-    <svg class="rm-sprite" aria-hidden="true" focusable="false">
-      <symbol id="rm-i-pin" viewBox="0 0 24 24"><path d="M12 2.5a7.5 7.5 0 0 0-7.5 7.5c0 5.3 6.2 10.9 6.9 11.5a.9.9 0 0 0 1.2 0c.7-.6 6.9-6.2 6.9-11.5A7.5 7.5 0 0 0 12 2.5Zm0 10.3a2.8 2.8 0 1 1 0-5.6 2.8 2.8 0 0 1 0 5.6Z"/></symbol>
-      <symbol id="rm-i-check" viewBox="0 0 24 24"><path d="M9.6 16.2 5.4 12l-1.4 1.4 5.6 5.6 10.4-10.4L18.6 7.2z"/></symbol>
-      <symbol id="rm-i-flag" viewBox="0 0 24 24"><path d="M5 21V4h9.2l.5 2H20v9h-6.8l-.5-2H7v8z"/></symbol>
-      <symbol id="rm-i-arrow" viewBox="0 0 24 24"><path d="M13.2 5.3 19.9 12l-6.7 6.7-1.4-1.4 4.3-4.3H4v-2h12.1l-4.3-4.3z"/></symbol>
-      <symbol id="rm-i-clock" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm.8-13h-1.6v5.8l4.6 2.8.8-1.3-3.8-2.3z"/></symbol>
-      <symbol id="rm-i-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/></symbol>
-    </svg>
-
-    <header class="rm-head">
-      <span class="rm-eyebrow">CHOOSE YOUR START</span>
-      <h2 id="roadmapTitle">어떤 분야로 출발할까요?</h2>
-      <p>관심 있는 학습 분야를 선택해 시작해보세요. 각 분야는 독립적으로 학습할 수 있어요.</p>
-    </header>
-
-    <!-- 1단계: 전체 분야 선택 지도 -->
-    <div class="rm-map" data-rm-map>
-      <!-- 데스크톱: 분야(큰 노드)와 강의(작은 노드)를 학습 순서 화살표로 잇는 지도 -->
-      <div class="rm-graph" data-rm-graph>
-        <!-- 화면 크기와 관계없이 같은 구조. 좁은 화면은 확대/축소 후 지도 안에서 이동 -->
-        <div class="rm-zoom" role="group" aria-label="지도 확대·축소">
-          <button type="button" data-zoom="out" aria-label="축소">−</button>
-          <span class="rm-zoom-level" data-zoom-level aria-live="polite">100%</span>
-          <button type="button" data-zoom="in" aria-label="확대">+</button>
-          <button type="button" data-zoom="fit" class="rm-zoom-fit">전체 보기</button>
-        </div>
-        <div class="rm-graph-viewport" data-rm-viewport>
-          <svg class="rm-graph-svg" data-rm-graph-svg viewBox="0 0 1200 540" role="group" aria-label="학습 분야와 강의 연결 지도"></svg>
-        </div>
-        <!-- 좁은 화면: 탭한 노드의 선수·다음 강의와 이동 버튼 -->
-        <div class="rm-ginfo" data-rm-ginfo aria-live="polite"></div>
-        <ul class="rm-legend" aria-hidden="true">
-          <li><i class="rm-legend-field"></i>분야</li>
-          <li><i class="rm-legend-course"></i>강의</li>
-          <li><i class="rm-legend-prev"></i>선수 강의</li>
-          <li><i class="rm-legend-arrow"></i>학습 순서</li>
-          <li class="rm-legend-hint">노드에 마우스를 올리면 연결된 강의가 강조돼요 · Ctrl+휠로 확대</li>
-        </ul>
-      </div>
-
-      <!-- 태블릿·모바일: 분야 카드 아래로 강의가 이어지는 목록형 지도 -->
-      <div class="rm-tree">
-      <div class="rm-hub" data-rm-hub>
-        <span class="rm-hub-mark" aria-hidden="true"><i></i></span>
-        <strong>나의 시작점</strong>
-      </div>
-
-      <div class="rm-branch  is-selected"
-           data-track="web">
-        <article class="rm-dest">
-          <div class="rm-dest-top">
-            <span class="rm-pin" aria-hidden="true"><svg><use href="#rm-i-pin"/></svg></span>
-            <h3>웹 개발 입문</h3>
-            <span class="rm-dest-state"><svg aria-hidden="true"><use href="#rm-i-check"/></svg>선택됨</span>
-          </div>
-          <p class="rm-dest-summary">HTML·CSS·JavaScript로 웹의 기초 다지기</p>
-          <div class="rm-dest-foot">
-            <span class="rm-dest-meta">
-              <span>3개 강의 · 입문</span>
-              
-            </span>
-            <button type="button" class="rm-dest-btn"
-                    aria-label="웹 개발 입문 과정 보기" aria-pressed="true" aria-controls="rm-panel-web">과정 보기<svg aria-hidden="true"><use href="#rm-i-arrow"/></svg></button>
-          </div>
-        </article>
-
-        <!-- 분야 안의 강의가 뿌리처럼 순서대로 뻗어 내려감 -->
-        <ol class="rm-roots" aria-label="웹 개발 입문 학습 순서">
-          <li>
-            <button type="button" class="rm-node  is-current"
-                    data-step="1"
-                    data-lang="html"
-                    aria-label="웹 개발 입문 1단계 HTML &amp; Internet 자세히 보기">
-              <span class="rm-node-no" aria-hidden="true">
-                
-                1
-              </span>
-              <span class="rm-node-name">HTML &amp; Internet</span>
-              
-            </button>
-          </li>
-          <li>
-            <button type="button" class="rm-node  is-next"
-                    data-step="2"
-                    data-lang="css"
-                    aria-label="웹 개발 입문 2단계 CSS 자세히 보기">
-              <span class="rm-node-no" aria-hidden="true">
-                
-                2
-              </span>
-              <span class="rm-node-name">CSS</span>
-              
-            </button>
-          </li>
-          <li>
-            <button type="button" class="rm-node  is-later"
-                    data-step="3"
-                    data-lang="javascript"
-                    aria-label="웹 개발 입문 3단계 JavaScript 자세히 보기">
-              <span class="rm-node-no" aria-hidden="true">
-                
-                3
-              </span>
-              <span class="rm-node-name">JavaScript</span>
-              
-            </button>
-          </li>
-          <li>
-            <button type="button" class="rm-node  is-upcoming"
-                    data-step="4"
-                    data-lang="project"
-                    aria-label="웹 개발 입문 4단계 미니 프로젝트, 준비 중 자세히 보기">
-              <span class="rm-node-no" aria-hidden="true">
-                
-                4
-              </span>
-              <span class="rm-node-name">미니 프로젝트</span>
-              <span class="rm-node-tag" aria-hidden="true">준비 중</span>
-            </button>
-          </li>
-        </ol>
-      </div>
-
-      <div class="rm-branch"
-           data-track="frontend">
-        <article class="rm-dest">
-          <div class="rm-dest-top">
-            <span class="rm-pin" aria-hidden="true"><svg><use href="#rm-i-pin"/></svg></span>
-            <h3>프론트엔드</h3>
-            <span class="rm-dest-state"><svg aria-hidden="true"><use href="#rm-i-check"/></svg>선택됨</span>
-          </div>
-          <p class="rm-dest-summary">React와 Next.js로 서비스 화면 만들기</p>
-          <div class="rm-dest-foot">
-            <span class="rm-dest-meta">
-              <span>3개 강의 · 초급</span>
-              
-            </span>
-            <button type="button" class="rm-dest-btn"
-                    aria-label="프론트엔드 과정 보기" aria-pressed="false" aria-controls="rm-panel-frontend">과정 보기<svg aria-hidden="true"><use href="#rm-i-arrow"/></svg></button>
-          </div>
-        </article>
-
-        <!-- 분야 안의 강의가 뿌리처럼 순서대로 뻗어 내려감 -->
-        <ol class="rm-roots" aria-label="프론트엔드 학습 순서">
-          <li>
-            <button type="button" class="rm-node  is-current"
-                    data-step="1"
-                    data-lang="javascript"
-                    aria-label="프론트엔드 1단계 JavaScript 자세히 보기">
-              <span class="rm-node-no" aria-hidden="true">
-                
-                1
-              </span>
-              <span class="rm-node-name">JavaScript</span>
-              
-            </button>
-          </li>
-          <li>
-            <button type="button" class="rm-node  is-next"
-                    data-step="2"
-                    data-lang="react"
-                    aria-label="프론트엔드 2단계 React 자세히 보기">
-              <span class="rm-node-no" aria-hidden="true">
-                
-                2
-              </span>
-              <span class="rm-node-name">React</span>
-              
-            </button>
-          </li>
-          <li>
-            <button type="button" class="rm-node  is-later"
-                    data-step="3"
-                    data-lang="nextjs"
-                    aria-label="프론트엔드 3단계 Next.js 자세히 보기">
-              <span class="rm-node-no" aria-hidden="true">
-                
-                3
-              </span>
-              <span class="rm-node-name">Next.js</span>
-              
-            </button>
-          </li>
-        </ol>
-      </div>
-
-      <div class="rm-branch"
-           data-track="backend">
-        <article class="rm-dest">
-          <div class="rm-dest-top">
-            <span class="rm-pin" aria-hidden="true"><svg><use href="#rm-i-pin"/></svg></span>
-            <h3>백엔드</h3>
-            <span class="rm-dest-state"><svg aria-hidden="true"><use href="#rm-i-check"/></svg>선택됨</span>
-          </div>
-          <p class="rm-dest-summary">서버에서 동작하는 웹 애플리케이션 만들기</p>
-          <div class="rm-dest-foot">
-            <span class="rm-dest-meta">
-              <span>3개 강의 · 입문</span>
-              
-            </span>
-            <button type="button" class="rm-dest-btn"
-                    aria-label="백엔드 과정 보기" aria-pressed="false" aria-controls="rm-panel-backend">과정 보기<svg aria-hidden="true"><use href="#rm-i-arrow"/></svg></button>
-          </div>
-        </article>
-
-        <!-- 분야 안의 강의가 뿌리처럼 순서대로 뻗어 내려감 -->
-        <ol class="rm-roots" aria-label="백엔드 학습 순서">
-          <li>
-            <button type="button" class="rm-node  is-current"
-                    data-step="1"
-                    data-lang="git"
-                    aria-label="백엔드 1단계 Git 자세히 보기">
-              <span class="rm-node-no" aria-hidden="true">
-                
-                1
-              </span>
-              <span class="rm-node-name">Git</span>
-              
-            </button>
-          </li>
-          <li>
-            <button type="button" class="rm-node  is-next"
-                    data-step="2"
-                    data-lang="php"
-                    aria-label="백엔드 2단계 PHP 자세히 보기">
-              <span class="rm-node-no" aria-hidden="true">
-                
-                2
-              </span>
-              <span class="rm-node-name">PHP</span>
-              
-            </button>
-          </li>
-          <li>
-            <button type="button" class="rm-node  is-later"
-                    data-step="3"
-                    data-lang="java"
-                    aria-label="백엔드 3단계 Java 입문 자세히 보기">
-              <span class="rm-node-no" aria-hidden="true">
-                
-                3
-              </span>
-              <span class="rm-node-name">Java 입문</span>
-              
-            </button>
-          </li>
-        </ol>
-      </div>
-
-      <div class="rm-branch"
-           data-track="database">
-        <article class="rm-dest">
-          <div class="rm-dest-top">
-            <span class="rm-pin" aria-hidden="true"><svg><use href="#rm-i-pin"/></svg></span>
-            <h3>데이터베이스</h3>
-            <span class="rm-dest-state"><svg aria-hidden="true"><use href="#rm-i-check"/></svg>선택됨</span>
-          </div>
-          <p class="rm-dest-summary">SQL로 데이터를 저장하고 조회하기</p>
-          <div class="rm-dest-foot">
-            <span class="rm-dest-meta">
-              <span>2개 강의 · 입문</span>
-              
-            </span>
-            <button type="button" class="rm-dest-btn"
-                    aria-label="데이터베이스 과정 보기" aria-pressed="false" aria-controls="rm-panel-database">과정 보기<svg aria-hidden="true"><use href="#rm-i-arrow"/></svg></button>
-          </div>
-        </article>
-
-        <!-- 분야 안의 강의가 뿌리처럼 순서대로 뻗어 내려감 -->
-        <ol class="rm-roots" aria-label="데이터베이스 학습 순서">
-          <li>
-            <button type="button" class="rm-node  is-current"
-                    data-step="1"
-                    data-lang="mysql"
-                    aria-label="데이터베이스 1단계 MySQL 자세히 보기">
-              <span class="rm-node-no" aria-hidden="true">
-                
-                1
-              </span>
-              <span class="rm-node-name">MySQL</span>
-              
-            </button>
-          </li>
-          <li>
-            <button type="button" class="rm-node  is-next"
-                    data-step="2"
-                    data-lang="sqljoin"
-                    aria-label="데이터베이스 2단계 SQL JOIN 자세히 보기">
-              <span class="rm-node-no" aria-hidden="true">
-                
-                2
-              </span>
-              <span class="rm-node-name">SQL JOIN</span>
-              
-            </button>
-          </li>
-        </ol>
-      </div>
-
-      <div class="rm-branch"
-           data-track="python">
-        <article class="rm-dest">
-          <div class="rm-dest-top">
-            <span class="rm-pin" aria-hidden="true"><svg><use href="#rm-i-pin"/></svg></span>
-            <h3>Python 입문</h3>
-            <span class="rm-dest-state"><svg aria-hidden="true"><use href="#rm-i-check"/></svg>선택됨</span>
-          </div>
-          <p class="rm-dest-summary">가장 쉬운 언어로 프로그래밍 시작하기</p>
-          <div class="rm-dest-foot">
-            <span class="rm-dest-meta">
-              <span>2개 강의 · 입문</span>
-              
-            </span>
-            <button type="button" class="rm-dest-btn"
-                    aria-label="Python 입문 과정 보기" aria-pressed="false" aria-controls="rm-panel-python">과정 보기<svg aria-hidden="true"><use href="#rm-i-arrow"/></svg></button>
-          </div>
-        </article>
-
-        <!-- 분야 안의 강의가 뿌리처럼 순서대로 뻗어 내려감 -->
-        <ol class="rm-roots" aria-label="Python 입문 학습 순서">
-          <li>
-            <button type="button" class="rm-node  is-current"
-                    data-step="1"
-                    data-lang="python"
-                    aria-label="Python 입문 1단계 Python 기초 자세히 보기">
-              <span class="rm-node-no" aria-hidden="true">
-                
-                1
-              </span>
-              <span class="rm-node-name">Python 기초</span>
-              
-            </button>
-          </li>
-          <li>
-            <button type="button" class="rm-node  is-next"
-                    data-step="2"
-                    data-lang="git"
-                    aria-label="Python 입문 2단계 Git 자세히 보기">
-              <span class="rm-node-no" aria-hidden="true">
-                
-                2
-              </span>
-              <span class="rm-node-name">Git</span>
-              
-            </button>
-          </li>
-        </ol>
-      </div>
-      </div>
-    </div>
-
-    <!-- 2단계: 선택한 분야 안의 순서형 학습 경로 -->
-    <div class="rm-path" id="roadmapPath">
-      <div class="rm-panel" role="region"
-               id="rm-panel-web"
-               data-panel="web"
-               aria-labelledby="rm-panel-title-web">
-        <div class="rm-panel-head">
-          <div class="rm-panel-copy">
-            <span class="rm-eyebrow">YOUR LEARNING PATH</span>
-            <h3 id="rm-panel-title-web">웹 개발 입문 학습 순서</h3>
-          </div>
-          <dl class="rm-panel-goal">
-            <div><dt>목표</dt><dd>나만의 웹 페이지 만들기</dd></div>
-            <div><dt>추천</dt><dd>웹사이트 제작을 처음 배우는 학습자</dd></div>
-          </dl>
-        </div>
-
-        <ol class="rm-steps" style="--rm-steps:4">
-          <li class="rm-step  is-current"
-              data-step="1"
-              style="--rm-i:0" aria-current="step">
-            <div class="rm-step-marker" aria-hidden="true">
-              
-              <span>1</span>
-            </div>
-            <div class="rm-step-card">
-              <div class="rm-step-top">
-                <span class="rm-step-status">
-                  
-                  <svg aria-hidden="true"><use href="#rm-i-flag"/></svg>여기서 시작
-                  
-                  
-                  
-                </span>
-              </div>
-              <h4><span class="rm-sr">1단계 </span>HTML &amp; Internet</h4>
-              <p class="rm-step-summary">웹 페이지의 기본 구조와 인터넷 동작 배우기</p>
-              <ul class="rm-step-meta">
-                <li>입문 · 약 3시간 30분</li>
-                <li>레슨 28개</li>
-              </ul>
-              <p class="rm-step-prereq">선수 강의 없음</p>
-              <a class="rm-step-cta" href="learn/html/index.html"
-                 aria-label="HTML &amp; Internet 학습 시작">
-                <span>학습 시작</span><svg aria-hidden="true"><use href="#rm-i-arrow"/></svg>
-              </a>
-            </div>
-          </li>
-          <li class="rm-step  is-next"
-              data-step="2"
-              style="--rm-i:1">
-            <div class="rm-step-marker" aria-hidden="true">
-              
-              <span>2</span>
-            </div>
-            <div class="rm-step-card">
-              <div class="rm-step-top">
-                <span class="rm-step-status">
-                  
-                  
-                  <svg aria-hidden="true"><use href="#rm-i-dot"/></svg>다음 단계
-                  
-                  
-                </span>
-              </div>
-              <h4><span class="rm-sr">2단계 </span>CSS</h4>
-              <p class="rm-step-summary">웹 페이지를 원하는 모습으로 꾸미기</p>
-              <ul class="rm-step-meta">
-                <li>입문</li>
-                <li>레슨 15개</li>
-              </ul>
-              <p class="rm-step-prereq">선수 강의: HTML &amp; Internet</p>
-              <a class="rm-step-cta" href="learn/css/index.html"
-                 aria-label="CSS 학습 시작">
-                <span>학습 시작</span><svg aria-hidden="true"><use href="#rm-i-arrow"/></svg>
-              </a>
-            </div>
-          </li>
-          <li class="rm-step  is-later"
-              data-step="3"
-              style="--rm-i:2">
-            <div class="rm-step-marker" aria-hidden="true">
-              
-              <span>3</span>
-            </div>
-            <div class="rm-step-card">
-              <div class="rm-step-top">
-                <span class="rm-step-status">
-                  
-                  
-                  
-                  <svg aria-hidden="true"><use href="#rm-i-dot"/></svg>이후 단계
-                  
-                </span>
-              </div>
-              <h4><span class="rm-sr">3단계 </span>JavaScript</h4>
-              <p class="rm-step-summary">웹 페이지에 동작과 상호작용 더하기</p>
-              <ul class="rm-step-meta">
-                <li>입문</li>
-                <li>레슨 38개</li>
-              </ul>
-              <p class="rm-step-prereq">선수 강의: CSS</p>
-              <a class="rm-step-cta" href="learn/javascript/index.html"
-                 aria-label="JavaScript 학습 시작">
-                <span>학습 시작</span><svg aria-hidden="true"><use href="#rm-i-arrow"/></svg>
-              </a>
-            </div>
-          </li>
-          <li class="rm-step  is-upcoming"
-              data-step="4"
-              style="--rm-i:3">
-            <div class="rm-step-marker" aria-hidden="true">
-              
-              <span>4</span>
-            </div>
-            <div class="rm-step-card">
-              <div class="rm-step-top">
-                <span class="rm-step-status">
-                  
-                  
-                  
-                  
-                  <svg aria-hidden="true"><use href="#rm-i-clock"/></svg>준비 중
-                </span>
-              </div>
-              <h4><span class="rm-sr">4단계 </span>미니 프로젝트</h4>
-              <p class="rm-step-summary">배운 내용으로 나만의 웹 페이지 완성하기</p>
-              <ul class="rm-step-meta">
-                <li>실습</li>
-                
-              </ul>
-              <p class="rm-step-prereq">선수 강의: JavaScript</p>
-              
-            </div>
-          </li>
-        </ol>
-      </div>
-      <div class="rm-panel" role="region"
-               id="rm-panel-frontend"
-               data-panel="frontend"
-               aria-labelledby="rm-panel-title-frontend" hidden="hidden">
-        <div class="rm-panel-head">
-          <div class="rm-panel-copy">
-            <span class="rm-eyebrow">YOUR LEARNING PATH</span>
-            <h3 id="rm-panel-title-frontend">프론트엔드 학습 순서</h3>
-          </div>
-          <dl class="rm-panel-goal">
-            <div><dt>목표</dt><dd>React·Next.js로 서비스 화면 만들기</dd></div>
-            <div><dt>추천</dt><dd>HTML·CSS 기초를 아는 학습자</dd></div>
-          </dl>
-        </div>
-
-        <ol class="rm-steps" style="--rm-steps:3">
-          <li class="rm-step  is-current"
-              data-step="1"
-              style="--rm-i:0" aria-current="step">
-            <div class="rm-step-marker" aria-hidden="true">
-              
-              <span>1</span>
-            </div>
-            <div class="rm-step-card">
-              <div class="rm-step-top">
-                <span class="rm-step-status">
-                  
-                  <svg aria-hidden="true"><use href="#rm-i-flag"/></svg>여기서 시작
-                  
-                  
-                  
-                </span>
-              </div>
-              <h4><span class="rm-sr">1단계 </span>JavaScript</h4>
-              <p class="rm-step-summary">React를 위한 JavaScript 기본기 다지기</p>
-              <ul class="rm-step-meta">
-                <li>입문</li>
-                <li>레슨 38개</li>
-              </ul>
-              <p class="rm-step-prereq">권장 선행: HTML·CSS 기초</p>
-              <a class="rm-step-cta" href="learn/javascript/index.html"
-                 aria-label="JavaScript 학습 시작">
-                <span>학습 시작</span><svg aria-hidden="true"><use href="#rm-i-arrow"/></svg>
-              </a>
-            </div>
-          </li>
-          <li class="rm-step  is-next"
-              data-step="2"
-              style="--rm-i:1">
-            <div class="rm-step-marker" aria-hidden="true">
-              
-              <span>2</span>
-            </div>
-            <div class="rm-step-card">
-              <div class="rm-step-top">
-                <span class="rm-step-status">
-                  
-                  
-                  <svg aria-hidden="true"><use href="#rm-i-dot"/></svg>다음 단계
-                  
-                  
-                </span>
-              </div>
-              <h4><span class="rm-sr">2단계 </span>React</h4>
-              <p class="rm-step-summary">컴포넌트로 화면을 나누고 CRUD 흐름 익히기</p>
-              <ul class="rm-step-meta">
-                <li>입문 · 약 1시간 40분</li>
-                <li>레슨 10개</li>
-              </ul>
-              <p class="rm-step-prereq">선수 강의: JavaScript</p>
-              <a class="rm-step-cta" href="learn/react/index.html"
-                 aria-label="React 학습 시작">
-                <span>학습 시작</span><svg aria-hidden="true"><use href="#rm-i-arrow"/></svg>
-              </a>
-            </div>
-          </li>
-          <li class="rm-step  is-later"
-              data-step="3"
-              style="--rm-i:2">
-            <div class="rm-step-marker" aria-hidden="true">
-              
-              <span>3</span>
-            </div>
-            <div class="rm-step-card">
-              <div class="rm-step-top">
-                <span class="rm-step-status">
-                  
-                  
-                  
-                  <svg aria-hidden="true"><use href="#rm-i-dot"/></svg>이후 단계
-                  
-                </span>
-              </div>
-              <h4><span class="rm-sr">3단계 </span>Next.js</h4>
-              <p class="rm-step-summary">라우팅과 서버 렌더링으로 앱 완성하기</p>
-              <ul class="rm-step-meta">
-                <li>입문</li>
-                <li>레슨 18개</li>
-              </ul>
-              <p class="rm-step-prereq">선수 강의: React</p>
-              <a class="rm-step-cta" href="learn/nextjs/index.html"
-                 aria-label="Next.js 학습 시작">
-                <span>학습 시작</span><svg aria-hidden="true"><use href="#rm-i-arrow"/></svg>
-              </a>
-            </div>
-          </li>
-        </ol>
-      </div>
-      <div class="rm-panel" role="region"
-               id="rm-panel-backend"
-               data-panel="backend"
-               aria-labelledby="rm-panel-title-backend" hidden="hidden">
-        <div class="rm-panel-head">
-          <div class="rm-panel-copy">
-            <span class="rm-eyebrow">YOUR LEARNING PATH</span>
-            <h3 id="rm-panel-title-backend">백엔드 학습 순서</h3>
-          </div>
-          <dl class="rm-panel-goal">
-            <div><dt>목표</dt><dd>서버가 있는 웹 애플리케이션 만들기</dd></div>
-            <div><dt>추천</dt><dd>서버와 데이터 처리가 궁금한 학습자</dd></div>
-          </dl>
-        </div>
-
-        <ol class="rm-steps" style="--rm-steps:3">
-          <li class="rm-step  is-current"
-              data-step="1"
-              style="--rm-i:0" aria-current="step">
-            <div class="rm-step-marker" aria-hidden="true">
-              
-              <span>1</span>
-            </div>
-            <div class="rm-step-card">
-              <div class="rm-step-top">
-                <span class="rm-step-status">
-                  
-                  <svg aria-hidden="true"><use href="#rm-i-flag"/></svg>여기서 시작
-                  
-                  
-                  
-                </span>
-              </div>
-              <h4><span class="rm-sr">1단계 </span>Git</h4>
-              <p class="rm-step-summary">버전 관리로 코드를 안전하게 기록하기</p>
-              <ul class="rm-step-meta">
-                <li>입문 · 약 45분</li>
-                <li>레슨 8개</li>
-              </ul>
-              <p class="rm-step-prereq">선수 강의 없음</p>
-              <a class="rm-step-cta" href="learn/git/index.html"
-                 aria-label="Git 학습 시작">
-                <span>학습 시작</span><svg aria-hidden="true"><use href="#rm-i-arrow"/></svg>
-              </a>
-            </div>
-          </li>
-          <li class="rm-step  is-next"
-              data-step="2"
-              style="--rm-i:1">
-            <div class="rm-step-marker" aria-hidden="true">
-              
-              <span>2</span>
-            </div>
-            <div class="rm-step-card">
-              <div class="rm-step-top">
-                <span class="rm-step-status">
-                  
-                  
-                  <svg aria-hidden="true"><use href="#rm-i-dot"/></svg>다음 단계
-                  
-                  
-                </span>
-              </div>
-              <h4><span class="rm-sr">2단계 </span>PHP</h4>
-              <p class="rm-step-summary">폼 처리와 서버 측 웹 애플리케이션 흐름 익히기</p>
-              <ul class="rm-step-meta">
-                <li>입문 · 약 6시간 10분</li>
-                <li>레슨 42개</li>
-              </ul>
-              <p class="rm-step-prereq">선수 강의: Git</p>
-              <a class="rm-step-cta" href="learn/php/index.html"
-                 aria-label="PHP 학습 시작">
-                <span>학습 시작</span><svg aria-hidden="true"><use href="#rm-i-arrow"/></svg>
-              </a>
-            </div>
-          </li>
-          <li class="rm-step  is-later"
-              data-step="3"
-              style="--rm-i:2">
-            <div class="rm-step-marker" aria-hidden="true">
-              
-              <span>3</span>
-            </div>
-            <div class="rm-step-card">
-              <div class="rm-step-top">
-                <span class="rm-step-status">
-                  
-                  
-                  
-                  <svg aria-hidden="true"><use href="#rm-i-dot"/></svg>이후 단계
-                  
-                </span>
-              </div>
-              <h4><span class="rm-sr">3단계 </span>Java 입문</h4>
-              <p class="rm-step-summary">Java 문법과 객체지향 기초 다지기</p>
-              <ul class="rm-step-meta">
-                <li>입문 · 약 15시간 10분</li>
-                <li>레슨 100개</li>
-              </ul>
-              <p class="rm-step-prereq">선수 강의: PHP</p>
-              <a class="rm-step-cta" href="learn/java/index.html"
-                 aria-label="Java 입문 학습 시작">
-                <span>학습 시작</span><svg aria-hidden="true"><use href="#rm-i-arrow"/></svg>
-              </a>
-            </div>
-          </li>
-        </ol>
-      </div>
-      <div class="rm-panel" role="region"
-               id="rm-panel-database"
-               data-panel="database"
-               aria-labelledby="rm-panel-title-database" hidden="hidden">
-        <div class="rm-panel-head">
-          <div class="rm-panel-copy">
-            <span class="rm-eyebrow">YOUR LEARNING PATH</span>
-            <h3 id="rm-panel-title-database">데이터베이스 학습 순서</h3>
-          </div>
-          <dl class="rm-panel-goal">
-            <div><dt>목표</dt><dd>관계형 데이터 설계하고 조회하기</dd></div>
-            <div><dt>추천</dt><dd>데이터 관리가 처음인 학습자</dd></div>
-          </dl>
-        </div>
-
-        <ol class="rm-steps" style="--rm-steps:2">
-          <li class="rm-step  is-current"
-              data-step="1"
-              style="--rm-i:0" aria-current="step">
-            <div class="rm-step-marker" aria-hidden="true">
-              
-              <span>1</span>
-            </div>
-            <div class="rm-step-card">
-              <div class="rm-step-top">
-                <span class="rm-step-status">
-                  
-                  <svg aria-hidden="true"><use href="#rm-i-flag"/></svg>여기서 시작
-                  
-                  
-                  
-                </span>
-              </div>
-              <h4><span class="rm-sr">1단계 </span>MySQL</h4>
-              <p class="rm-step-summary">관계형 데이터베이스와 SQL 기본 문법 익히기</p>
-              <ul class="rm-step-meta">
-                <li>입문 · 약 3시간 20분</li>
-                <li>레슨 27개</li>
-              </ul>
-              <p class="rm-step-prereq">선수 강의 없음</p>
-              <a class="rm-step-cta" href="learn/mysql/index.html"
-                 aria-label="MySQL 학습 시작">
-                <span>학습 시작</span><svg aria-hidden="true"><use href="#rm-i-arrow"/></svg>
-              </a>
-            </div>
-          </li>
-          <li class="rm-step  is-next"
-              data-step="2"
-              style="--rm-i:1">
-            <div class="rm-step-marker" aria-hidden="true">
-              
-              <span>2</span>
-            </div>
-            <div class="rm-step-card">
-              <div class="rm-step-top">
-                <span class="rm-step-status">
-                  
-                  
-                  <svg aria-hidden="true"><use href="#rm-i-dot"/></svg>다음 단계
-                  
-                  
-                </span>
-              </div>
-              <h4><span class="rm-sr">2단계 </span>SQL JOIN</h4>
-              <p class="rm-step-summary">테이블을 나누고 JOIN으로 연결하기</p>
-              <ul class="rm-step-meta">
-                <li>입문 · 약 51분</li>
-                <li>레슨 8개</li>
-              </ul>
-              <p class="rm-step-prereq">선수 강의: MySQL</p>
-              <a class="rm-step-cta" href="learn/sqljoin/index.html"
-                 aria-label="SQL JOIN 학습 시작">
-                <span>학습 시작</span><svg aria-hidden="true"><use href="#rm-i-arrow"/></svg>
-              </a>
-            </div>
-          </li>
-        </ol>
-      </div>
-      <div class="rm-panel" role="region"
-               id="rm-panel-python"
-               data-panel="python"
-               aria-labelledby="rm-panel-title-python" hidden="hidden">
-        <div class="rm-panel-head">
-          <div class="rm-panel-copy">
-            <span class="rm-eyebrow">YOUR LEARNING PATH</span>
-            <h3 id="rm-panel-title-python">Python 입문 학습 순서</h3>
-          </div>
-          <dl class="rm-panel-goal">
-            <div><dt>목표</dt><dd>Python으로 첫 프로그램 만들기</dd></div>
-            <div><dt>추천</dt><dd>프로그래밍을 처음 배우는 학습자</dd></div>
-          </dl>
-        </div>
-
-        <ol class="rm-steps" style="--rm-steps:2">
-          <li class="rm-step  is-current"
-              data-step="1"
-              style="--rm-i:0" aria-current="step">
-            <div class="rm-step-marker" aria-hidden="true">
-              
-              <span>1</span>
-            </div>
-            <div class="rm-step-card">
-              <div class="rm-step-top">
-                <span class="rm-step-status">
-                  
-                  <svg aria-hidden="true"><use href="#rm-i-flag"/></svg>여기서 시작
-                  
-                  
-                  
-                </span>
-              </div>
-              <h4><span class="rm-sr">1단계 </span>Python 기초</h4>
-              <p class="rm-step-summary">변수·조건문·반복문으로 프로그래밍 기초 익히기</p>
-              <ul class="rm-step-meta">
-                <li>입문 · 약 1시간 40분</li>
-                <li>레슨 18개</li>
-              </ul>
-              <p class="rm-step-prereq">선수 강의 없음</p>
-              <a class="rm-step-cta" href="learn/python/index.html"
-                 aria-label="Python 기초 학습 시작">
-                <span>학습 시작</span><svg aria-hidden="true"><use href="#rm-i-arrow"/></svg>
-              </a>
-            </div>
-          </li>
-          <li class="rm-step  is-next"
-              data-step="2"
-              style="--rm-i:1">
-            <div class="rm-step-marker" aria-hidden="true">
-              
-              <span>2</span>
-            </div>
-            <div class="rm-step-card">
-              <div class="rm-step-top">
-                <span class="rm-step-status">
-                  
-                  
-                  <svg aria-hidden="true"><use href="#rm-i-dot"/></svg>다음 단계
-                  
-                  
-                </span>
-              </div>
-              <h4><span class="rm-sr">2단계 </span>Git</h4>
-              <p class="rm-step-summary">만든 코드를 버전 관리로 기록하기</p>
-              <ul class="rm-step-meta">
-                <li>입문 · 약 45분</li>
-                <li>레슨 8개</li>
-              </ul>
-              <p class="rm-step-prereq">선수 강의: Python 기초</p>
-              <a class="rm-step-cta" href="learn/git/index.html"
-                 aria-label="Git 학습 시작">
-                <span>학습 시작</span><svg aria-hidden="true"><use href="#rm-i-arrow"/></svg>
-              </a>
-            </div>
-          </li>
-        </ol>
-      </div>
-    </div>
-  </section>
-
-  <section class="recommended-section" id="recommendedCourses">
-    <div class="recommended-heading">
-      <h2>추천 강의</h2>
-      <a href="learn/index.html">전체 보기 <span>›</span></a>
-    </div>
-    <div class="recommended-grid">
-      <a href="learn/html/index.html"
-         class="course-card  course-html">
-        <div class="course-cover course-youtube-thumbnail">
-          <img src="https://i.ytimg.com/vi/tZooW6PritE/hqdefault.jpg"
-               alt="WEB1 - HTML &amp; Internet 유튜브 썸네일"
-               loading="lazy">
-          <span class="course-play-badge"
-                aria-hidden="true"></span>
-          
-          
-        </div>
-        <div class="course-info">
-          <span class="course-step-label">웹 개발 입문 · 1단계</span>
-          <h3>HTML &amp; Internet</h3>
-          <p>웹 페이지의 기본 구조와 인터넷 동작 배우기</p>
-          
-          <span class="course-progress-label">입문 · 레슨 28개</span>
-        </div>
-      </a><a href="learn/css/index.html"
-         class="course-card  course-css">
-        <div class="course-cover course-youtube-thumbnail">
-          <img src="https://i.ytimg.com/vi/Ok0bBJPtgJI/hqdefault.jpg"
-               alt="WEB2 - CSS 유튜브 썸네일"
-               loading="lazy">
-          <span class="course-play-badge"
-                aria-hidden="true"></span>
-          
-          
-        </div>
-        <div class="course-info">
-          <span class="course-step-label">웹 개발 입문 · 2단계</span>
-          <h3>CSS</h3>
-          <p>웹 페이지를 원하는 모습으로 꾸미기</p>
-          
-          <span class="course-progress-label">입문 · 레슨 15개</span>
-        </div>
-      </a><a href="learn/javascript/index.html"
-         class="course-card  course-javascript">
-        <div class="course-cover course-youtube-thumbnail">
-          <img src="https://i.ytimg.com/vi/dPRtcRwKo-Y/hqdefault.jpg"
-               alt="WEB2 - JavaScript 유튜브 썸네일"
-               loading="lazy">
-          <span class="course-play-badge"
-                aria-hidden="true"></span>
-          
-          
-        </div>
-        <div class="course-info">
-          <span class="course-step-label">웹 개발 입문 · 3단계</span>
-          <h3>JavaScript</h3>
-          <p>웹 페이지에 동작과 상호작용 더하기</p>
-          
-          <span class="course-progress-label">입문 · 레슨 38개</span>
-        </div>
-      </a><a href="learn/java/index.html"
-         class="course-card  course-java">
-        <div class="course-cover course-youtube-thumbnail">
-          <img src="https://i.ytimg.com/vi/jdTsJzXmgU0/hqdefault.jpg"
-               alt="Java 입문 수업 유튜브 썸네일"
-               loading="lazy">
-          <span class="course-play-badge"
-                aria-hidden="true"></span>
-          
-          
-        </div>
-        <div class="course-info">
-          <span class="course-step-label">백엔드 · 3단계</span>
-          <h3>Java 입문</h3>
-          <p>Java 문법과 객체지향 기초 다지기</p>
-          
-          <span class="course-progress-label">입문 · 레슨 100개</span>
-        </div>
-      </a><a href="learn/php/index.html"
-         class="course-card  course-php">
-        <div class="course-cover course-youtube-thumbnail">
-          <img src="https://i.ytimg.com/vi/Qh_6JheU_gY/hqdefault.jpg"
-               alt="WEB2-PHP 유튜브 썸네일"
-               loading="lazy">
-          <span class="course-play-badge"
-                aria-hidden="true"></span>
-          
-          
-        </div>
-        <div class="course-info">
-          <span class="course-step-label">백엔드 · 2단계</span>
-          <h3>PHP</h3>
-          <p>폼 처리와 서버 측 웹 애플리케이션 흐름 익히기</p>
-          
-          <span class="course-progress-label">입문 · 레슨 42개</span>
-        </div>
-      </a><a href="learn/mysql/index.html"
-         class="course-card  course-mysql">
-        <div class="course-cover course-youtube-thumbnail">
-          <img src="https://i.ytimg.com/vi/h_XDmyz--0w/hqdefault.jpg"
-               alt="DATABASE2 - MySQL 유튜브 썸네일"
-               loading="lazy">
-          <span class="course-play-badge"
-                aria-hidden="true"></span>
-          
-          
-        </div>
-        <div class="course-info">
-          <span class="course-step-label">데이터베이스 · 1단계</span>
-          <h3>MySQL</h3>
-          <p>관계형 데이터베이스와 SQL 기본 문법 익히기</p>
-          
-          <span class="course-progress-label">입문 · 레슨 27개</span>
-        </div>
-      </a><a href="learn/sqljoin/index.html"
-         class="course-card  course-sqljoin">
-        <div class="course-cover course-youtube-thumbnail">
-          <img src="https://i.ytimg.com/vi/2Xa54XBXbk0/hqdefault.jpg"
-               alt="SQL JOIN 유튜브 썸네일"
-               loading="lazy">
-          <span class="course-play-badge"
-                aria-hidden="true"></span>
-          
-          
-        </div>
-        <div class="course-info">
-          <span class="course-step-label">데이터베이스 · 2단계</span>
-          <h3>SQL JOIN</h3>
-          <p>테이블을 나누고 JOIN으로 연결하기</p>
-          
-          <span class="course-progress-label">입문 · 레슨 8개</span>
-        </div>
-      </a><a href="learn/python/index.html"
-         class="course-card  course-python">
-        <div class="course-cover course-youtube-thumbnail">
-          <img src="https://i.ytimg.com/vi/-3DHpwy498o/hqdefault.jpg"
-               alt="Python 입문수업 유튜브 썸네일"
-               loading="lazy">
-          <span class="course-play-badge"
-                aria-hidden="true"></span>
-          
-          
-        </div>
-        <div class="course-info">
-          <span class="course-step-label">Python 입문 · 1단계</span>
-          <h3>Python 기초</h3>
-          <p>변수·조건문·반복문으로 프로그래밍 기초 익히기</p>
-          
-          <span class="course-progress-label">입문 · 레슨 18개</span>
-        </div>
-      </a><a href="learn/react/index.html"
-         class="course-card  course-react">
-        <div class="course-cover course-youtube-thumbnail">
-          <img src="https://i.ytimg.com/vi/AoMv0SIjZL8/hqdefault.jpg"
-               alt="React 2022 개정판 유튜브 썸네일"
-               loading="lazy">
-          <span class="course-play-badge"
-                aria-hidden="true"></span>
-          
-          
-        </div>
-        <div class="course-info">
-          <span class="course-step-label">프론트엔드 · 2단계</span>
-          <h3>React</h3>
-          <p>컴포넌트로 화면을 나누고 CRUD 흐름 익히기</p>
-          
-          <span class="course-progress-label">입문 · 레슨 10개</span>
-        </div>
-      </a><a href="learn/nextjs/index.html"
-         class="course-card  course-nextjs">
-        <div class="course-cover course-youtube-thumbnail">
-          <img src="https://i.ytimg.com/vi/9KOaR6QMb9A/hqdefault.jpg"
-               alt="Next.js 13 유튜브 썸네일"
-               loading="lazy">
-          <span class="course-play-badge"
-                aria-hidden="true"></span>
-          
-          
-        </div>
-        <div class="course-info">
-          <span class="course-step-label">프론트엔드 · 3단계</span>
-          <h3>Next.js</h3>
-          <p>라우팅과 서버 렌더링으로 앱 완성하기</p>
-          
-          <span class="course-progress-label">입문 · 레슨 18개</span>
-        </div>
-      </a><a href="learn/git/index.html"
-         class="course-card  course-git">
-        <div class="course-cover course-youtube-thumbnail">
-          <img src="https://i.ytimg.com/vi/uKtBJ65UWoM/hqdefault.jpg"
-               alt="GIT1 유튜브 썸네일"
-               loading="lazy">
-          <span class="course-play-badge"
-                aria-hidden="true"></span>
-          
-          
-        </div>
-        <div class="course-info">
-          <span class="course-step-label">백엔드 · 1단계</span>
-          <h3>Git</h3>
-          <p>버전 관리로 코드를 안전하게 기록하기</p>
-          
-          <span class="course-progress-label">입문 · 레슨 8개</span>
-        </div>
-      </a>
-    </div>
-  </section>
-
-  <section class="home-metrics" aria-label="서비스 현황">
-    <a href="learn/index.html" class="metric-card">
-      <span class="metric-value"><b class="count-up" data-target="312">0</b></span>
-      <span class="metric-label">완료할 강의</span>
-      <img class="metric-icon" src="images/metrics/metric-lessons.png" alt="" aria-hidden="true">
-    </a>
-    <a href="learn/index.html" class="metric-card">
-      <span class="metric-value"><b class="count-up" data-target="11">0</b></span>
-      <span class="metric-label">학습 코스</span>
-      <img class="metric-icon" src="images/metrics/metric-courses.png" alt="" aria-hidden="true">
-    </a>
-    <a href="quiz/index.html" class="metric-card">
-      <span class="metric-value"><b class="count-up" data-target="10">0</b></span>
-      <span class="metric-label">도전할 퀴즈</span>
-      <img class="metric-icon" src="images/metrics/metric-quiz.png" alt="" aria-hidden="true">
-    </a>
-    <a href="community/index.html" class="metric-card">
-      <span class="metric-value"><b class="count-up" data-target="7">0</b></span>
-      <span class="metric-label">함께하는 학습자</span>
-      <img class="metric-icon" src="images/metrics/metric-learners.png" alt="" aria-hidden="true">
-    </a>
-  </section>
-</main>
-
-<!-- ══════ FOOTER ══════ -->
-
-<footer>
-  <div class="f-logo">
-    <span class="brand-text"><b>Coding</b>Edu</span>
-  </div>
-  <div>© <span>2026</span> Code<em style="color:var(--accent);font-style:normal;"><i>E</i></em>du. 코딩은 즐거워요!</div>
-  <div class="f-links">
-    <a href="community/index.html">커뮤니티</a>
-    <a href="learn/index.html">강의</a>
-    <a href="quiz/index.html">퀴즈</a>
-    <a href="ai/index.html">AI 도우미</a>
-    <a href="notice.html">이용약관</a>
-    <a href="notice.html">개인정보처리방침</a>
-  </div>
-</footer>
-<script src="js/nav.js"></script>
-
-<script src="js/roadmap.js"></script>
-
-<script>
-  /* ── Number Count Up FX ── */
-  document.addEventListener("DOMContentLoaded", function() {
-    document.querySelectorAll('.course-youtube-thumbnail img[data-fallback-src]').forEach(img => {
-      img.addEventListener('error', function handleThumbnailError() {
-        this.removeEventListener('error', handleThumbnailError);
-        if (this.dataset.fallbackSrc) this.src = this.dataset.fallbackSrc;
-      });
-    });
-
-    const counters = document.querySelectorAll(".count-up");
-    if (!counters.length) return;
-
-    function animateCounter(counter) {
-      const target = +counter.getAttribute('data-target');
-      if (isNaN(target) || target <= 0) return;
-
-      if (counter._rafId) cancelAnimationFrame(counter._rafId);
-
-      const duration = 1800;
-      const startTime = performance.now();
-
-      const update = (now) => {
-        const progress = Math.min((now - startTime) / duration, 1);
-        const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-        counter.textContent = Math.round(eased * target);
-
-        if (progress < 1) {
-          counter._rafId = requestAnimationFrame(update);
-        } else {
-          counter.textContent = target;
-          counter._rafId = null;
-        }
-      };
-
-      counter._rafId = requestAnimationFrame(update);
-    }
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          animateCounter(entry.target);
-        } else {
-          // 뷰포트 밖으로 나가면 0으로 리셋 → 다시 들어올 때 재실행
-          const counter = entry.target;
-          if (counter._rafId) {
-            cancelAnimationFrame(counter._rafId);
-            counter._rafId = null;
-          }
-          counter.textContent = '0';
-        }
-      });
-    }, { threshold: 0.4 });
-
-    counters.forEach(c => observer.observe(c));
-  });
-
-</script>
+</head>
+<body class="page-index">
+
+<!-- ══════ NAV ══════ -->
+<nav>
+  <a href="index.html" class="logo">
+    <span class="brand-text"><b>Coding</b>Edu</span>
+  </a>
+
+  <div class="nav-links">
+    <a href="index.html" data-tab="home">홈</a>
+    <a href="learn/index.html" data-tab="learn">강의</a>
+    <a href="quiz/index.html" data-tab="quiz">퀴즈</a>
+    <a href="challenge/index.html" data-tab="more">챌린지</a>
+    <a href="community/index.html" data-tab="more">커뮤니티</a>
+    <a href="ai/index.html" data-tab="more">AI 도우미</a>
+  </div>
+
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeToggle" title="테마 전환" aria-label="다크/라이트 모드 전환"></button>
+
+    <div class="nav-right-auth">
+      <a href="me/index.html" class="btn-login ghost">로그인</a>
+      <a href="me/index.html" class="btn-login">회원가입</a>
+    </div>
+
+    
+  </div>
+</nav>
+
+<main class="home-frame">
+  <section class="home-hero">
+    <div class="home-hero-copy">
+      <span class="home-eyebrow">처음이어도 괜찮아요</span>
+      
+      <h1>코딩, <em>함께 배우고</em><br>성장하는 공간</h1>
+      <p>다양한 강의와 퀴즈, 챌린지로<br>나만의 성장을 기록해보세요.</p>
+      <div class="home-hero-actions">
+        <a href="learn/index.html" class="home-primary-btn">강의 시작하기</a>
+        
+        <a href="#learningRoadmap" class="home-secondary-btn">학습 지도 보기</a>
+      </div>
+    </div>
+    <div class="home-hero-art">
+      <img src="images/coding-hero-transparent.png" alt="노트북으로 코딩을 공부하는 학습자">
+    </div>
+  </section>
+
+  <!-- ══════ LEARNING ROADMAP: 분야 선택 지도 → 분야별 학습 순서 ══════ -->
+  <section class="roadmap" id="learningRoadmap" aria-labelledby="roadmapTitle" data-initial-track="web">
+    <svg class="rm-sprite" aria-hidden="true" focusable="false">
+      <symbol id="rm-i-pin" viewBox="0 0 24 24"><path d="M12 2.5a7.5 7.5 0 0 0-7.5 7.5c0 5.3 6.2 10.9 6.9 11.5a.9.9 0 0 0 1.2 0c.7-.6 6.9-6.2 6.9-11.5A7.5 7.5 0 0 0 12 2.5Zm0 10.3a2.8 2.8 0 1 1 0-5.6 2.8 2.8 0 0 1 0 5.6Z"/></symbol>
+      <symbol id="rm-i-check" viewBox="0 0 24 24"><path d="M9.6 16.2 5.4 12l-1.4 1.4 5.6 5.6 10.4-10.4L18.6 7.2z"/></symbol>
+      <symbol id="rm-i-flag" viewBox="0 0 24 24"><path d="M5 21V4h9.2l.5 2H20v9h-6.8l-.5-2H7v8z"/></symbol>
+      <symbol id="rm-i-arrow" viewBox="0 0 24 24"><path d="M13.2 5.3 19.9 12l-6.7 6.7-1.4-1.4 4.3-4.3H4v-2h12.1l-4.3-4.3z"/></symbol>
+      <symbol id="rm-i-clock" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm.8-13h-1.6v5.8l4.6 2.8.8-1.3-3.8-2.3z"/></symbol>
+      <symbol id="rm-i-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/></symbol>
+    </svg>
+
+    <header class="rm-head">
+      <span class="rm-eyebrow">CHOOSE YOUR START</span>
+      <h2 id="roadmapTitle">어떤 분야로 출발할까요?</h2>
+      <p>관심 있는 학습 분야를 선택해 시작해보세요. 각 분야는 독립적으로 학습할 수 있어요.</p>
+    </header>
+
+    <!-- 1단계: 전체 분야 선택 지도 -->
+    <div class="rm-map" data-rm-map>
+      <!-- 데스크톱: 분야(큰 노드)와 강의(작은 노드)를 학습 순서 화살표로 잇는 지도 -->
+      <div class="rm-graph" data-rm-graph>
+        <!-- 화면 크기와 관계없이 같은 구조. 좁은 화면은 확대/축소 후 지도 안에서 이동 -->
+        <div class="rm-zoom" role="group" aria-label="지도 확대·축소">
+          <button type="button" data-zoom="out" aria-label="축소">−</button>
+          <span class="rm-zoom-level" data-zoom-level aria-live="polite">100%</span>
+          <button type="button" data-zoom="in" aria-label="확대">+</button>
+          <button type="button" data-zoom="fit" class="rm-zoom-fit">전체 보기</button>
+        </div>
+        <div class="rm-graph-viewport" data-rm-viewport>
+          <svg class="rm-graph-svg" data-rm-graph-svg viewBox="0 0 1200 540" role="group" aria-label="학습 분야와 강의 연결 지도"></svg>
+        </div>
+        <ul class="rm-legend" aria-hidden="true">
+          <li><i class="rm-legend-field"></i>분야</li>
+          <li><i class="rm-legend-course"></i>강의</li>
+          <li><i class="rm-legend-prev"></i>선수 강의</li>
+          <li><i class="rm-legend-arrow"></i>학습 순서</li>
+          <li class="rm-legend-hint">노드에 마우스를 올리면 연결된 강의가 강조돼요 · Ctrl+휠로 확대</li>
+          <li class="rm-legend-touch">노드를 탭하면 연결된 강의가 강조되고, 아래에 학습 순서가 나와요</li>
+        </ul>
+      </div>
+
+      <!-- 태블릿·모바일: 분야 카드 아래로 강의가 이어지는 목록형 지도 -->
+      <div class="rm-tree">
+      <div class="rm-hub" data-rm-hub>
+        <span class="rm-hub-mark" aria-hidden="true"><i></i></span>
+        <strong>나의 시작점</strong>
+      </div>
+
+      <div class="rm-branch  is-selected"
+           data-track="web">
+        <article class="rm-dest">
+          <div class="rm-dest-top">
+            <span class="rm-pin" aria-hidden="true"><svg><use href="#rm-i-pin"/></svg></span>
+            <h3>웹 개발 입문</h3>
+            <span class="rm-dest-state"><svg aria-hidden="true"><use href="#rm-i-check"/></svg>선택됨</span>
+          </div>
+          <p class="rm-dest-summary">HTML·CSS·JavaScript로 웹의 기초 다지기</p>
+          <div class="rm-dest-foot">
+            <span class="rm-dest-meta">
+              <span>3개 강의 · 입문</span>
+              
+            </span>
+            <button type="button" class="rm-dest-btn"
+                    aria-label="웹 개발 입문 과정 보기" aria-pressed="true" aria-controls="rm-panel-web">과정 보기<svg aria-hidden="true"><use href="#rm-i-arrow"/></svg></button>
+          </div>
+        </article>
+
+        <!-- 분야 안의 강의가 뿌리처럼 순서대로 뻗어 내려감 -->
+        <ol class="rm-roots" aria-label="웹 개발 입문 학습 순서">
+          <li>
+            <button type="button" class="rm-node  is-current"
+                    data-step="1"
+                    data-lang="html"
+                    aria-label="웹 개발 입문 1단계 HTML &amp; Internet 자세히 보기">
+              <span class="rm-node-no" aria-hidden="true">
+                
+                1
+              </span>
+              <span class="rm-node-name">HTML &amp; Internet</span>
+              
+            </button>
+          </li>
+          <li>
+            <button type="button" class="rm-node  is-next"
+                    data-step="2"
+                    data-lang="css"
+                    aria-label="웹 개발 입문 2단계 CSS 자세히 보기">
+              <span class="rm-node-no" aria-hidden="true">
+                
+                2
+              </span>
+              <span class="rm-node-name">CSS</span>
+              
+            </button>
+          </li>
+          <li>
+            <button type="button" class="rm-node  is-later"
+                    data-step="3"
+                    data-lang="javascript"
+                    aria-label="웹 개발 입문 3단계 JavaScript 자세히 보기">
+              <span class="rm-node-no" aria-hidden="true">
+                
+                3
+              </span>
+              <span class="rm-node-name">JavaScript</span>
+              
+            </button>
+          </li>
+          <li>
+            <button type="button" class="rm-node  is-upcoming"
+                    data-step="4"
+                    data-lang="project"
+                    aria-label="웹 개발 입문 4단계 미니 프로젝트, 준비 중 자세히 보기">
+              <span class="rm-node-no" aria-hidden="true">
+                
+                4
+              </span>
+              <span class="rm-node-name">미니 프로젝트</span>
+              <span class="rm-node-tag" aria-hidden="true">준비 중</span>
+            </button>
+          </li>
+        </ol>
+      </div>
+
+      <div class="rm-branch"
+           data-track="frontend">
+        <article class="rm-dest">
+          <div class="rm-dest-top">
+            <span class="rm-pin" aria-hidden="true"><svg><use href="#rm-i-pin"/></svg></span>
+            <h3>프론트엔드</h3>
+            <span class="rm-dest-state"><svg aria-hidden="true"><use href="#rm-i-check"/></svg>선택됨</span>
+          </div>
+          <p class="rm-dest-summary">React와 Next.js로 서비스 화면 만들기</p>
+          <div class="rm-dest-foot">
+            <span class="rm-dest-meta">
+              <span>3개 강의 · 초급</span>
+              
+            </span>
+            <button type="button" class="rm-dest-btn"
+                    aria-label="프론트엔드 과정 보기" aria-pressed="false" aria-controls="rm-panel-frontend">과정 보기<svg aria-hidden="true"><use href="#rm-i-arrow"/></svg></button>
+          </div>
+        </article>
+
+        <!-- 분야 안의 강의가 뿌리처럼 순서대로 뻗어 내려감 -->
+        <ol class="rm-roots" aria-label="프론트엔드 학습 순서">
+          <li>
+            <button type="button" class="rm-node  is-current"
+                    data-step="1"
+                    data-lang="javascript"
+                    aria-label="프론트엔드 1단계 JavaScript 자세히 보기">
+              <span class="rm-node-no" aria-hidden="true">
+                
+                1
+              </span>
+              <span class="rm-node-name">JavaScript</span>
+              
+            </button>
+          </li>
+          <li>
+            <button type="button" class="rm-node  is-next"
+                    data-step="2"
+                    data-lang="react"
+                    aria-label="프론트엔드 2단계 React 자세히 보기">
+              <span class="rm-node-no" aria-hidden="true">
+                
+                2
+              </span>
+              <span class="rm-node-name">React</span>
+              
+            </button>
+          </li>
+          <li>
+            <button type="button" class="rm-node  is-later"
+                    data-step="3"
+                    data-lang="nextjs"
+                    aria-label="프론트엔드 3단계 Next.js 자세히 보기">
+              <span class="rm-node-no" aria-hidden="true">
+                
+                3
+              </span>
+              <span class="rm-node-name">Next.js</span>
+              
+            </button>
+          </li>
+        </ol>
+      </div>
+
+      <div class="rm-branch"
+           data-track="backend">
+        <article class="rm-dest">
+          <div class="rm-dest-top">
+            <span class="rm-pin" aria-hidden="true"><svg><use href="#rm-i-pin"/></svg></span>
+            <h3>백엔드</h3>
+            <span class="rm-dest-state"><svg aria-hidden="true"><use href="#rm-i-check"/></svg>선택됨</span>
+          </div>
+          <p class="rm-dest-summary">서버에서 동작하는 웹 애플리케이션 만들기</p>
+          <div class="rm-dest-foot">
+            <span class="rm-dest-meta">
+              <span>3개 강의 · 입문</span>
+              
+            </span>
+            <button type="button" class="rm-dest-btn"
+                    aria-label="백엔드 과정 보기" aria-pressed="false" aria-controls="rm-panel-backend">과정 보기<svg aria-hidden="true"><use href="#rm-i-arrow"/></svg></button>
+          </div>
+        </article>
+
+        <!-- 분야 안의 강의가 뿌리처럼 순서대로 뻗어 내려감 -->
+        <ol class="rm-roots" aria-label="백엔드 학습 순서">
+          <li>
+            <button type="button" class="rm-node  is-current"
+                    data-step="1"
+                    data-lang="git"
+                    aria-label="백엔드 1단계 Git 자세히 보기">
+              <span class="rm-node-no" aria-hidden="true">
+                
+                1
+              </span>
+              <span class="rm-node-name">Git</span>
+              
+            </button>
+          </li>
+          <li>
+            <button type="button" class="rm-node  is-next"
+                    data-step="2"
+                    data-lang="php"
+                    aria-label="백엔드 2단계 PHP 자세히 보기">
+              <span class="rm-node-no" aria-hidden="true">
+                
+                2
+              </span>
+              <span class="rm-node-name">PHP</span>
+              
+            </button>
+          </li>
+          <li>
+            <button type="button" class="rm-node  is-later"
+                    data-step="3"
+                    data-lang="java"
+                    aria-label="백엔드 3단계 Java 입문 자세히 보기">
+              <span class="rm-node-no" aria-hidden="true">
+                
+                3
+              </span>
+              <span class="rm-node-name">Java 입문</span>
+              
+            </button>
+          </li>
+        </ol>
+      </div>
+
+      <div class="rm-branch"
+           data-track="database">
+        <article class="rm-dest">
+          <div class="rm-dest-top">
+            <span class="rm-pin" aria-hidden="true"><svg><use href="#rm-i-pin"/></svg></span>
+            <h3>데이터베이스</h3>
+            <span class="rm-dest-state"><svg aria-hidden="true"><use href="#rm-i-check"/></svg>선택됨</span>
+          </div>
+          <p class="rm-dest-summary">SQL로 데이터를 저장하고 조회하기</p>
+          <div class="rm-dest-foot">
+            <span class="rm-dest-meta">
+              <span>2개 강의 · 입문</span>
+              
+            </span>
+            <button type="button" class="rm-dest-btn"
+                    aria-label="데이터베이스 과정 보기" aria-pressed="false" aria-controls="rm-panel-database">과정 보기<svg aria-hidden="true"><use href="#rm-i-arrow"/></svg></button>
+          </div>
+        </article>
+
+        <!-- 분야 안의 강의가 뿌리처럼 순서대로 뻗어 내려감 -->
+        <ol class="rm-roots" aria-label="데이터베이스 학습 순서">
+          <li>
+            <button type="button" class="rm-node  is-current"
+                    data-step="1"
+                    data-lang="mysql"
+                    aria-label="데이터베이스 1단계 MySQL 자세히 보기">
+              <span class="rm-node-no" aria-hidden="true">
+                
+                1
+              </span>
+              <span class="rm-node-name">MySQL</span>
+              
+            </button>
+          </li>
+          <li>
+            <button type="button" class="rm-node  is-next"
+                    data-step="2"
+                    data-lang="sqljoin"
+                    aria-label="데이터베이스 2단계 SQL JOIN 자세히 보기">
+              <span class="rm-node-no" aria-hidden="true">
+                
+                2
+              </span>
+              <span class="rm-node-name">SQL JOIN</span>
+              
+            </button>
+          </li>
+        </ol>
+      </div>
+
+      <div class="rm-branch"
+           data-track="python">
+        <article class="rm-dest">
+          <div class="rm-dest-top">
+            <span class="rm-pin" aria-hidden="true"><svg><use href="#rm-i-pin"/></svg></span>
+            <h3>Python 입문</h3>
+            <span class="rm-dest-state"><svg aria-hidden="true"><use href="#rm-i-check"/></svg>선택됨</span>
+          </div>
+          <p class="rm-dest-summary">가장 쉬운 언어로 프로그래밍 시작하기</p>
+          <div class="rm-dest-foot">
+            <span class="rm-dest-meta">
+              <span>2개 강의 · 입문</span>
+              
+            </span>
+            <button type="button" class="rm-dest-btn"
+                    aria-label="Python 입문 과정 보기" aria-pressed="false" aria-controls="rm-panel-python">과정 보기<svg aria-hidden="true"><use href="#rm-i-arrow"/></svg></button>
+          </div>
+        </article>
+
+        <!-- 분야 안의 강의가 뿌리처럼 순서대로 뻗어 내려감 -->
+        <ol class="rm-roots" aria-label="Python 입문 학습 순서">
+          <li>
+            <button type="button" class="rm-node  is-current"
+                    data-step="1"
+                    data-lang="python"
+                    aria-label="Python 입문 1단계 Python 기초 자세히 보기">
+              <span class="rm-node-no" aria-hidden="true">
+                
+                1
+              </span>
+              <span class="rm-node-name">Python 기초</span>
+              
+            </button>
+          </li>
+          <li>
+            <button type="button" class="rm-node  is-next"
+                    data-step="2"
+                    data-lang="git"
+                    aria-label="Python 입문 2단계 Git 자세히 보기">
+              <span class="rm-node-no" aria-hidden="true">
+                
+                2
+              </span>
+              <span class="rm-node-name">Git</span>
+              
+            </button>
+          </li>
+        </ol>
+      </div>
+      </div>
+    </div>
+
+    <!-- 2단계: 선택한 분야 안의 순서형 학습 경로 -->
+    <div class="rm-path" id="roadmapPath">
+      <div class="rm-panel" role="region"
+               id="rm-panel-web"
+               data-panel="web"
+               aria-labelledby="rm-panel-title-web">
+        <div class="rm-panel-head">
+          <div class="rm-panel-copy">
+            <span class="rm-eyebrow">YOUR LEARNING PATH</span>
+            <h3 id="rm-panel-title-web">웹 개발 입문 학습 순서</h3>
+          </div>
+          <dl class="rm-panel-goal">
+            <div><dt>목표</dt><dd>나만의 웹 페이지 만들기</dd></div>
+            <div><dt>추천</dt><dd>웹사이트 제작을 처음 배우는 학습자</dd></div>
+          </dl>
+        </div>
+
+        <ol class="rm-steps" style="--rm-steps:4">
+          <li class="rm-step  is-current"
+              data-step="1"
+              style="--rm-i:0" aria-current="step">
+            <div class="rm-step-marker" aria-hidden="true">
+              
+              <span>1</span>
+            </div>
+            <div class="rm-step-card">
+              <div class="rm-step-top">
+                <span class="rm-step-status">
+                  
+                  <svg aria-hidden="true"><use href="#rm-i-flag"/></svg>여기서 시작
+                  
+                  
+                  
+                </span>
+              </div>
+              <h4><span class="rm-sr">1단계 </span>HTML &amp; Internet</h4>
+              <p class="rm-step-summary">웹 페이지의 기본 구조와 인터넷 동작 배우기</p>
+              <ul class="rm-step-meta">
+                <li>입문 · 약 3시간 30분</li>
+                <li>레슨 28개</li>
+              </ul>
+              <p class="rm-step-prereq">선수 강의 없음</p>
+              <a class="rm-step-cta" href="learn/html/index.html"
+                 aria-label="HTML &amp; Internet 학습 시작">
+                <span>학습 시작</span><svg aria-hidden="true"><use href="#rm-i-arrow"/></svg>
+              </a>
+            </div>
+          </li>
+          <li class="rm-step  is-next"
+              data-step="2"
+              style="--rm-i:1">
+            <div class="rm-step-marker" aria-hidden="true">
+              
+              <span>2</span>
+            </div>
+            <div class="rm-step-card">
+              <div class="rm-step-top">
+                <span class="rm-step-status">
+                  
+                  
+                  <svg aria-hidden="true"><use href="#rm-i-dot"/></svg>다음 단계
+                  
+                  
+                </span>
+              </div>
+              <h4><span class="rm-sr">2단계 </span>CSS</h4>
+              <p class="rm-step-summary">웹 페이지를 원하는 모습으로 꾸미기</p>
+              <ul class="rm-step-meta">
+                <li>입문</li>
+                <li>레슨 15개</li>
+              </ul>
+              <p class="rm-step-prereq">선수 강의: HTML &amp; Internet</p>
+              <a class="rm-step-cta" href="learn/css/index.html"
+                 aria-label="CSS 학습 시작">
+                <span>학습 시작</span><svg aria-hidden="true"><use href="#rm-i-arrow"/></svg>
+              </a>
+            </div>
+          </li>
+          <li class="rm-step  is-later"
+              data-step="3"
+              style="--rm-i:2">
+            <div class="rm-step-marker" aria-hidden="true">
+              
+              <span>3</span>
+            </div>
+            <div class="rm-step-card">
+              <div class="rm-step-top">
+                <span class="rm-step-status">
+                  
+                  
+                  
+                  <svg aria-hidden="true"><use href="#rm-i-dot"/></svg>이후 단계
+                  
+                </span>
+              </div>
+              <h4><span class="rm-sr">3단계 </span>JavaScript</h4>
+              <p class="rm-step-summary">웹 페이지에 동작과 상호작용 더하기</p>
+              <ul class="rm-step-meta">
+                <li>입문</li>
+                <li>레슨 38개</li>
+              </ul>
+              <p class="rm-step-prereq">선수 강의: CSS</p>
+              <a class="rm-step-cta" href="learn/javascript/index.html"
+                 aria-label="JavaScript 학습 시작">
+                <span>학습 시작</span><svg aria-hidden="true"><use href="#rm-i-arrow"/></svg>
+              </a>
+            </div>
+          </li>
+          <li class="rm-step  is-upcoming"
+              data-step="4"
+              style="--rm-i:3">
+            <div class="rm-step-marker" aria-hidden="true">
+              
+              <span>4</span>
+            </div>
+            <div class="rm-step-card">
+              <div class="rm-step-top">
+                <span class="rm-step-status">
+                  
+                  
+                  
+                  
+                  <svg aria-hidden="true"><use href="#rm-i-clock"/></svg>준비 중
+                </span>
+              </div>
+              <h4><span class="rm-sr">4단계 </span>미니 프로젝트</h4>
+              <p class="rm-step-summary">배운 내용으로 나만의 웹 페이지 완성하기</p>
+              <ul class="rm-step-meta">
+                <li>실습</li>
+                
+              </ul>
+              <p class="rm-step-prereq">선수 강의: JavaScript</p>
+              
+            </div>
+          </li>
+        </ol>
+      </div>
+      <div class="rm-panel" role="region"
+               id="rm-panel-frontend"
+               data-panel="frontend"
+               aria-labelledby="rm-panel-title-frontend" hidden="hidden">
+        <div class="rm-panel-head">
+          <div class="rm-panel-copy">
+            <span class="rm-eyebrow">YOUR LEARNING PATH</span>
+            <h3 id="rm-panel-title-frontend">프론트엔드 학습 순서</h3>
+          </div>
+          <dl class="rm-panel-goal">
+            <div><dt>목표</dt><dd>React·Next.js로 서비스 화면 만들기</dd></div>
+            <div><dt>추천</dt><dd>HTML·CSS 기초를 아는 학습자</dd></div>
+          </dl>
+        </div>
+
+        <ol class="rm-steps" style="--rm-steps:3">
+          <li class="rm-step  is-current"
+              data-step="1"
+              style="--rm-i:0" aria-current="step">
+            <div class="rm-step-marker" aria-hidden="true">
+              
+              <span>1</span>
+            </div>
+            <div class="rm-step-card">
+              <div class="rm-step-top">
+                <span class="rm-step-status">
+                  
+                  <svg aria-hidden="true"><use href="#rm-i-flag"/></svg>여기서 시작
+                  
+                  
+                  
+                </span>
+              </div>
+              <h4><span class="rm-sr">1단계 </span>JavaScript</h4>
+              <p class="rm-step-summary">React를 위한 JavaScript 기본기 다지기</p>
+              <ul class="rm-step-meta">
+                <li>입문</li>
+                <li>레슨 38개</li>
+              </ul>
+              <p class="rm-step-prereq">권장 선행: HTML·CSS 기초</p>
+              <a class="rm-step-cta" href="learn/javascript/index.html"
+                 aria-label="JavaScript 학습 시작">
+                <span>학습 시작</span><svg aria-hidden="true"><use href="#rm-i-arrow"/></svg>
+              </a>
+            </div>
+          </li>
+          <li class="rm-step  is-next"
+              data-step="2"
+              style="--rm-i:1">
+            <div class="rm-step-marker" aria-hidden="true">
+              
+              <span>2</span>
+            </div>
+            <div class="rm-step-card">
+              <div class="rm-step-top">
+                <span class="rm-step-status">
+                  
+                  
+                  <svg aria-hidden="true"><use href="#rm-i-dot"/></svg>다음 단계
+                  
+                  
+                </span>
+              </div>
+              <h4><span class="rm-sr">2단계 </span>React</h4>
+              <p class="rm-step-summary">컴포넌트로 화면을 나누고 CRUD 흐름 익히기</p>
+              <ul class="rm-step-meta">
+                <li>입문 · 약 1시간 40분</li>
+                <li>레슨 10개</li>
+              </ul>
+              <p class="rm-step-prereq">선수 강의: JavaScript</p>
+              <a class="rm-step-cta" href="learn/react/index.html"
+                 aria-label="React 학습 시작">
+                <span>학습 시작</span><svg aria-hidden="true"><use href="#rm-i-arrow"/></svg>
+              </a>
+            </div>
+          </li>
+          <li class="rm-step  is-later"
+              data-step="3"
+              style="--rm-i:2">
+            <div class="rm-step-marker" aria-hidden="true">
+              
+              <span>3</span>
+            </div>
+            <div class="rm-step-card">
+              <div class="rm-step-top">
+                <span class="rm-step-status">
+                  
+                  
+                  
+                  <svg aria-hidden="true"><use href="#rm-i-dot"/></svg>이후 단계
+                  
+                </span>
+              </div>
+              <h4><span class="rm-sr">3단계 </span>Next.js</h4>
+              <p class="rm-step-summary">라우팅과 서버 렌더링으로 앱 완성하기</p>
+              <ul class="rm-step-meta">
+                <li>입문</li>
+                <li>레슨 18개</li>
+              </ul>
+              <p class="rm-step-prereq">선수 강의: React</p>
+              <a class="rm-step-cta" href="learn/nextjs/index.html"
+                 aria-label="Next.js 학습 시작">
+                <span>학습 시작</span><svg aria-hidden="true"><use href="#rm-i-arrow"/></svg>
+              </a>
+            </div>
+          </li>
+        </ol>
+      </div>
+      <div class="rm-panel" role="region"
+               id="rm-panel-backend"
+               data-panel="backend"
+               aria-labelledby="rm-panel-title-backend" hidden="hidden">
+        <div class="rm-panel-head">
+          <div class="rm-panel-copy">
+            <span class="rm-eyebrow">YOUR LEARNING PATH</span>
+            <h3 id="rm-panel-title-backend">백엔드 학습 순서</h3>
+          </div>
+          <dl class="rm-panel-goal">
+            <div><dt>목표</dt><dd>서버가 있는 웹 애플리케이션 만들기</dd></div>
+            <div><dt>추천</dt><dd>서버와 데이터 처리가 궁금한 학습자</dd></div>
+          </dl>
+        </div>
+
+        <ol class="rm-steps" style="--rm-steps:3">
+          <li class="rm-step  is-current"
+              data-step="1"
+              style="--rm-i:0" aria-current="step">
+            <div class="rm-step-marker" aria-hidden="true">
+              
+              <span>1</span>
+            </div>
+            <div class="rm-step-card">
+              <div class="rm-step-top">
+                <span class="rm-step-status">
+                  
+                  <svg aria-hidden="true"><use href="#rm-i-flag"/></svg>여기서 시작
+                  
+                  
+                  
+                </span>
+              </div>
+              <h4><span class="rm-sr">1단계 </span>Git</h4>
+              <p class="rm-step-summary">버전 관리로 코드를 안전하게 기록하기</p>
+              <ul class="rm-step-meta">
+                <li>입문 · 약 45분</li>
+                <li>레슨 8개</li>
+              </ul>
+              <p class="rm-step-prereq">선수 강의 없음</p>
+              <a class="rm-step-cta" href="learn/git/index.html"
+                 aria-label="Git 학습 시작">
+                <span>학습 시작</span><svg aria-hidden="true"><use href="#rm-i-arrow"/></svg>
+              </a>
+            </div>
+          </li>
+          <li class="rm-step  is-next"
+              data-step="2"
+              style="--rm-i:1">
+            <div class="rm-step-marker" aria-hidden="true">
+              
+              <span>2</span>
+            </div>
+            <div class="rm-step-card">
+              <div class="rm-step-top">
+                <span class="rm-step-status">
+                  
+                  
+                  <svg aria-hidden="true"><use href="#rm-i-dot"/></svg>다음 단계
+                  
+                  
+                </span>
+              </div>
+              <h4><span class="rm-sr">2단계 </span>PHP</h4>
+              <p class="rm-step-summary">폼 처리와 서버 측 웹 애플리케이션 흐름 익히기</p>
+              <ul class="rm-step-meta">
+                <li>입문 · 약 6시간 10분</li>
+                <li>레슨 42개</li>
+              </ul>
+              <p class="rm-step-prereq">선수 강의: Git</p>
+              <a class="rm-step-cta" href="learn/php/index.html"
+                 aria-label="PHP 학습 시작">
+                <span>학습 시작</span><svg aria-hidden="true"><use href="#rm-i-arrow"/></svg>
+              </a>
+            </div>
+          </li>
+          <li class="rm-step  is-later"
+              data-step="3"
+              style="--rm-i:2">
+            <div class="rm-step-marker" aria-hidden="true">
+              
+              <span>3</span>
+            </div>
+            <div class="rm-step-card">
+              <div class="rm-step-top">
+                <span class="rm-step-status">
+                  
+                  
+                  
+                  <svg aria-hidden="true"><use href="#rm-i-dot"/></svg>이후 단계
+                  
+                </span>
+              </div>
+              <h4><span class="rm-sr">3단계 </span>Java 입문</h4>
+              <p class="rm-step-summary">Java 문법과 객체지향 기초 다지기</p>
+              <ul class="rm-step-meta">
+                <li>입문 · 약 15시간 10분</li>
+                <li>레슨 100개</li>
+              </ul>
+              <p class="rm-step-prereq">선수 강의: PHP</p>
+              <a class="rm-step-cta" href="learn/java/index.html"
+                 aria-label="Java 입문 학습 시작">
+                <span>학습 시작</span><svg aria-hidden="true"><use href="#rm-i-arrow"/></svg>
+              </a>
+            </div>
+          </li>
+        </ol>
+      </div>
+      <div class="rm-panel" role="region"
+               id="rm-panel-database"
+               data-panel="database"
+               aria-labelledby="rm-panel-title-database" hidden="hidden">
+        <div class="rm-panel-head">
+          <div class="rm-panel-copy">
+            <span class="rm-eyebrow">YOUR LEARNING PATH</span>
+            <h3 id="rm-panel-title-database">데이터베이스 학습 순서</h3>
+          </div>
+          <dl class="rm-panel-goal">
+            <div><dt>목표</dt><dd>관계형 데이터 설계하고 조회하기</dd></div>
+            <div><dt>추천</dt><dd>데이터 관리가 처음인 학습자</dd></div>
+          </dl>
+        </div>
+
+        <ol class="rm-steps" style="--rm-steps:2">
+          <li class="rm-step  is-current"
+              data-step="1"
+              style="--rm-i:0" aria-current="step">
+            <div class="rm-step-marker" aria-hidden="true">
+              
+              <span>1</span>
+            </div>
+            <div class="rm-step-card">
+              <div class="rm-step-top">
+                <span class="rm-step-status">
+                  
+                  <svg aria-hidden="true"><use href="#rm-i-flag"/></svg>여기서 시작
+                  
+                  
+                  
+                </span>
+              </div>
+              <h4><span class="rm-sr">1단계 </span>MySQL</h4>
+              <p class="rm-step-summary">관계형 데이터베이스와 SQL 기본 문법 익히기</p>
+              <ul class="rm-step-meta">
+                <li>입문 · 약 3시간 20분</li>
+                <li>레슨 27개</li>
+              </ul>
+              <p class="rm-step-prereq">선수 강의 없음</p>
+              <a class="rm-step-cta" href="learn/mysql/index.html"
+                 aria-label="MySQL 학습 시작">
+                <span>학습 시작</span><svg aria-hidden="true"><use href="#rm-i-arrow"/></svg>
+              </a>
+            </div>
+          </li>
+          <li class="rm-step  is-next"
+              data-step="2"
+              style="--rm-i:1">
+            <div class="rm-step-marker" aria-hidden="true">
+              
+              <span>2</span>
+            </div>
+            <div class="rm-step-card">
+              <div class="rm-step-top">
+                <span class="rm-step-status">
+                  
+                  
+                  <svg aria-hidden="true"><use href="#rm-i-dot"/></svg>다음 단계
+                  
+                  
+                </span>
+              </div>
+              <h4><span class="rm-sr">2단계 </span>SQL JOIN</h4>
+              <p class="rm-step-summary">테이블을 나누고 JOIN으로 연결하기</p>
+              <ul class="rm-step-meta">
+                <li>입문 · 약 51분</li>
+                <li>레슨 8개</li>
+              </ul>
+              <p class="rm-step-prereq">선수 강의: MySQL</p>
+              <a class="rm-step-cta" href="learn/sqljoin/index.html"
+                 aria-label="SQL JOIN 학습 시작">
+                <span>학습 시작</span><svg aria-hidden="true"><use href="#rm-i-arrow"/></svg>
+              </a>
+            </div>
+          </li>
+        </ol>
+      </div>
+      <div class="rm-panel" role="region"
+               id="rm-panel-python"
+               data-panel="python"
+               aria-labelledby="rm-panel-title-python" hidden="hidden">
+        <div class="rm-panel-head">
+          <div class="rm-panel-copy">
+            <span class="rm-eyebrow">YOUR LEARNING PATH</span>
+            <h3 id="rm-panel-title-python">Python 입문 학습 순서</h3>
+          </div>
+          <dl class="rm-panel-goal">
+            <div><dt>목표</dt><dd>Python으로 첫 프로그램 만들기</dd></div>
+            <div><dt>추천</dt><dd>프로그래밍을 처음 배우는 학습자</dd></div>
+          </dl>
+        </div>
+
+        <ol class="rm-steps" style="--rm-steps:2">
+          <li class="rm-step  is-current"
+              data-step="1"
+              style="--rm-i:0" aria-current="step">
+            <div class="rm-step-marker" aria-hidden="true">
+              
+              <span>1</span>
+            </div>
+            <div class="rm-step-card">
+              <div class="rm-step-top">
+                <span class="rm-step-status">
+                  
+                  <svg aria-hidden="true"><use href="#rm-i-flag"/></svg>여기서 시작
+                  
+                  
+                  
+                </span>
+              </div>
+              <h4><span class="rm-sr">1단계 </span>Python 기초</h4>
+              <p class="rm-step-summary">변수·조건문·반복문으로 프로그래밍 기초 익히기</p>
+              <ul class="rm-step-meta">
+                <li>입문 · 약 1시간 40분</li>
+                <li>레슨 18개</li>
+              </ul>
+              <p class="rm-step-prereq">선수 강의 없음</p>
+              <a class="rm-step-cta" href="learn/python/index.html"
+                 aria-label="Python 기초 학습 시작">
+                <span>학습 시작</span><svg aria-hidden="true"><use href="#rm-i-arrow"/></svg>
+              </a>
+            </div>
+          </li>
+          <li class="rm-step  is-next"
+              data-step="2"
+              style="--rm-i:1">
+            <div class="rm-step-marker" aria-hidden="true">
+              
+              <span>2</span>
+            </div>
+            <div class="rm-step-card">
+              <div class="rm-step-top">
+                <span class="rm-step-status">
+                  
+                  
+                  <svg aria-hidden="true"><use href="#rm-i-dot"/></svg>다음 단계
+                  
+                  
+                </span>
+              </div>
+              <h4><span class="rm-sr">2단계 </span>Git</h4>
+              <p class="rm-step-summary">만든 코드를 버전 관리로 기록하기</p>
+              <ul class="rm-step-meta">
+                <li>입문 · 약 45분</li>
+                <li>레슨 8개</li>
+              </ul>
+              <p class="rm-step-prereq">선수 강의: Python 기초</p>
+              <a class="rm-step-cta" href="learn/git/index.html"
+                 aria-label="Git 학습 시작">
+                <span>학습 시작</span><svg aria-hidden="true"><use href="#rm-i-arrow"/></svg>
+              </a>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="recommended-section" id="recommendedCourses">
+    <div class="recommended-heading">
+      <h2>추천 강의</h2>
+      <a href="learn/index.html">전체 보기 <span>›</span></a>
+    </div>
+    <div class="recommended-grid">
+      <a href="learn/html/index.html"
+         class="course-card  course-html">
+        <div class="course-cover course-youtube-thumbnail">
+          <img src="https://i.ytimg.com/vi/tZooW6PritE/hqdefault.jpg"
+               alt="WEB1 - HTML &amp; Internet 유튜브 썸네일"
+               loading="lazy">
+          <span class="course-play-badge"
+                aria-hidden="true"></span>
+          
+          
+        </div>
+        <div class="course-info">
+          <span class="course-step-label">웹 개발 입문 · 1단계</span>
+          <h3>HTML &amp; Internet</h3>
+          <p>웹 페이지의 기본 구조와 인터넷 동작 배우기</p>
+          
+          <span class="course-progress-label">입문 · 레슨 28개</span>
+        </div>
+      </a><a href="learn/css/index.html"
+         class="course-card  course-css">
+        <div class="course-cover course-youtube-thumbnail">
+          <img src="https://i.ytimg.com/vi/Ok0bBJPtgJI/hqdefault.jpg"
+               alt="WEB2 - CSS 유튜브 썸네일"
+               loading="lazy">
+          <span class="course-play-badge"
+                aria-hidden="true"></span>
+          
+          
+        </div>
+        <div class="course-info">
+          <span class="course-step-label">웹 개발 입문 · 2단계</span>
+          <h3>CSS</h3>
+          <p>웹 페이지를 원하는 모습으로 꾸미기</p>
+          
+          <span class="course-progress-label">입문 · 레슨 15개</span>
+        </div>
+      </a><a href="learn/javascript/index.html"
+         class="course-card  course-javascript">
+        <div class="course-cover course-youtube-thumbnail">
+          <img src="https://i.ytimg.com/vi/dPRtcRwKo-Y/hqdefault.jpg"
+               alt="WEB2 - JavaScript 유튜브 썸네일"
+               loading="lazy">
+          <span class="course-play-badge"
+                aria-hidden="true"></span>
+          
+          
+        </div>
+        <div class="course-info">
+          <span class="course-step-label">웹 개발 입문 · 3단계</span>
+          <h3>JavaScript</h3>
+          <p>웹 페이지에 동작과 상호작용 더하기</p>
+          
+          <span class="course-progress-label">입문 · 레슨 38개</span>
+        </div>
+      </a><a href="learn/java/index.html"
+         class="course-card  course-java">
+        <div class="course-cover course-youtube-thumbnail">
+          <img src="https://i.ytimg.com/vi/jdTsJzXmgU0/hqdefault.jpg"
+               alt="Java 입문 수업 유튜브 썸네일"
+               loading="lazy">
+          <span class="course-play-badge"
+                aria-hidden="true"></span>
+          
+          
+        </div>
+        <div class="course-info">
+          <span class="course-step-label">백엔드 · 3단계</span>
+          <h3>Java 입문</h3>
+          <p>Java 문법과 객체지향 기초 다지기</p>
+          
+          <span class="course-progress-label">입문 · 레슨 100개</span>
+        </div>
+      </a><a href="learn/php/index.html"
+         class="course-card  course-php">
+        <div class="course-cover course-youtube-thumbnail">
+          <img src="https://i.ytimg.com/vi/Qh_6JheU_gY/hqdefault.jpg"
+               alt="WEB2-PHP 유튜브 썸네일"
+               loading="lazy">
+          <span class="course-play-badge"
+                aria-hidden="true"></span>
+          
+          
+        </div>
+        <div class="course-info">
+          <span class="course-step-label">백엔드 · 2단계</span>
+          <h3>PHP</h3>
+          <p>폼 처리와 서버 측 웹 애플리케이션 흐름 익히기</p>
+          
+          <span class="course-progress-label">입문 · 레슨 42개</span>
+        </div>
+      </a><a href="learn/mysql/index.html"
+         class="course-card  course-mysql">
+        <div class="course-cover course-youtube-thumbnail">
+          <img src="https://i.ytimg.com/vi/h_XDmyz--0w/hqdefault.jpg"
+               alt="DATABASE2 - MySQL 유튜브 썸네일"
+               loading="lazy">
+          <span class="course-play-badge"
+                aria-hidden="true"></span>
+          
+          
+        </div>
+        <div class="course-info">
+          <span class="course-step-label">데이터베이스 · 1단계</span>
+          <h3>MySQL</h3>
+          <p>관계형 데이터베이스와 SQL 기본 문법 익히기</p>
+          
+          <span class="course-progress-label">입문 · 레슨 27개</span>
+        </div>
+      </a><a href="learn/sqljoin/index.html"
+         class="course-card  course-sqljoin">
+        <div class="course-cover course-youtube-thumbnail">
+          <img src="https://i.ytimg.com/vi/2Xa54XBXbk0/hqdefault.jpg"
+               alt="SQL JOIN 유튜브 썸네일"
+               loading="lazy">
+          <span class="course-play-badge"
+                aria-hidden="true"></span>
+          
+          
+        </div>
+        <div class="course-info">
+          <span class="course-step-label">데이터베이스 · 2단계</span>
+          <h3>SQL JOIN</h3>
+          <p>테이블을 나누고 JOIN으로 연결하기</p>
+          
+          <span class="course-progress-label">입문 · 레슨 8개</span>
+        </div>
+      </a><a href="learn/python/index.html"
+         class="course-card  course-python">
+        <div class="course-cover course-youtube-thumbnail">
+          <img src="https://i.ytimg.com/vi/-3DHpwy498o/hqdefault.jpg"
+               alt="Python 입문수업 유튜브 썸네일"
+               loading="lazy">
+          <span class="course-play-badge"
+                aria-hidden="true"></span>
+          
+          
+        </div>
+        <div class="course-info">
+          <span class="course-step-label">Python 입문 · 1단계</span>
+          <h3>Python 기초</h3>
+          <p>변수·조건문·반복문으로 프로그래밍 기초 익히기</p>
+          
+          <span class="course-progress-label">입문 · 레슨 18개</span>
+        </div>
+      </a><a href="learn/react/index.html"
+         class="course-card  course-react">
+        <div class="course-cover course-youtube-thumbnail">
+          <img src="https://i.ytimg.com/vi/AoMv0SIjZL8/hqdefault.jpg"
+               alt="React 2022 개정판 유튜브 썸네일"
+               loading="lazy">
+          <span class="course-play-badge"
+                aria-hidden="true"></span>
+          
+          
+        </div>
+        <div class="course-info">
+          <span class="course-step-label">프론트엔드 · 2단계</span>
+          <h3>React</h3>
+          <p>컴포넌트로 화면을 나누고 CRUD 흐름 익히기</p>
+          
+          <span class="course-progress-label">입문 · 레슨 10개</span>
+        </div>
+      </a><a href="learn/nextjs/index.html"
+         class="course-card  course-nextjs">
+        <div class="course-cover course-youtube-thumbnail">
+          <img src="https://i.ytimg.com/vi/9KOaR6QMb9A/hqdefault.jpg"
+               alt="Next.js 13 유튜브 썸네일"
+               loading="lazy">
+          <span class="course-play-badge"
+                aria-hidden="true"></span>
+          
+          
+        </div>
+        <div class="course-info">
+          <span class="course-step-label">프론트엔드 · 3단계</span>
+          <h3>Next.js</h3>
+          <p>라우팅과 서버 렌더링으로 앱 완성하기</p>
+          
+          <span class="course-progress-label">입문 · 레슨 18개</span>
+        </div>
+      </a><a href="learn/git/index.html"
+         class="course-card  course-git">
+        <div class="course-cover course-youtube-thumbnail">
+          <img src="https://i.ytimg.com/vi/uKtBJ65UWoM/hqdefault.jpg"
+               alt="GIT1 유튜브 썸네일"
+               loading="lazy">
+          <span class="course-play-badge"
+                aria-hidden="true"></span>
+          
+          
+        </div>
+        <div class="course-info">
+          <span class="course-step-label">백엔드 · 1단계</span>
+          <h3>Git</h3>
+          <p>버전 관리로 코드를 안전하게 기록하기</p>
+          
+          <span class="course-progress-label">입문 · 레슨 8개</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section class="home-metrics" aria-label="서비스 현황">
+    <a href="learn/index.html" class="metric-card">
+      <span class="metric-value"><b class="count-up" data-target="312">0</b></span>
+      <span class="metric-label">완료할 강의</span>
+      <img class="metric-icon" src="images/metrics/metric-lessons.png" alt="" aria-hidden="true">
+    </a>
+    <a href="learn/index.html" class="metric-card">
+      <span class="metric-value"><b class="count-up" data-target="11">0</b></span>
+      <span class="metric-label">학습 코스</span>
+      <img class="metric-icon" src="images/metrics/metric-courses.png" alt="" aria-hidden="true">
+    </a>
+    <a href="quiz/index.html" class="metric-card">
+      <span class="metric-value"><b class="count-up" data-target="10">0</b></span>
+      <span class="metric-label">도전할 퀴즈</span>
+      <img class="metric-icon" src="images/metrics/metric-quiz.png" alt="" aria-hidden="true">
+    </a>
+    <a href="community/index.html" class="metric-card">
+      <span class="metric-value"><b class="count-up" data-target="7">0</b></span>
+      <span class="metric-label">함께하는 학습자</span>
+      <img class="metric-icon" src="images/metrics/metric-learners.png" alt="" aria-hidden="true">
+    </a>
+  </section>
+</main>
+
+<!-- ══════ FOOTER ══════ -->
+
+<footer>
+  <div class="f-logo">
+    <span class="brand-text"><b>Coding</b>Edu</span>
+  </div>
+  <div>© <span>2026</span> Code<em style="color:var(--accent);font-style:normal;"><i>E</i></em>du. 코딩은 즐거워요!</div>
+  <div class="f-links">
+    <a href="community/index.html">커뮤니티</a>
+    <a href="learn/index.html">강의</a>
+    <a href="quiz/index.html">퀴즈</a>
+    <a href="ai/index.html">AI 도우미</a>
+    <a href="notice.html">이용약관</a>
+    <a href="notice.html">개인정보처리방침</a>
+  </div>
+</footer>
+<script src="js/nav.js"></script>
+
+<script src="js/roadmap.js"></script>
+
+<script>
+  /* ── Number Count Up FX ── */
+  document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll('.course-youtube-thumbnail img[data-fallback-src]').forEach(img => {
+      img.addEventListener('error', function handleThumbnailError() {
+        this.removeEventListener('error', handleThumbnailError);
+        if (this.dataset.fallbackSrc) this.src = this.dataset.fallbackSrc;
+      });
+    });
+
+    const counters = document.querySelectorAll(".count-up");
+    if (!counters.length) return;
+
+    function animateCounter(counter) {
+      const target = +counter.getAttribute('data-target');
+      if (isNaN(target) || target <= 0) return;
+
+      if (counter._rafId) cancelAnimationFrame(counter._rafId);
+
+      const duration = 1800;
+      const startTime = performance.now();
+
+      const update = (now) => {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+        counter.textContent = Math.round(eased * target);
+
+        if (progress < 1) {
+          counter._rafId = requestAnimationFrame(update);
+        } else {
+          counter.textContent = target;
+          counter._rafId = null;
+        }
+      };
+
+      counter._rafId = requestAnimationFrame(update);
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          animateCounter(entry.target);
+        } else {
+          // 뷰포트 밖으로 나가면 0으로 리셋 → 다시 들어올 때 재실행
+          const counter = entry.target;
+          if (counter._rafId) {
+            cancelAnimationFrame(counter._rafId);
+            counter._rafId = null;
+          }
+          counter.textContent = '0';
+        }
+      });
+    }, { threshold: 0.4 });
+
+    counters.forEach(c => observer.observe(c));
+  });
+
+</script>
 <script src="demo.js"></script>
-</body>
-</html>
+</body>
+</html>

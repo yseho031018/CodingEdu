@@ -161,8 +161,73 @@
       if (count) count.textContent = String((+count.textContent || 0) + 1);
       textarea.value = '';
     }
+
+    // 설정: 서버 대신 화면에서 바로 결과를 보여줌 (목업이라 저장은 되지 않음)
+    if (/^\/settings\//.test(path)) {
+      e.preventDefault();
+      settingsSubmit(path, form);
+      return;
+    }
     // 그 밖의 저장 기능은 목업 안내 화면으로 이동
   }
+
+  function settingsAlert(text, type) {
+    var wrap = document.querySelector('.settings-wrap');
+    if (!wrap) return;
+    wrap.querySelectorAll('.settings-alert').forEach(function (el) { el.remove(); });
+    var box = document.createElement('div');
+    box.className = 'settings-alert' + (type ? ' is-' + type : '');
+    box.setAttribute('role', type === 'error' ? 'alert' : 'status');
+    box.textContent = text;
+    wrap.insertBefore(box, wrap.firstChild);
+    box.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
+
+  function settingsSubmit(path, form) {
+    var details = form.closest('details');
+    function done(message) {
+      if (details) details.open = false;
+      settingsAlert(message + ' (목업이라 실제로 저장되지는 않아요)', 'success');
+    }
+    if (path === '/settings/nickname') {
+      var nick = form.querySelector('[name="newNickname"]').value.trim();
+      if (!nick) return settingsAlert('닉네임을 입력해 주세요.', 'error');
+      document.querySelectorAll('[data-field="nickname"], .nav-user-name').forEach(function (el) { el.textContent = nick; });
+      document.querySelectorAll('[data-field="initial"]').forEach(function (el) { el.textContent = nick.charAt(0).toUpperCase(); });
+      return done('닉네임이 변경되었어요.');
+    }
+    if (path === '/settings/email') {
+      var email = form.querySelector('[name="newEmail"]').value.trim();
+      document.querySelectorAll('[data-field="email"]').forEach(function (el) { el.textContent = email; });
+      return done('이메일이 변경되었어요.');
+    }
+    if (path === '/settings/password') {
+      var next = form.querySelector('[name="newPassword"]').value;
+      if (next !== form.querySelector('[name="confirmPassword"]').value) {
+        return settingsAlert('새 비밀번호가 서로 달라요. 다시 확인해 주세요.', 'error');
+      }
+      form.reset();
+      return done('비밀번호가 변경되었어요.');
+    }
+    if (path === '/settings/delete-account') {
+      form.reset();
+      var sheet = form.closest('[role="dialog"]');
+      if (sheet) sheet.hidden = true;
+      settingsAlert('목업에서는 계정이 삭제되지 않아요. 실제 서비스에서는 비밀번호를 확인한 뒤 바로 삭제돼요.');
+    }
+  }
+
+  // ── 알림: 서버처럼 알림 화면을 한 번 열면 다른 화면의 안 읽은 개수 배지를 지움 (이 탭을 닫으면 처음 상태로)
+  try {
+    if (/\/notifications\/(index\.html)?$/.test(location.pathname)) {
+      sessionStorage.setItem('demoNotificationsRead', '1');
+    } else if (sessionStorage.getItem('demoNotificationsRead')) {
+      var bell = document.querySelector('nav .nav-notify');
+      var badge = bell && bell.querySelector('span:not(.notify-emoji)');
+      if (badge) badge.remove();
+      if (bell) bell.setAttribute('aria-label', '알림');
+    }
+  } catch (err) { /* 저장소를 쓸 수 없으면 배지를 그대로 둠 */ }
 
   document.addEventListener('submit', onDemoSubmit, true);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', filterCommunity);

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>글 수정 - CodeEdu</title>
+    <link rel="stylesheet" href="../../../../css/common.css">
+    <link rel="stylesheet" href="../../../../css/tailwind.css">
+    <link rel="stylesheet" href="../../../../css/design-refresh.css">
+    <link rel="stylesheet" href="../../../../css/site-nav.css">
+    <link rel="stylesheet" href="../../../../css/mobile.css">
+    <style>
+        .course-page-heading { max-width: 800px; }
+        .write-container {
+            max-width: 800px; margin: 0 auto; background: var(--bg-surface);
+            border-radius: 8px; padding: 40px; box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-card);
+        }
+        .write-header { margin-bottom: 32px; padding-bottom: 24px; border-bottom: 2px dashed var(--border-card); }
+        .write-header h2 { font-size: 1.7rem; font-weight: 900; color: var(--ink-1); letter-spacing: -0.01em; }
+        .write-header p { font-size: .95rem; color: var(--ink-2); margin-top: 8px; }
+
+        .form-group { margin-bottom: 28px; }
+        .form-group label { display: block; font-size: .88rem; font-weight: 800; color: var(--ink-2); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.02em; }
+        .form-control {
+            width: 100%; padding: 12px 16px; border-radius: 6px; border: 1px solid var(--border-card);
+            font-size: 1rem; transition: all .2s; outline: none; font-family: inherit; background: var(--bg-section); color: var(--ink-1);
+        }
+        .form-control:focus { border-color: var(--accent); background: var(--bg-surface); box-shadow: 0 0 0 3px var(--accent-soft); }
+        select.form-control { appearance: none; background: var(--bg-section) url('data:image/svg+xml;utf8,<svg fill="%2364748b" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>') no-repeat right 12px center; background-size: 20px; }
+        textarea.form-control { min-height: 350px; resize: vertical; line-height: 1.6; }
+
+        .btn-group { display: flex; gap: 12px; justify-content: flex-end; margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border); }
+        .btn-cancel {
+            background: var(--bg-surface); color: var(--ink-2); border: 1px solid var(--border-card);
+            padding: 11px 24px; border-radius: 6px; font-size: .95rem; font-weight: 700;
+            cursor: pointer; text-decoration: none; transition: all .2s;
+        }
+        .btn-cancel:hover { background: var(--bg-section); border-color: var(--ink-3); color: var(--ink-1); }
+        .btn-submit {
+            background: var(--accent); color: #fff; border: 1px solid var(--accent);
+            padding: 11px 30px; border-radius: 6px; font-size: .95rem; font-weight: 800;
+            cursor: pointer; transition: all .2s;
+            box-shadow: 0 4px 12px rgba(79,85,231,0.2);
+        }
+        .btn-submit:hover { background: var(--accent-h); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(79,85,231,0.3); }
+    </style>
+<link rel="stylesheet" href="../../../../demo.css">
+<meta name="demo-own-post" content="../../../../me/community/16/index.html">
+</head>
+<body class="page-courses">
+<nav>
+  <a href="../../../../me/index.html" class="logo">
+    <span class="brand-text"><b>Coding</b>Edu</span>
+  </a>
+
+  <div class="nav-links">
+    <a href="../../../../me/index.html" data-tab="home">홈</a>
+    <a href="../../../../me/learn/index.html" data-tab="learn">강의</a>
+    <a href="../../../../me/quiz/index.html" data-tab="quiz">퀴즈</a>
+    <a href="../../../../me/challenge/index.html" data-tab="more">챌린지</a>
+    <a href="../../../../me/community/index.html" data-tab="more">커뮤니티</a>
+    <a href="../../../../me/ai/index.html" data-tab="more">AI 도우미</a>
+  </div>
+
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeToggle" title="테마 전환" aria-label="다크/라이트 모드 전환"></button>
+
+    
+
+    <div class="nav-right-auth">
+      <a href="../../../../me/mypage/index.html" class="nav-user">
+        👤 <span class="nav-user-name">데모학습자</span><span class="nav-user-suffix">님</span>
+      </a>
+      <a href="../../../../me/notifications/index.html" class="nav-notify" style="position:relative; text-decoration:none; font-size:1.2rem;" title="알림">
+        🔔
+        <span style="position:absolute; top:-6px; right:-8px; background:var(--danger); color:#fff; font-size:.6rem; font-weight:800; border-radius:50%; min-width:16px; height:16px; display:flex; align-items:center; justify-content:center; padding:0 2px; line-height:1;">2</span>
+      </a>
+      <a href="../../../../me/settings/index.html" class="nav-icon-btn nav-mobile-only" title="설정" aria-label="설정">⚙️</a>
+      <a href="../../../../me/settings/index.html" class="btn-login ghost nav-mobile-hide">⚙️ 설정</a>
+      <form data-demo-post="/logout" action="../../../../index.html" method="get" style="margin:0;">
+        <button type="submit" class="nav-icon-btn nav-icon-btn-logout nav-mobile-only" title="로그아웃" aria-label="로그아웃">🚪</button>
+        <button type="submit" class="btn-login ghost nav-mobile-hide">로그아웃</button>
+      </form>
+    </div>
+  </div>
+</nav>
+
+    <main class="course-page-main">
+        <!-- 모바일 앱 바 뒤로가기: 이전 화면이 없으면 이 글로 -->
+        <a href="../../../../me/community/16/index.html" data-appbar-back hidden>게시글</a>
+        <header class="course-page-heading">
+            <div>
+                <span class="course-page-kicker">COMMUNITY</span>
+                <h1>글 수정</h1>
+                <p>내용을 수정하고 저장하세요.</p>
+            </div>
+        </header>
+
+        <div class="write-container reveal">
+
+    <form data-demo-post="/community/16/edit" action="../../../../me/community/16/edit/index.html" method="get">
+        <!-- 카테고리 선택 -->
+        <div class="form-group">
+            <label for="category">카테고리</label>
+            <select id="category" name="category" class="form-control" required>
+                <option value="qna" selected="selected">💡 에러/질문 (Q&A)</option>
+                <option value="tips">🔥 꿀팁/노하우</option>
+                <option value="study">📚 스터디 모집</option>
+                <option value="free">☕ 자유게시판</option>
+            </select>
+        </div>
+
+        <!-- 제목 입력 -->
+        <div class="form-group">
+            <label for="title">제목</label>
+            <input type="text" id="title" name="title" class="form-control"
+                   value="CSS 박스 모델에서 margin과 padding 차이가 헷갈려요" required autofocus>
+        </div>
+
+        <!-- 내용 입력 -->
+        <div class="form-group">
+            <label for="content">내용</label>
+            <textarea id="content" name="content" class="form-control" required>WEB2 CSS 8강 박스 모델을 듣고 있는데, margin과 padding을 언제 써야 할지 헷갈립니다.
+배경색이 들어가는 영역 기준으로 구분하면 될까요?</textarea>
+        </div>
+
+        <div class="btn-group">
+            <a href="../../../../me/community/16/index.html" class="btn-cancel">취소</a>
+            <button type="submit" class="btn-submit">수정 완료</button>
+        </div>
+    </form>
+        </div>
+    </main>
+
+<script src="../../../../js/nav.js"></script>
+
+<script src="../../../../demo.js"></script>
+</body>
+</html>

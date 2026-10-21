@@ -312,6 +312,15 @@
   body.page-courses .btn-back-group { margin-top: 24px; }
   body.page-courses .btn-back { display: none; } /* 앱 바 뒤로가기로 대신 */
 
+  /* ── 커뮤니티 글쓰기·수정 ── */
+  body.page-courses .write-container { padding: 18px 16px; border-radius: var(--m-radius); box-shadow: var(--m-shadow); }
+  body.page-courses .write-container .form-group { margin-bottom: 18px; }
+  body.page-courses .write-container .form-control { font-size: 16px; border-radius: 12px; } /* iOS 입력 확대 방지 */
+  body.page-courses .write-container textarea.form-control { min-height: 240px; }
+  body.page-courses .write-container .btn-group { display: grid; grid-template-columns: 1fr 2fr; margin-top: 20px; padding-top: 16px; }
+  body.page-courses .write-container .btn-cancel,
+  body.page-courses .write-container .btn-submit { min-height: 48px; display: grid; place-items: center; padding: 0 12px; border-radius: 12px; }
+
   /* ── AI 도우미: 메신저처럼 대화가 화면을 채우고 입력창은 아래에 고정 ── */
   body.page-ai .course-page-main { padding: 8px 12px; }
   body.page-ai .ai-page-grid { grid-template-columns: 1fr; gap: 0; }

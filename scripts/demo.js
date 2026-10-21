@@ -162,6 +162,74 @@
       textarea.value = '';
     }
 
+    // 새 글 등록: 이 탭에 저장해 두고 목록 맨 위·마이페이지에 보여줌 (서버처럼 등록 후 목록으로)
+    if (path === '/community/write') {
+      e.preventDefault();
+      var posts = loadNewPosts();
+      posts.unshift({
+        id: 'n' + Date.now(),
+        category: form.querySelector('[name="category"]').value,
+        title: form.querySelector('[name="title"]').value.trim(),
+        content: form.querySelector('[name="content"]').value,
+        createdAt: Date.now()
+      });
+      saveNewPosts(posts);
+      flash('글을 등록했어요 (이 탭에서만 반영돼요)');
+      location.href = communityListUrl();
+      return;
+    }
+    // 새 글의 수정·삭제 (데모 계정 글 화면을 빌려 쓰므로 주소의 ?demoPost= 로 구분)
+    if (demoPostId && /^\/community\/\d+\/(edit|delete)$/.test(path)) {
+      e.preventDefault();
+      e.stopPropagation();
+      var list = loadNewPosts();
+      var post = list.filter(function (p) { return p.id === demoPostId; })[0];
+      if (!post) { location.href = communityListUrl(); return; }
+      if (/\/delete$/.test(path)) {
+        if (!window.confirm('게시글을 삭제할까요?')) return;
+        saveNewPosts(list.filter(function (p) { return p.id !== demoPostId; }));
+        flash('글을 삭제했어요 (이 탭에서만 반영돼요)');
+        location.href = communityListUrl();
+        return;
+      }
+      post.category = form.querySelector('[name="category"]').value;
+      post.title = form.querySelector('[name="title"]').value.trim();
+      post.content = form.querySelector('[name="content"]').value;
+      saveNewPosts(list);
+      flash('글을 수정했어요 (이 탭에서만 반영돼요)');
+      location.href = newPostUrl(post);
+      return;
+    }
+
+    // 게시글 수정·삭제: 이 탭에 저장해 두고 글·목록·마이페이지에 반영
+    var postEdit = path.match(/^\/community\/(\d+)\/edit$/);
+    if (postEdit) {
+      e.preventDefault();
+      var changes = loadPostChanges();
+      changes[postEdit[1]] = {
+        category: form.querySelector('[name="category"]').value,
+        title: form.querySelector('[name="title"]').value.trim(),
+        content: form.querySelector('[name="content"]').value
+      };
+      savePostChanges(changes);
+      flash('글을 수정했어요 (이 탭에서만 반영돼요)');
+      var back = form.querySelector('.btn-cancel');
+      location.href = back ? back.href : communityListUrl();
+      return;
+    }
+    var postDelete = path.match(/^\/community\/(\d+)\/delete$/);
+    if (postDelete) {
+      e.preventDefault();
+      e.stopPropagation(); // 폼의 확인 창 대신 아래에서 한 번만 물어봄
+      if (!window.confirm('게시글을 삭제할까요?')) return;
+      var all = loadPostChanges();
+      all[postDelete[1]] = { deleted: true };
+      savePostChanges(all);
+      flash('글을 삭제했어요 (이 탭에서만 반영돼요)');
+      location.href = communityListUrl();
+      return;
+    }
+
     // 설정: 서버 대신 화면에서 바로 결과를 보여줌 (목업이라 저장은 되지 않음)
     if (/^\/settings\//.test(path)) {
       e.preventDefault();
@@ -217,6 +285,214 @@
     }
   }
 
+  // ── 게시글 수정·삭제 결과 (이 탭을 닫으면 처음 상태로)
+  var POSTS_KEY = 'demoPostChanges';
+  var CATEGORY = { qna: ['질문', '💡 질문', 'Q&A'], tips: ['정보', '🔥 꿀팁', '팁'], study: ['스터디', '📚 스터디', '스터디'], free: ['자유', '☕ 자유', '자유'] };
+  function loadPostChanges() {
+    try { return JSON.parse(sessionStorage.getItem(POSTS_KEY)) || {}; } catch (err) { return {}; }
+  }
+  function savePostChanges(changes) {
+    try { sessionStorage.setItem(POSTS_KEY, JSON.stringify(changes)); } catch (err) { /* 저장소를 쓸 수 없으면 반영하지 않음 */ }
+  }
+  // 글 상세(…/community/16/) 또는 수정 화면(suffix 'edit/' → …/community/16/edit/)의 글 번호
+  function postIdOf(url, suffix) {
+    var path = new URL(url, location.href).pathname.replace(/index\.html$/, '');
+    var m = path.match(/\/community\/(\d+)\/(edit\/)?$/);
+    return m && (m[2] || '') === (suffix || '') ? m[1] : null;
+  }
+  function communityListUrl() {
+    var link = document.querySelector('nav .nav-links a[href*="community"]');
+    return link ? link.href : location.href;
+  }
+  function setText(rootEl, selector, text) {
+    var el = rootEl.querySelector(selector);
+    if (el) el.textContent = text;
+  }
+  function setCategory(el, base, key, labelIndex) {
+    if (!el || !CATEGORY[key]) return;
+    el.className = base + ' ' + key;
+    el.textContent = CATEGORY[key][labelIndex];
+  }
+
+  function applyPostChanges() {
+    var changes = loadPostChanges();
+    if (!Object.keys(changes).length) return;
+
+    var detailId = !demoPostId && postIdOf(location.href); // 새 글 화면은 applyNewPost가 채움
+    var detail = detailId && changes[detailId];
+    if (detail && detail.deleted) { location.replace(communityListUrl()); return; }
+    if (detail) {
+      document.title = detail.title + ' - CodeEdu';
+      setText(document, '.detail-header h2', detail.title);
+      setText(document, '.detail-content', detail.content);
+      setCategory(document.querySelector('.detail-header .post-category'), 'post-category', detail.category, 1);
+    }
+
+    var editId = !demoPostId && postIdOf(location.href, 'edit/');
+    var edit = editId && changes[editId];
+    if (edit && !edit.deleted) {
+      document.getElementById('category').value = edit.category;
+      document.getElementById('title').value = edit.title;
+      document.getElementById('content').value = edit.content;
+    }
+
+    document.querySelectorAll('a.community-post-row, a.post-item').forEach(function (row) {
+      if (/[?&]demoPost=/.test(row.href)) return; // 새 글은 데모 계정 글 주소를 빌려 쓰므로 제외
+      var change = changes[postIdOf(row.href)];
+      if (!change) return;
+      if (change.deleted) { row.remove(); return; }
+      if (row.classList.contains('post-item')) {
+        setText(row, '.post-item-title', change.title);
+        setCategory(row.querySelector('.post-category-tag'), 'post-category-tag', change.category, 2);
+      } else {
+        setText(row, '.community-post-title', change.title);
+        setText(row, '.community-post-preview', change.content.split('\n')[0]);
+        setCategory(row.querySelector('.community-category'), 'community-category', change.category, 0);
+      }
+    });
+  }
+
+  // ── 새 글 (이 탭을 닫으면 처음 상태로). 상세·수정 화면은 데모 계정 글 화면에 ?demoPost=를 붙여 빌려 씀
+  var NEW_POSTS_KEY = 'demoNewPosts';
+  var demoPostId = new URLSearchParams(location.search).get('demoPost');
+  function loadNewPosts() {
+    try { return JSON.parse(sessionStorage.getItem(NEW_POSTS_KEY)) || []; } catch (err) { return []; }
+  }
+  function saveNewPosts(posts) {
+    try { sessionStorage.setItem(NEW_POSTS_KEY, JSON.stringify(posts)); } catch (err) { /* 저장소를 쓸 수 없으면 반영하지 않음 */ }
+  }
+  function newPostUrl(post, edit) {
+    var own = document.querySelector('meta[name="demo-own-post"]');
+    if (!own) return communityListUrl();
+    var url = new URL(edit ? 'edit/index.html' : 'index.html', new URL(own.content, location.href));
+    url.search = '?demoPost=' + encodeURIComponent(post.id);
+    return url.href;
+  }
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function formatDate(ms, pattern) {
+    var d = new Date(ms);
+    return pattern.replace('yyyy', d.getFullYear()).replace('MM', pad(d.getMonth() + 1)).replace('dd', pad(d.getDate()))
+      .replace('HH', pad(d.getHours())).replace('mm', pad(d.getMinutes()));
+  }
+  function myNickname() {
+    var el = document.querySelector('.nav-user-name');
+    return el ? el.textContent.trim() : '데모학습자';
+  }
+
+  // 새 글 상세·수정 화면: 빌려 쓴 데모 계정 글의 내용·반응·댓글을 새 글 기준으로 바꿈
+  function applyNewPost() {
+    if (!demoPostId) return;
+    var post = loadNewPosts().filter(function (p) { return p.id === demoPostId; })[0];
+    if (!post) { location.replace(communityListUrl()); return; }
+
+    if (postIdOf(location.href)) {
+      document.title = post.title + ' - CodeEdu';
+      setText(document, '.detail-header h2', post.title);
+      setText(document, '.detail-content', post.content);
+      setCategory(document.querySelector('.detail-header .post-category'), 'post-category', post.category, 1);
+      setText(document, '.meta-date', formatDate(post.createdAt, 'yyyy-MM-dd HH:mm'));
+      setText(document, '.meta-right span', '👁️ 1');
+      ['likeCount', 'disappointedCount'].forEach(function (id) { var el = document.getElementById(id); if (el) el.textContent = '0'; });
+      document.querySelectorAll('.reaction-btn').forEach(function (btn) {
+        btn.classList.remove('active');
+        setText(btn, '.reaction-icon', btn.classList.contains('like') ? '🤍' : '💭');
+      });
+      var comments = document.querySelector('.comment-list');
+      if (comments) {
+        comments.innerHTML = '';
+        var empty = document.createElement('div');
+        empty.setAttribute('style', 'font-size: .95rem; color: var(--ink-3); text-align: center; padding: 40px 0;');
+        empty.textContent = '아직 작성된 댓글이 없습니다. 첫 번째 댓글을 남겨보세요! ✨';
+        comments.appendChild(empty);
+      }
+      setText(document, '.comments-section h3 span', '0');
+      var editLink = document.querySelector('.btn-edit');
+      if (editLink) editLink.href = newPostUrl(post, true);
+    }
+    if (postIdOf(location.href, 'edit/')) {
+      document.getElementById('category').value = post.category;
+      document.getElementById('title').value = post.title;
+      document.getElementById('content').value = post.content;
+      var cancel = document.querySelector('.btn-cancel');
+      if (cancel) cancel.href = newPostUrl(post);
+      document.querySelectorAll('main a[data-appbar-back], .appbar-back').forEach(function (a) { a.href = newPostUrl(post); });
+    }
+  }
+
+  // 커뮤니티 목록 첫 페이지(전체 또는 같은 카테고리)와 마이페이지 '내 게시글' 맨 위에 새 글 추가
+  function addNewPostsToLists() {
+    var posts = loadNewPosts();
+    if (!posts.length) return;
+
+    var listPage = location.pathname.replace(/index\.html$/, '').match(/\/community\/(?:(free|qna|study|tips)\/)?$/);
+    var sampleRow = document.querySelector('a.community-post-row');
+    if (listPage && sampleRow) {
+      posts.slice().reverse().forEach(function (post) {
+        if (listPage[1] && listPage[1] !== post.category) return;
+        var row = sampleRow.cloneNode(true);
+        row.href = newPostUrl(post);
+        setCategory(row.querySelector('.community-category'), 'community-category', post.category, 0);
+        setText(row, '.community-post-title', post.title);
+        setText(row, '.community-post-preview', post.content.split('\n')[0]);
+        var meta = row.querySelectorAll('.community-post-mobile-meta span');
+        [myNickname(), '좋아요 0', '댓글 0', '조회 1'].forEach(function (text, i) { if (meta[i]) meta[i].textContent = text; });
+        setText(row, '.community-post-author', myNickname());
+        row.querySelectorAll('.community-post-stat').forEach(function (el) { el.textContent = '0'; });
+        setText(row, '.community-post-date', formatDate(post.createdAt, 'MM-dd HH:mm'));
+        sampleRow.parentNode.insertBefore(row, sampleRow.parentNode.querySelector('a.community-post-row'));
+      });
+    }
+
+    var sampleItem = document.querySelector('a.post-item[href*="/community/"]');
+    if (sampleItem) {
+      posts.slice().reverse().forEach(function (post) {
+        var item = sampleItem.cloneNode(true);
+        item.href = newPostUrl(post);
+        setCategory(item.querySelector('.post-category-tag'), 'post-category-tag', post.category, 2);
+        setText(item, '.post-item-title', post.title);
+        setText(item, '.post-item-meta', formatDate(post.createdAt, 'MM.dd') + ' · 👁 1');
+        sampleItem.parentNode.insertBefore(item, sampleItem.parentNode.firstChild);
+      });
+    }
+  }
+
+  // 마이페이지: 새 글·삭제를 반영해 '작성 글' 숫자와 '총 N개'를 맞춤
+  function adjustMyPostCount(before) {
+    var delta = document.querySelectorAll('a.post-item[href*="/community/"]').length - before;
+    if (!delta) return;
+    var stat = Array.prototype.filter.call(document.querySelectorAll('.stat-box'), function (box) {
+      return /작성 글/.test(box.textContent);
+    })[0];
+    var num = stat && stat.querySelector('.num');
+    if (num) {
+      var base = +(num.getAttribute('data-count-to') || num.textContent) || 0;
+      var next = String(Math.max(0, base + delta));
+      if (num.hasAttribute('data-count-to')) num.setAttribute('data-count-to', next); // 숫자 올라가는 효과가 이 값까지
+      num.textContent = num.hasAttribute('data-count-to') ? '0' : next;
+    }
+    Array.prototype.forEach.call(document.querySelectorAll('.block-title span'), function (span) {
+      var m = span.textContent.match(/^총 (\d+)개$/);
+      if (m && /내 게시글/.test(span.parentNode.textContent)) span.textContent = '총 ' + Math.max(0, +m[1] + delta) + '개';
+    });
+  }
+
+  // 다음 화면에서 잠깐 보여줄 안내 (수정·삭제 후 이동한 화면)
+  function flash(text) {
+    try { sessionStorage.setItem('demoFlash', text); } catch (err) { /* 무시 */ }
+  }
+  function showFlash() {
+    var text;
+    try { text = sessionStorage.getItem('demoFlash'); sessionStorage.removeItem('demoFlash'); } catch (err) { return; }
+    if (!text) return;
+    var toast = document.createElement('div');
+    toast.className = 'demo-toast';
+    toast.setAttribute('role', 'status');
+    toast.textContent = text;
+    document.body.appendChild(toast);
+    setTimeout(function () { toast.classList.add('is-out'); }, 2600);
+    setTimeout(function () { toast.remove(); }, 3000);
+  }
+
   // ── 알림: 서버처럼 알림 화면을 한 번 열면 다른 화면의 안 읽은 개수 배지를 지움 (이 탭을 닫으면 처음 상태로)
   try {
     if (/\/notifications\/(index\.html)?$/.test(location.pathname)) {
@@ -230,6 +506,12 @@
   } catch (err) { /* 저장소를 쓸 수 없으면 배지를 그대로 둠 */ }
 
   document.addEventListener('submit', onDemoSubmit, true);
+  var myPostsBefore = document.querySelectorAll('a.post-item[href*="/community/"]').length;
+  applyNewPost();
+  addNewPostsToLists();
+  applyPostChanges();
+  adjustMyPostCount(myPostsBefore);
+  showFlash();
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', filterCommunity);
   else filterCommunity();
 })();

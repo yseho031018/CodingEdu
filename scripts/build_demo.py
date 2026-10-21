@@ -50,6 +50,7 @@ DEMO_POST = {'category': 'qna', 'title': 'CSS 박스 모델에서 margin과 padd
              'content': 'WEB2 CSS 8강 박스 모델을 듣고 있는데, margin과 padding을 언제 써야 할지 헷갈립니다.\n'
                         '배경색이 들어가는 영역 기준으로 구분하면 될까요?'}
 DEMO_COMMENT = '로드맵 순서대로 HTML 다음 CSS를 듣고 있어요. 저도 같은 부분에서 막혔는데 도움이 됐습니다!'
+DEMO_OWN_POST = None  # 데모 계정이 쓴 글 번호 (prepare_demo_account에서 정함)
 # 데모 계정 글에 댓글을 달아 알림을 만들어 줄 다른 학습자들
 HELPERS = [
     ({'username': 'code_friend', 'nickname': '코딩친구', 'email': 'friend@example.com'},
@@ -156,6 +157,12 @@ def prepare_demo_account():
         post_form(op, '/community/%s/comment' % first_post[-1], {'content': DEMO_COMMENT}, csrf_from(detail))
         # 다른 학습자들이 데모 계정 글(가장 최근 글)에 댓글 → 데모 계정에 댓글 알림이 생김
         my_post = str(max(int(pid) for pid in first_post))
+        global DEMO_OWN_POST
+        DEMO_OWN_POST = my_post
+        # 데모 계정 글의 수정 화면도 캡처 (알림 화면은 계속 마지막)
+        notifications = ME_ONLY.pop('/notifications')
+        ME_ONLY['/community/%s/edit' % my_post] = 'community/%s/edit/index.html' % my_post
+        ME_ONLY['/notifications'] = notifications
         for helper, comment in HELPERS:
             hop = session()
             account = dict(helper, password=secrets.token_urlsafe(12))
@@ -264,6 +271,10 @@ def convert(html, area, here):
     html = re.sub(r'<input type="hidden" name="_csrf"[^>]*>', '', html)
     html = html.replace('</head>', '<link rel="stylesheet" href="%sdemo.css">\n</head>' % prefix, 1)
     html = html.replace('</body>', '<script src="%sdemo.js"></script>\n</body>' % prefix, 1)
+    if area == 'me/' and DEMO_OWN_POST:
+        # 목업에서 새로 쓴 글의 상세·수정 화면은 데모 계정 글 화면을 빌려 씀 (demo.js)
+        html = html.replace('</head>', '<meta name="demo-own-post" content="%sme/community/%s/index.html">\n</head>'
+                            % (prefix, DEMO_OWN_POST), 1)
     # 새로고침 시 404가 나지 않도록 주소 변경 제거
     html = html.replace("history.replaceState(null, '', '/learn/' + lang);", '')
     if area == 'me/':
@@ -333,12 +344,25 @@ def main():
     for folder in ('css', 'js', 'images'):
         shutil.copytree(os.path.join(STATIC, folder), os.path.join(OUT, folder))
     with open(os.path.join(OUT, 'demo.css'), 'w', encoding='utf-8') as f:
-        f.write('/* 목업 전용 스타일 (AI 도우미는 demo.js의 데모 답변으로 동작하므로 숨기지 않음) */\n')
+        f.write(DEMO_CSS)
     with open(os.path.join(OUT, 'notice.html'), 'w', encoding='utf-8') as f:
         f.write(NOTICE)
     shutil.copy(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'demo.js'), os.path.join(OUT, 'demo.js'))
     print('done', OUT)
 
+
+DEMO_CSS = '''/* 목업 전용 스타일 (AI 도우미는 demo.js의 데모 답변으로 동작하므로 숨기지 않음) */
+/* 글 수정·삭제처럼 서버 대신 처리한 뒤 다음 화면에서 잠깐 보여주는 안내 */
+.demo-toast {
+  position: fixed; left: 50%; bottom: 32px; z-index: 2000; transform: translateX(-50%);
+  width: max-content; max-width: calc(100% - 32px); padding: 12px 16px; border-radius: 12px;
+  background: rgba(15, 23, 42, .92); color: #fff; font-size: .88rem; font-weight: 600; line-height: 1.45; text-align: center;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, .25); animation: demo-toast-in .25s ease; transition: opacity .3s ease;
+}
+.demo-toast.is-out { opacity: 0; }
+@keyframes demo-toast-in { from { opacity: 0; transform: translate(-50%, 8px); } }
+@media (max-width: 640px) { .demo-toast { bottom: calc(80px + env(safe-area-inset-bottom)); } } /* 하단 탭바 위 */
+'''
 
 NOTICE = '''<!DOCTYPE html>
 <html lang="ko">

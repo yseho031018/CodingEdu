@@ -1,1 +1,11 @@
 /* 목업 전용 스타일 (AI 도우미는 demo.js의 데모 답변으로 동작하므로 숨기지 않음) */
+/* 글 수정·삭제처럼 서버 대신 처리한 뒤 다음 화면에서 잠깐 보여주는 안내 */
+.demo-toast {
+  position: fixed; left: 50%; bottom: 32px; z-index: 2000; transform: translateX(-50%);
+  width: max-content; max-width: calc(100% - 32px); padding: 12px 16px; border-radius: 12px;
+  background: rgba(15, 23, 42, .92); color: #fff; font-size: .88rem; font-weight: 600; line-height: 1.45; text-align: center;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, .25); animation: demo-toast-in .25s ease; transition: opacity .3s ease;
+}
+.demo-toast.is-out { opacity: 0; }
+@keyframes demo-toast-in { from { opacity: 0; transform: translate(-50%, 8px); } }
+@media (max-width: 640px) { .demo-toast { bottom: calc(80px + env(safe-area-inset-bottom)); } } /* 하단 탭바 위 */

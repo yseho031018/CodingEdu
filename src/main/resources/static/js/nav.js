@@ -1,3 +1,15 @@
+// 모바일 페이지 전환 방향: 더 깊은 화면(상세)으로 가면 forward, 얕은 화면으로 가면 back
+// (View Transitions를 지원하는 브라우저에서만 동작. 전환 효과 자체는 mobile.css)
+window.addEventListener('pagereveal', function (e) {
+  if (!e.viewTransition || !window.navigation || !navigation.activation || !navigation.activation.from) return;
+  function depth(url) {
+    return new URL(url).pathname.replace(/index\.html$/, '').split('/').filter(Boolean).length;
+  }
+  var from = depth(navigation.activation.from.url);
+  var to = depth(navigation.activation.entry.url);
+  e.viewTransition.types.add(to > from ? 'forward' : to < from ? 'back' : 'fade');
+});
+
 // 스크롤 리빌 애니메이션 (전체 페이지 공통)
 (function () {
   var els = document.querySelectorAll('.reveal');
@@ -162,23 +174,49 @@
   // 상단바의 폼은 로그아웃 폼 하나뿐 (정적 목업에서는 action 주소가 바뀌므로 위치로 찾음)
   var logoutForm = document.querySelector('nav .nav-right form');
   if (logoutForm) items += '<button type="button" data-logout>로그아웃</button>';
-  sheet.innerHTML = '<div class="mobile-sheet-panel"><div class="mobile-sheet-head"><strong>더보기</strong>'
+  sheet.innerHTML = '<div class="mobile-sheet-panel"><span class="mobile-sheet-handle" aria-hidden="true"></span>'
+    + '<div class="mobile-sheet-head"><strong>더보기</strong>'
     + '<button type="button" class="mobile-sheet-close" aria-label="닫기">✕</button></div>'
     + '<div class="mobile-sheet-list">' + items + '</div></div>';
+  var panel = sheet.querySelector('.mobile-sheet-panel');
 
   function openSheet() {
     sheet.hidden = false;
-    requestAnimationFrame(function () { sheet.classList.add('open'); });
+    panel.style.transform = '';
+    void sheet.offsetWidth; // 닫힌 상태를 먼저 그린 뒤 열림 전환이 일어나도록 (프레임 대기 없이)
+    sheet.classList.add('open');
     moreBtn.setAttribute('aria-expanded', 'true');
     var first = sheet.querySelector('.mobile-sheet-list a, .mobile-sheet-list button');
-    if (first) first.focus();
+    if (first) first.focus({ preventScroll: true });
   }
   function closeSheet() {
     sheet.classList.remove('open');
+    panel.style.transform = '';
     moreBtn.setAttribute('aria-expanded', 'false');
-    setTimeout(function () { sheet.hidden = true; }, 200);
-    moreBtn.focus();
+    setTimeout(function () { sheet.hidden = true; }, 260);
+    moreBtn.focus({ preventScroll: true });
   }
+
+  // 시트를 아래로 쓸어내리면 닫힘 (손가락을 따라 내려가고, 80px 이상이면 닫기)
+  var dragStart = null;
+  panel.addEventListener('touchstart', function (e) {
+    if (panel.scrollTop > 0) return;
+    dragStart = e.touches[0].clientY;
+    panel.style.transition = 'none';
+  }, { passive: true });
+  panel.addEventListener('touchmove', function (e) {
+    if (dragStart === null) return;
+    var dy = e.touches[0].clientY - dragStart;
+    if (dy > 0) panel.style.transform = 'translateY(' + dy + 'px)';
+  }, { passive: true });
+  panel.addEventListener('touchend', function (e) {
+    if (dragStart === null) return;
+    var dy = e.changedTouches[0].clientY - dragStart;
+    dragStart = null;
+    panel.style.transition = '';
+    if (dy > 80) closeSheet();
+    else panel.style.transform = '';
+  });
   moreBtn.addEventListener('click', function () { sheet.hidden ? openSheet() : closeSheet(); });
   sheet.addEventListener('click', function (e) {
     if (e.target === sheet || e.target.closest('.mobile-sheet-close')) closeSheet();
@@ -191,6 +229,80 @@
   document.body.appendChild(sheet);
   document.body.appendChild(bar);
   document.body.classList.add('has-mobile-tabbar');
+})();
+
+// 모바일 모션: 앱 바 그림자, 스크롤하면 나타나는 섹션, 이미지 페이드인, 숫자 카운트업
+// 화면에서 보이는 효과는 mobile.css. "동작 줄이기" 설정이면 아무것도 하지 않음
+(function () {
+  var mobile = window.matchMedia('(max-width: 640px)');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (!mobile.matches || reduce.matches) return;
+  var html = document.documentElement;
+
+  // 1) 스크롤하면 앱 바에 옅은 그림자
+  var ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () {
+      document.body.classList.toggle('is-scrolled', window.scrollY > 4);
+      ticking = false;
+    });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  if (!('IntersectionObserver' in window)) return;
+
+  // 2) 첫 화면 아래에 있는 섹션은 스크롤해서 보일 때 부드럽게 등장
+  var revealSelector = '.recommended-section, .home-metrics, .rm-path, .course-progress-panel, .quiz-aside, '
+    + '.routine-grid, .upcoming-list, .community-sidebar, .comments-section, .mission-timeline';
+  var revealIo = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('m-in');
+      revealIo.unobserve(entry.target);
+    });
+  }, { rootMargin: '0px 0px -8% 0px' });
+  document.querySelectorAll(revealSelector).forEach(function (el) {
+    if (el.getBoundingClientRect().top > window.innerHeight) {
+      el.classList.add('m-reveal');
+      revealIo.observe(el);
+    }
+  });
+
+  // 3) 썸네일은 다 불러온 뒤 서서히 표시
+  document.querySelectorAll('.course-thumbnail img, .course-cover img').forEach(function (img) {
+    if (img.complete && img.naturalWidth) return;
+    img.classList.add('m-img');
+    var done = function () { img.classList.add('is-loaded'); };
+    img.addEventListener('load', done, { once: true });
+    img.addEventListener('error', done, { once: true });
+  });
+
+  // 4) 통계 숫자는 화면에 보일 때 0부터 올라감
+  var countIo = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      countIo.unobserve(entry.target);
+      var el = entry.target;
+      var target = parseInt(el.getAttribute('data-count-to'), 10);
+      var start = performance.now();
+      (function step(now) {
+        var t = Math.min(1, (now - start) / 700);
+        el.textContent = Math.round(target * (1 - Math.pow(1 - t, 3)));
+        if (t < 1) requestAnimationFrame(step);
+      })(start);
+    });
+  }, { threshold: .4 });
+  document.querySelectorAll('.quiz-stat-value > span, .spotlight-metrics b, .stat-box .num').forEach(function (el) {
+    var text = el.textContent.trim();
+    if (!/^\d+$/.test(text) || text === '0') return;
+    el.setAttribute('data-count-to', text);
+    el.textContent = '0';
+    countIo.observe(el);
+  });
+  html.classList.add('m-motion');
 })();
 
 // 다크모드 토글

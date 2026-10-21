@@ -54,18 +54,23 @@ window.addEventListener('pagereveal', function (e) {
   var active = links.querySelector('a.active');
   if (active && active.getAttribute('data-tab') === 'home') return;
   var isDetail = !!active && clean(location.pathname) !== clean(active.pathname);
+  // 상세 화면은 목록으로, 탭 첫 화면(강의·퀴즈 등)은 홈으로 돌아가는 화살표
+  var backTo = isDetail ? active : nav.querySelector('.logo');
 
   var bar = document.createElement('div');
   bar.className = 'appbar-title';
-  if (isDetail) {
+  if (backTo) {
     var back = document.createElement('a');
     back.className = 'appbar-back';
-    back.href = active.getAttribute('href');
-    back.setAttribute('aria-label', active.textContent.trim() + ' 목록으로');
+    back.href = backTo.getAttribute('href');
+    back.setAttribute('aria-label', isDetail ? active.textContent.trim() + ' 목록으로' : '홈으로');
     back.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     // 같은 사이트에서 왔다면 브라우저 뒤로가기(스크롤 위치 유지), 아니면 목록으로
+    // 탭 첫 화면은 홈에서 바로 왔을 때만 뒤로가기 (다른 탭에서 왔으면 홈으로 이동)
     back.addEventListener('click', function (e) {
-      if (history.length > 1 && document.referrer.indexOf(location.origin) === 0) {
+      var ref = document.referrer;
+      if (history.length > 1 && ref.indexOf(location.origin) === 0 &&
+          (isDetail || clean(new URL(ref).pathname) === clean(back.pathname))) {
         e.preventDefault();
         history.back();
       }
